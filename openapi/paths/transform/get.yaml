@@ -1,0 +1,19 @@
+get:
+  description: Get a table structure by id
+  summary: Get Table Structure
+  operationId: getTableStructure
+  parameters:
+    - name: tableStructureId
+      in: query
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: "Table structure found."
+      content:
+        application/json:
+          schema:
+            $ref: '../../schemas/tableStructure.yaml'
+    '404':
+      description: "Table structure not found."

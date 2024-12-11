@@ -1,0 +1,25 @@
+post:
+  description: Create a new user with the given email, name and password.
+  summary: Create a new user
+  operationId: createUser
+  parameters:
+    - name: email
+      in: query
+      required: true
+      schema:
+        type: string
+    - name: name
+      in: query
+      required: true
+      schema:
+        type: string
+    - name: password
+      in: query
+      required: true
+      schema:
+        type: string
+  responses:
+    '200':
+      description: "User created."
+    '400':
+      description: "User already exists."
