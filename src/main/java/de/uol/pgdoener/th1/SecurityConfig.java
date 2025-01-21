@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.config;
+package de.uol.pgdoener.th1;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,11 +20,11 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
-                .authorizeHttpRequests(auth -> auth.requestMatchers("/v3/api-docs/**",
+                /*.authorizeHttpRequests(auth -> auth.requestMatchers("/v3/api-docs/**",
                                 "/swagger-ui/**", "/swagger-ui.html")
                         .permitAll()
                         .anyRequest()
-                        .authenticated())
+                        .authenticated())*/
                 .httpBasic(Customizer.withDefaults());
         return http.build();
     }
