@@ -1,5 +1,5 @@
 # Phase 1: Build
-FROM openjdk:21-oracle
+FROM openjdk:21-oracle AS build
 
 # Create and copy app files
 RUN mkdir /app
@@ -18,7 +18,7 @@ RUN ./mvnw clean package -DskipTests
 FROM openjdk:21-oracle
 
 # Copy the JAR fromRequest the build stage
-COPY --from=build /app/target/backend-0.0.1-SNAPSHOT.jar app.jar
+COPY --from=build /app/target/TH1-0.0.1-SNAPSHOT.jar app.jar
 
 # Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
