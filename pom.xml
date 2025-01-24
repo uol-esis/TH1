@@ -235,4 +235,13 @@
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>docker</id>
+            <build>
+                <finalName>th1</finalName>
+            </build>
+        </profile>
+    </profiles>
+
 </project>
