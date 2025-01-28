@@ -1,0 +1,8 @@
+type: object
+required:
+  - username
+properties:
+  email:
+    type: string
+  username:
+    type: string
