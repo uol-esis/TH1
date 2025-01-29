@@ -2,6 +2,10 @@ name: Test Project
 
 on:
   push:
+    paths:
+      - src/**
+      - pom.xml
+      - openapi/**
   workflow_call:
 
 jobs:
