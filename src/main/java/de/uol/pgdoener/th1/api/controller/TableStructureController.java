@@ -17,10 +17,10 @@ public class TableStructureController implements TableStructuresApiDelegate {
     private final TableStructureService tableStructureService;
 
     @Override
-    public ResponseEntity<String> createTableStructure(TableStructureDto request) {
+    public ResponseEntity<Void> createTableStructure(TableStructureDto request) {
         tableStructureService.create(request);
 
-        return ResponseEntity.ok("TableStructure created");
+        return ResponseEntity.ok().build();
     }
 
     @Override
