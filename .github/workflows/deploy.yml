@@ -1,7 +1,7 @@
 name: Deploy to dev
 
 on:
-  pull_request:
+  push:
     branches:
       - main
 
@@ -13,8 +13,8 @@ jobs:
       - name: Execute deploy script on dev server
         uses: appleboy/ssh-action@v1.2.0
         with:
-        host: ${{ secrets.DEPLOY_HOST }}
-        username: ${{ secrets.DEPLOY_USERNAME }}
-        key: ${{ secrets.DEPLOY_KEY }}
-        port: ${{ secrets.DEPLOY_PORT }}
-        script: deploy
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USERNAME }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ secrets.DEPLOY_PORT }}
+          script: deploy
