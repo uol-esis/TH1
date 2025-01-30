@@ -170,28 +170,29 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.8.0</version>
+                <version>7.10.0</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/openapi/openapi.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>de.uol.pgdoener.th1.api</apiPackage>
-                            <modelPackage>de.uol.pgdoener.th1.model</modelPackage>
+                            <modelPackage>de.uol.pgdoener.th1.business.dto</modelPackage>
                             <generateModelTests>false</generateModelTests>
                             <generateApiTests>false</generateApiTests>
                             <addTestCompileSourceRoot>false</addTestCompileSourceRoot>
                             <supportingFilesToGenerate>
-                                HomeController.java,SpringDocConfiguration.java,RFC3339DateFormat.java,ApiUtil.java
+                                SpringDocConfiguration.java,ApiUtil.java,application.properties
                             </supportingFilesToGenerate>
-                            <modelNameSuffix>DTO</modelNameSuffix>
+                            <modelNameSuffix>Dto</modelNameSuffix>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <delegatePattern>true</delegatePattern>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <useOptional>true</useOptional>
                             </configOptions>
                         </configuration>
                     </execution>

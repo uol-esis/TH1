@@ -3,7 +3,6 @@ package de.uol.pgdoener.th1.business.service;
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
-import de.uol.pgdoener.th1.business.dto.TableStructuresDto;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -29,7 +28,7 @@ public class TableStructureService {
     private final PlatformTransactionManager transactionManager;
 
     public void create(TableStructureDto tableStructureDto) {
-        List<StructureDto> structureDtoList = tableStructureDto.structure();
+        List<StructureDto> structureDtoList = tableStructureDto.getStructures();
         TableStructure tableStructure = TableStructureMapper.toEntity(tableStructureDto);
 
         new TransactionTemplate(transactionManager).execute(
@@ -51,14 +50,14 @@ public class TableStructureService {
     }
 
     /// TODO: Möglicherweise weniger zurück geben. Jetzt werden alle Informationen zurück gegeben.
-    public TableStructuresDto getAll() {
+    public List<TableStructureSummaryDto> getAll() {
         Iterable<TableStructure> tableStructures = tableStructureRepository.findAll();
 
-        TableStructuresDto tableStructuresDto = new TableStructuresDto(new ArrayList<>());
+        List<TableStructureSummaryDto> tableStructuresDto = new ArrayList<>();
         tableStructures.forEach(tableStructure -> {
             List<Structure> structureList = structureRepository.findByTableStructureId(tableStructure.getId());
             TableStructureSummaryDto tableStructureSummaryDto = TableStructureMapper.toSummaryDto(tableStructure, structureList);
-            tableStructuresDto.tableStructures().add(tableStructureSummaryDto);
+            tableStructuresDto.add(tableStructureSummaryDto);
         });
 
         return tableStructuresDto;

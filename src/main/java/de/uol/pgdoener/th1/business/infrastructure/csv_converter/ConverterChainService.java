@@ -5,6 +5,8 @@ import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.ConverterChain;
 import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.ConverterFactory;
+import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.IStructure;
+import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -20,8 +22,9 @@ public class ConverterChainService {
         this.tableStructure = tableStructure;
         this.converterChain = new ConverterChain();
 
-        for (StructureDto structure : this.tableStructure.structure()) {
-            Converter converter = ConverterFactory.createValidator(structure);
+        for (StructureDto structureDto : this.tableStructure.getStructures()) {
+            IStructure structure = StructureMapper.toConverterStructure(structureDto);
+            Converter converter = ConverterFactory.createConverter(structure);
             this.converterChain.add(converter);
         }
     }
@@ -45,10 +48,10 @@ public class ConverterChainService {
             List<String[]> rows = new ArrayList<>();
             String line;
             while ((line = reader.readLine()) != null) {
-                rows.add(line.split(String.valueOf(tableStructure.delimiter()), -1));
+                rows.add(line.split(String.valueOf(tableStructure.getDelimiter()), -1));
             }
-            int endRow = tableStructure.endRow();
-            int endCol = tableStructure.endColumn();
+            int endRow = tableStructure.getEndRow();
+            int endCol = tableStructure.getEndColumn();
             String[][] matrix = new String[endRow][endCol];
             for (int i = 0; i < endRow; i++) {
                 String[] row = rows.get(i);
@@ -73,7 +76,7 @@ public class ConverterChainService {
         File newFile = new File(fileName);
         try (BufferedWriter writer = Files.newBufferedWriter(newFile.toPath())) {
             for (String[] row : matrix) {
-                writer.write(String.join(String.valueOf(tableStructure.delimiter()), row));
+                writer.write(String.join(String.valueOf(tableStructure.getDelimiter()), row));
                 writer.newLine();
             }
         } catch (IOException e) {

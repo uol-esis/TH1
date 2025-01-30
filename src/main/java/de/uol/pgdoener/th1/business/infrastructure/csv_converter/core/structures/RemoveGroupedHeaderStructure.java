@@ -7,4 +7,5 @@ public record RemoveGroupedHeaderStructure(
         int endRow,
         int startColumn,
         int endColumn
-){}
+) implements IStructure {
+}
