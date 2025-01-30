@@ -6,6 +6,7 @@ on:
       - src/**
       - pom.xml
       - openapi/**
+      - .github/workflows/test.yml
   workflow_call:
 
 jobs:
