@@ -88,16 +88,16 @@ components:
           items:
             type: integer
             minimum: 1
-        startR:
+        startRow:
           type: integer
           minimum: 1
-        startC:
+        startColumn:
           type: integer
           minimum: 1
-        endR:
+        endRow:
           type: integer
           minimum: 1
-        endC:
+        endColumn:
           type: integer
           minimum: 1
 

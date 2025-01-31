@@ -18,10 +18,10 @@ public abstract class StructureMapper {
                 .converterType(ConverterTypeMapper.toDto(entity.getConverterType()))
                 .columnIndex(List.of(entity.getColumns()))
                 .rowIndex(List.of(entity.getRows()))
-                .startR(entity.getStartRow())
-                .endR(entity.getEndRow())
-                .startC(entity.getStartColumn())
-                .endC(entity.getEndColumn());
+                .startRow(entity.getStartRow())
+                .endRow(entity.getEndRow())
+                .startColumn(entity.getStartColumn())
+                .endColumn(entity.getEndColumn());
     }
 
     public static Structure toEntity(StructureDto dto, int position, Long tableStructureId) {
@@ -30,10 +30,10 @@ public abstract class StructureMapper {
                 ConverterTypeMapper.toEntity(dto.getConverterType()),
                 dto.getColumnIndex().toArray(new Integer[0]),
                 dto.getRowIndex().toArray(new Integer[0]),
-                dto.getStartR().orElse(null),
-                dto.getEndR().orElse(null),
-                dto.getStartC().orElse(null),
-                dto.getEndC().orElse(null),
+                dto.getStartRow().orElse(null),
+                dto.getEndRow().orElse(null),
+                dto.getStartColumn().orElse(null),
+                dto.getEndColumn().orElse(null),
                 position,
                 tableStructureId
         );
@@ -58,10 +58,10 @@ public abstract class StructureMapper {
                 yield new RemoveGroupedHeaderStructure(
                         structureDto.getColumnIndex().toArray(new Integer[0]),
                         structureDto.getRowIndex().toArray(new Integer[0]),
-                        structureDto.getStartR().orElseThrow(() -> new IllegalArgumentException("Start row missing")),
-                        structureDto.getEndR().orElseThrow(() -> new IllegalArgumentException("End row missing")),
-                        structureDto.getStartC().orElseThrow(() -> new IllegalArgumentException("Start column missing")),
-                        structureDto.getEndC().orElseThrow(() -> new IllegalArgumentException("End column missing"))
+                        structureDto.getStartRow().orElseThrow(() -> new IllegalArgumentException("Start row missing")),
+                        structureDto.getEndRow().orElseThrow(() -> new IllegalArgumentException("End row missing")),
+                        structureDto.getStartColumn().orElseThrow(() -> new IllegalArgumentException("Start column missing")),
+                        structureDto.getEndColumn().orElseThrow(() -> new IllegalArgumentException("End column missing"))
                 );
             case FILL_EMPTY_CELLS:
                 if (structureDto.getRowIndex().isEmpty()) {
