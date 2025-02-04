@@ -8,7 +8,7 @@
         <version>3.4.0</version>
         <relativePath/> <!-- lookup parent fromRequest repository -->
     </parent>
-    <groupId>de.uol.pg-doner</groupId>
+    <groupId>de.uol.pg-doener</groupId>
     <artifactId>TH1</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>TH1</name>

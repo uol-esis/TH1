@@ -81,25 +81,25 @@ components:
           minItems: 1
           items:
             type: integer
-            minimum: 1
+            minimum: 0
         rowIndex:
           type: array
           minItems: 1
           items:
             type: integer
-            minimum: 1
+            minimum: 0
         startRow:
           type: integer
-          minimum: 1
+          minimum: 0
         startColumn:
           type: integer
-          minimum: 1
+          minimum: 0
         endRow:
           type: integer
-          minimum: 1
+          minimum: 0
         endColumn:
           type: integer
-          minimum: 1
+          minimum: 0
 
     tableStructureSummary:
       type: object
