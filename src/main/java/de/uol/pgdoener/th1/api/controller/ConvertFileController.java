@@ -45,7 +45,7 @@ public class ConvertFileController implements ConverterApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Resource> fullConvertTable(MultipartFile file, TableStructureDto request) {
+    public ResponseEntity<Resource> fileConvertTable(MultipartFile file, TableStructureDto request) {
         List<String> convertedLines = convertFileService.convertTest(request, file);
 
         // Return the full converted file as a download

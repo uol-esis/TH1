@@ -255,10 +255,10 @@ paths:
           description: Bad request
         '401':
           description: Unauthorized
-  /converter/full:
+  /converter/file:
     post:
-      summary: Convert a table and return the full result
-      operationId: fullConvertTable
+      summary: Convert a table and return the result as a file
+      operationId: fileConvertTable
       requestBody:
         content:
           multipart/form-data:
