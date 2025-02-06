@@ -185,7 +185,7 @@
                             <generateApiTests>false</generateApiTests>
                             <addTestCompileSourceRoot>false</addTestCompileSourceRoot>
                             <supportingFilesToGenerate>
-                                SpringDocConfiguration.java,ApiUtil.java,application.properties
+                                SpringDocConfiguration.java,ApiUtil.java,EnumConverterConfiguration.java
                             </supportingFilesToGenerate>
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <configOptions>
