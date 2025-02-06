@@ -7,7 +7,7 @@ To build the project, you need to have Java 21 installed.
 Clone this repository and run the following command in the root directory of the project:
 
 ```bash
-./mvnw clean install
+./mvnw clean install package
 ```
 
 This will build the project.
@@ -20,7 +20,7 @@ java -jar target/TH1-1.0-SNAPSHOT.jar
 ## OpenAPI
 
 This project uses OpenAPI to document the API and generate the server code.
-The OpenAPI specification is located in the `openapi/openapi.yaml` file.
+The OpenAPI specification is located in the `openapi.yaml` file.
 You can read up on OpenAPI and the specification [here](https://spec.openapis.org/oas/v3.0.3) and use the
 [Reference Guide](https://swagger.io/docs/specification/v3_0/about/) by Swagger.
 
@@ -31,7 +31,7 @@ If you want to run the project for the first time or have made changes to the Op
 generate the server code. You can do this by running the following command:
 
 ```bash
-./mvnw clean install
+./mvnw clean compile
 ```
 
 After generating the server code, you can run the project as described above.

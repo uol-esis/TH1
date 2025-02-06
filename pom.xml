@@ -8,7 +8,7 @@
         <version>3.4.0</version>
         <relativePath/> <!-- lookup parent fromRequest repository -->
     </parent>
-    <groupId>de.uol.pg-doner</groupId>
+    <groupId>de.uol.pg-doener</groupId>
     <artifactId>TH1</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>TH1</name>
@@ -28,7 +28,7 @@
     </scm>
     <properties>
         <java.version>21</java.version>
-        <springdoc.version>2.2.0</springdoc.version>
+        <springdoc.version>2.7.0</springdoc.version>
         <swagger-ui.version>5.3.1</swagger-ui.version>
         <lombok.mapstruct.version>0.2.0</lombok.mapstruct.version>
         <mapstruct.version>1.6.3</mapstruct.version>
@@ -170,28 +170,29 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>7.8.0</version>
+                <version>7.10.0</version>
                 <executions>
                     <execution>
                         <goals>
                             <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <inputSpec>${project.basedir}/openapi/openapi.yaml</inputSpec>
+                            <inputSpec>${project.basedir}/openapi.yaml</inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>de.uol.pgdoener.th1.api</apiPackage>
-                            <modelPackage>de.uol.pgdoener.th1.model</modelPackage>
+                            <modelPackage>de.uol.pgdoener.th1.business.dto</modelPackage>
                             <generateModelTests>false</generateModelTests>
                             <generateApiTests>false</generateApiTests>
                             <addTestCompileSourceRoot>false</addTestCompileSourceRoot>
                             <supportingFilesToGenerate>
-                                HomeController.java,SpringDocConfiguration.java,RFC3339DateFormat.java,ApiUtil.java
+                                SpringDocConfiguration.java,ApiUtil.java,EnumConverterConfiguration.java
                             </supportingFilesToGenerate>
-                            <modelNameSuffix>DTO</modelNameSuffix>
+                            <modelNameSuffix>Dto</modelNameSuffix>
                             <configOptions>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <delegatePattern>true</delegatePattern>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
+                                <useOptional>true</useOptional>
                             </configOptions>
                         </configuration>
                     </execution>
