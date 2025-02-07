@@ -78,6 +78,8 @@ public abstract class StructureMapper {
                     throw new IllegalArgumentException("Rows missing");
                 }
                 yield new RemoveRowByIndexStructure(structureDto.getRowIndex().toArray(new Integer[0]));
+            case UNKNOWN_DEFAULT_OPEN_API: // This should never happen
+                throw new IllegalArgumentException("Unknown converterType");
         };
     }
 

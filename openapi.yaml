@@ -71,6 +71,7 @@ components:
 
     structure:
       type: object
+      x-class-extra-annotation: "@de.uol.pgdoener.th1.api.validation.ValidStructure"
       required:
         - converterType
       properties:
@@ -131,6 +132,7 @@ components:
 
     converterType:
       type: string
+      x-field-extra-annotation: "@de.uol.pgdoener.th1.api.validation.ValidConverterType"
       enum:
         - REMOVE_GROUPED_HEADER
         - FILL_EMPTY_CELLS
