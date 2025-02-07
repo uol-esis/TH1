@@ -17,7 +17,9 @@ public class ValidStructureValidator implements ConstraintValidator<ValidStructu
 
         return switch (converterType) {
             case REMOVE_GROUPED_HEADER -> structure.getStartRow().isPresent() && structure.getEndRow().isPresent()
-                    && structure.getStartColumn().isPresent() && structure.getEndColumn().isPresent();
+                    && structure.getStartColumn().isPresent() && structure.getEndColumn().isPresent()
+                    && structure.getRowIndex() != null && !structure.getRowIndex().isEmpty()
+                    && structure.getColumnIndex() != null && !structure.getColumnIndex().isEmpty();
             case FILL_EMPTY_CELLS -> structure.getRowIndex() != null && !structure.getRowIndex().isEmpty();
             case REMOVE_COLUMN_BY_INDEX -> structure.getColumnIndex() != null && !structure.getColumnIndex().isEmpty();
             case REMOVE_ROW_BY_INDEX -> structure.getRowIndex() != null && !structure.getRowIndex().isEmpty();
