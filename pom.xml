@@ -189,6 +189,8 @@
                             </supportingFilesToGenerate>
                             <modelNameSuffix>Dto</modelNameSuffix>
                             <configOptions>
+                                <configPackage>de.uol.pgdoener.th1.config</configPackage>
+                                <enumUnknownDefaultCase>true</enumUnknownDefaultCase>
                                 <useSpringBoot3>true</useSpringBoot3>
                                 <delegatePattern>true</delegatePattern>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
