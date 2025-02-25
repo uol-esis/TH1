@@ -1,7 +1,7 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.converter;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.RemoveRowByIndexStructure;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveRowByIndexStructure;
 
 public class RemoveRowByIndexConverter extends Converter {
 

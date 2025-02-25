@@ -1,7 +1,8 @@
 package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterResult;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
@@ -12,9 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -41,7 +39,7 @@ public class ConvertFileService {
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
 
         try {
-            String[][] transformedMatrix = converterService.performTransformationGetArray(file);
+            String[][] transformedMatrix = converterService.performTransformation(file).data();
 
             String tableName = "dynamic_table_" + tableStructureId;
 
@@ -54,17 +52,10 @@ public class ConvertFileService {
         }
     }
 
-    public List<String> convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
-
+    public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
         try {
-            ByteArrayOutputStream transformedFileStream = converterService.performTransformation(file);
-
-            // Assuming the converted file is in a format that can be split into lines (e.g., CSV, JSON, plain text)
-            String transformedContent = transformedFileStream.toString(StandardCharsets.UTF_8);
-
-            return Arrays.asList(transformedContent.split("\n"));
-
+            return converterService.performTransformation(file);
         } catch (Exception e) {
             throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);
         }

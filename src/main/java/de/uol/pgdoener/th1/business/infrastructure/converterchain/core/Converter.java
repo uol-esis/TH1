@@ -1,9 +1,9 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter.core;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
 public abstract class Converter {
     protected Converter nextConverter;
 
-    public String[][] handleRequest(String[][] matrix){
+    public String[][] handleRequest(String[][] matrix) {
         if (nextConverter != null) {
             return nextConverter.handleRequest(matrix);
         }
