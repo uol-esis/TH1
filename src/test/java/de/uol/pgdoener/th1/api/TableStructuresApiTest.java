@@ -19,8 +19,10 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @Testcontainers
 @ExtendWith(SpringExtension.class)
@@ -35,6 +37,12 @@ public class TableStructuresApiTest {
             .withDatabaseName("test")
             .withUsername("test")
             .withPassword("test");
+    @Value("classpath:integrationTests/tableStructure.json")
+    private Resource tableStructure;
+    @Autowired
+    private TableStructureRepository tableStructureRepository;
+    @Autowired
+    private MockMvc mockMvc;
 
     @BeforeAll
     static void beforeAll() {
@@ -48,17 +56,8 @@ public class TableStructuresApiTest {
 
     @BeforeEach
     void beforeEach() {
-       tableStructureRepository.deleteAll();
+        tableStructureRepository.deleteAll();
     }
-
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Value("classpath:integrationTests/tableStructure.json")
-    Resource tableStructure;
-
-    @Autowired
-    TableStructureRepository tableStructureRepository;
 
     @Test
     void createTableStructureEndpoint() throws Exception {
@@ -96,5 +95,21 @@ public class TableStructuresApiTest {
         Assertions.assertEquals(1, tableStructureRepository.count());
 
     }
+
+    @Test
+    void getAllTableStructuresEndpoint() throws Exception {
+        // upload test structure
+        String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
+
+        mockMvc.perform(post("/api/v1/table-structures")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(tableStructureJson)
+                .accept(MediaType.APPLICATION_JSON));
+
+        // begin test
+        mockMvc.perform(get("/api/v1/table-structures"))
+                .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
+    }
+
 
 }
