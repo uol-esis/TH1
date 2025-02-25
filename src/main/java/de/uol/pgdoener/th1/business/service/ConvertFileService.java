@@ -2,6 +2,7 @@ package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.csv_converter.InputFile;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
@@ -55,10 +56,10 @@ public class ConvertFileService {
     }
 
     public List<String> convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
-
+        InputFile inputFile = new InputFile(file, tableStructureDto);
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
         try {
-            ByteArrayOutputStream transformedFileStream = converterService.performTransformation(file);
+            ByteArrayOutputStream transformedFileStream = converterService.performTransformation(inputFile);
 
             // Assuming the converted file is in a format that can be split into lines (e.g., CSV, JSON, plain text)
             String transformedContent = transformedFileStream.toString(StandardCharsets.UTF_8);

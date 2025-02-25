@@ -7,13 +7,13 @@ import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.ConverterC
 import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.ConverterFactory;
 import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.IStructure;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.Files;
-import java.util.ArrayList;
-import java.util.List;
 
+@Slf4j
 public class ConverterChainService {
     private final TableStructureDto tableStructure;
     private final ConverterChain converterChain;
@@ -29,8 +29,8 @@ public class ConverterChainService {
         }
     }
 
-    public ByteArrayOutputStream performTransformation(MultipartFile file) throws Exception {
-        String[][] matrix = readCsvToMatrix(file, this.tableStructure);
+    public ByteArrayOutputStream performTransformation(InputFile file) throws Exception {
+        String[][] matrix = file.asStringArray();
         if (converterChain.getFirst() == null) throw new Exception("First chain is null");
         String[][] transformedMatrix = converterChain.getFirst().handleRequest(matrix);
         return writeMatrixToStream(transformedMatrix);
@@ -41,24 +41,6 @@ public class ConverterChainService {
         String[][] matrix = readCsvToMatrix(file, this.tableStructure);
         if (converterChain.getFirst() == null) throw new Exception("First chain is null");
         return converterChain.getFirst().handleRequest(matrix);
-    }
-
-    private String[][] readCsvToMatrix(MultipartFile file, TableStructureDto tableStructure) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            List<String[]> rows = new ArrayList<>();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                rows.add(line.split(String.valueOf(tableStructure.getDelimiter()), -1));
-            }
-            int endRow = tableStructure.getEndRow();
-            int endCol = tableStructure.getEndColumn();
-            String[][] matrix = new String[endRow][endCol];
-            for (int i = 0; i < endRow; i++) {
-                String[] row = rows.get(i);
-                System.arraycopy(row, 0, matrix[i], 0, endCol);
-            }
-            return matrix;
-        }
     }
 
     private ByteArrayOutputStream writeMatrixToStream(String[][] matrix) throws IOException {
