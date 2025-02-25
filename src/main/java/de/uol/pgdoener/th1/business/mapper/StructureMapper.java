@@ -3,7 +3,7 @@ package de.uol.pgdoener.th1.business.mapper;
 import de.uol.pgdoener.th1.business.dto.ConverterTypeDto;
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.StructureSummaryDto;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.*;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.*;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures;
 
 public record RemoveGroupedHeaderStructure(
         Integer[] columns,
