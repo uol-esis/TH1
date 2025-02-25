@@ -2,6 +2,7 @@ package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.ConverterApiDelegate;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterResult;
 import de.uol.pgdoener.th1.business.service.ConvertFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Slf4j
@@ -36,22 +36,22 @@ public class ConvertFileController implements ConverterApiDelegate {
 
     //TODO: File kleiner machen, muss nicht nur 10 zurück geben sondern auch weniger datenpunkte umwandeln
     @Override
-    public ResponseEntity<List<String>> previewConvertTable(MultipartFile file, TableStructureDto request) {
-        List<String> convertedLines = convertFileService.convertTest(request, file);
+    public ResponseEntity<List<List<String>>> previewConvertTable(MultipartFile file, TableStructureDto request) {
+        ConverterResult result = convertFileService.convertTest(request, file);
 
         // Return the first 10 lines as a JSON response
-        List<String> previewLines = convertedLines.stream().limit(10).toList();
+        List<List<String>> previewLines = result.dataAsListOfLists().stream().limit(10).toList();
         return ResponseEntity.ok(previewLines);
     }
 
     @Override
     public ResponseEntity<Resource> fileConvertTable(MultipartFile file, TableStructureDto request) {
-        List<String> convertedLines = convertFileService.convertTest(request, file);
+        ConverterResult result = convertFileService.convertTest(request, file);
 
         // Return the full converted file as a download
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream outputStream;
         try {
-            outputStream.write(String.join("\n", convertedLines).getBytes(StandardCharsets.UTF_8));
+            outputStream = result.dataAsCSVStream();
         } catch (IOException e) {
             throw new RuntimeException("Error while preparing file for download", e);
         }
