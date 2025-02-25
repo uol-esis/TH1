@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 

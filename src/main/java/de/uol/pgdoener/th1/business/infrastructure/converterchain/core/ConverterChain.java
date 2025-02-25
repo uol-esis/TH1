@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter.core;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
 public class ConverterChain {
     private Converter first;

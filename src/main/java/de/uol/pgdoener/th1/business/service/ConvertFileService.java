@@ -1,8 +1,8 @@
 package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterChainService;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterResult;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterResult;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;

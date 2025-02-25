@@ -1,11 +1,11 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.ConverterChain;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.ConverterFactory;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.IStructure;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.IStructure;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;

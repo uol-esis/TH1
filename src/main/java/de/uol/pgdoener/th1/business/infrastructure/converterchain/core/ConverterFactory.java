@@ -1,10 +1,10 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter.core;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.converter.FillEmptyCellsConverter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.converter.RemoveColumnByIndexConverter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.converter.RemoveGroupedHeaderConverter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.converter.RemoveRowByIndexConverter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.*;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter.FillEmptyCellsConverter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter.RemoveColumnByIndexConverter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter.RemoveGroupedHeaderConverter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter.RemoveRowByIndexConverter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

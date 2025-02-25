@@ -2,7 +2,7 @@ package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.ConverterApiDelegate;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterResult;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterResult;
 import de.uol.pgdoener.th1.business.service.ConvertFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
