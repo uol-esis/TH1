@@ -1,7 +1,7 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.converter;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.core.structures.RemoveGroupedHeaderStructure;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveGroupedHeaderStructure;
 
 //TODO: Bedingung hinzufügen? wann der converter genutzt werden kann.Z.B. am Ende vorher muss immer laufen oder muss vor .. laufen usw.
 public class RemoveGroupedHeaderConverter extends Converter {
@@ -26,7 +26,7 @@ public class RemoveGroupedHeaderConverter extends Converter {
         }
 
         int resultRows = (endRow - startRow) * (endColumn - startColumn);
-        String[][] transformedMatrix = new String[resultRows +1][];
+        String[][] transformedMatrix = new String[resultRows + 1][];
         int index = 0;
 
         //TODO: Header überlegen auszulagern. Eigener Converter? Gehört aber auch irgednwie zum header auflösen dazu
