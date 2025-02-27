@@ -1,12 +1,12 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.FillEmptyStructure;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.FillEmptyRowStructure;
 
-public class FillEmptyCellsConverter extends Converter {
-    private final FillEmptyStructure structure;
+public class FillEmptyRowConverter extends Converter {
+    private final FillEmptyRowStructure structure;
 
-    public FillEmptyCellsConverter(FillEmptyStructure structure) {
+    public FillEmptyRowConverter(FillEmptyRowStructure structure) {
         this.structure = structure;
     }
 
@@ -16,7 +16,7 @@ public class FillEmptyCellsConverter extends Converter {
         String lastNonEmptyValue = "";
 
         for (int i = 0; i < row.length; i++) {
-            if (!row[i].isEmpty()) {
+            if (!row[i].trim().isEmpty()) {
                 lastNonEmptyValue = row[i];
             } else {
                 row[i] = lastNonEmptyValue;

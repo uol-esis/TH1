@@ -29,10 +29,11 @@ public abstract class TableStructureMapper {
         return new TableStructureDto(
                 tableStructure.getName(),
                 String.valueOf(tableStructure.getDelimiter()),
-                structureDtoList,
-                tableStructure.getEndRow(),
-                tableStructure.getEndColumn()
-        ).id(tableStructure.getId());
+                structureDtoList
+        )
+                .id(tableStructure.getId())
+                .endRow(tableStructure.getEndRow())
+                .endColumn(tableStructure.getEndColumn());
     }
 
     public static TableStructure toEntity(TableStructureDto tableStructureDto) {
@@ -40,8 +41,8 @@ public abstract class TableStructureMapper {
                 null,
                 tableStructureDto.getName(),
                 tableStructureDto.getDelimiter().charAt(0),
-                tableStructureDto.getEndRow(),
-                tableStructureDto.getEndColumn()
+                tableStructureDto.getEndRow().orElse(null),
+                tableStructureDto.getEndColumn().orElse(null)
         );
     }
 

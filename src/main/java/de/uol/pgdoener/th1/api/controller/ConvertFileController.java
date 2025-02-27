@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.List;
 
 @Slf4j
 @Component
@@ -36,14 +35,12 @@ public class ConvertFileController implements ConverterApiDelegate {
 
     //TODO: File kleiner machen, muss nicht nur 10 zurück geben sondern auch weniger datenpunkte umwandeln
     @Override
-    public ResponseEntity<List<List<String>>> previewConvertTable(MultipartFile file, TableStructureDto request) {
+    public ResponseEntity<String> previewConvertTable(MultipartFile file, TableStructureDto request) {
         ConverterResult result = convertFileService.convertTest(request, file);
-
-        // Return the first 10 lines as a JSON response
-        List<List<String>> previewLines = result.dataAsListOfLists().stream().limit(10).toList();
-        return ResponseEntity.ok(previewLines);
+        return ResponseEntity.ok(result.dataAsJson());
     }
 
+    /// TODO: immer den aktuellen Datentyp setzen.
     @Override
     public ResponseEntity<Resource> fileConvertTable(MultipartFile file, TableStructureDto request) {
         ConverterResult result = convertFileService.convertTest(request, file);
@@ -51,14 +48,14 @@ public class ConvertFileController implements ConverterApiDelegate {
         // Return the full converted file as a download
         ByteArrayOutputStream outputStream;
         try {
-            outputStream = result.dataAsCSVStream();
+            outputStream = result.dataAsStream();
         } catch (IOException e) {
             throw new RuntimeException("Error while preparing file for download", e);
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("attachment")
-                .filename("converted_file.txt")
+                .filename("converted_file.csv")
                 .build());
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
