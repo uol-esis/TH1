@@ -255,7 +255,11 @@ paths:
           content:
             application/json:
               schema:
-                type: string
+                type: array
+                items:
+                  type: array
+                  items:
+                    type: string
         '400':
           description: Bad request
         '401':

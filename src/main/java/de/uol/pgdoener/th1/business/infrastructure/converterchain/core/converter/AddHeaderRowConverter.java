@@ -16,7 +16,6 @@ public class AddHeaderRowConverter extends Converter {
     public String[][] handleRequest(String[][] matrix) {
 
         String[] row = structure.headerRows();
-        matrix[0][0] = Arrays.toString(structure.headerRows());
 
         System.arraycopy(row, 0, matrix[0], 0, row.length);
         return super.handleRequest(matrix);

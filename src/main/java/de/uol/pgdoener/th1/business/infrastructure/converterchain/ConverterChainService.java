@@ -14,7 +14,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,7 +28,6 @@ public class ConverterChainService {
 
         for (StructureDto structureDto : this.tableStructure.getStructures()) {
             IStructure structure = StructureMapper.toConverterStructure(structureDto);
-            assert structure != null;
             Converter converter = ConverterFactory.createConverter(structure);
             this.converterChain.add(converter);
         }

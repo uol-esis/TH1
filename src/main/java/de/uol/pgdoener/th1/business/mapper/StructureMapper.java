@@ -82,7 +82,7 @@ public abstract class StructureMapper {
                 }
                 yield new HeaderRowStructure(structureDto.getHeaderNames().toArray(new String[0]));
             case UNKNOWN_DEFAULT_OPEN_API:
-                yield null;
+                throw new IllegalArgumentException("Unknown converterType");
         };
     }
 

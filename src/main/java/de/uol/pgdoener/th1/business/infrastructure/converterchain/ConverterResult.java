@@ -5,11 +5,17 @@ import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import java.io.*;
 import java.nio.file.Files;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public record ConverterResult(TableStructureDto tableStructure, String[][] data) {
 
-    public ByteArrayOutputStream dataAsStream() throws IOException {
+    public List<List<String>> dataAsListOfLists() {
+        return Stream.of(data).map(List::of).toList();
+    }
+
+    public ByteArrayOutputStream dataAsCsvStream() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
             for (String[] row : data) {
@@ -18,56 +24,6 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
             }
         }
         return outputStream;
-    }
-
-    public String dataAsJson() {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
-            writer.write("[\n");
-
-            // Überprüfen, ob alle Elemente in der ersten Zeile Strings sind
-            boolean allStringsInFirstRow = true;
-            for (Object value : data[0]) {
-                if (!(value instanceof String)) {
-                    allStringsInFirstRow = false;
-                    break;
-                }
-            }
-
-            // Wenn alle Werte in der ersten Zeile Strings sind, verwenden wir sie als Schlüssel
-            if (allStringsInFirstRow) {
-                for (int i = 1; i < data.length; i++) {  // Beginne bei i = 1, um die erste Zeile als Header zu verwenden
-                    String[] row = data[i];
-                    writer.write("  {\n");
-                    for (int j = 0; j < row.length; j++) {
-                        writer.write(String.format("    \"%s\": \"%s\"", data[0][j], row[j]));  // Verwende data[0][j] als Schlüssel
-                        if (j < row.length - 1) {
-                            writer.write(",");
-                        }
-                        writer.newLine();
-                    }
-                    writer.write(i < data.length - 1 ? "  },\n" : "  }\n");
-                }
-            } else {
-                // Fallback auf Standard-Schlüssel (column1, column2, ...) falls nicht alle Strings
-                for (int i = 0; i < data.length; i++) {
-                    String[] row = data[i];
-                    writer.write("  {\n");
-                    for (int j = 0; j < row.length; j++) {
-                        writer.write(String.format("    \"column%d\": \"%s\"", j + 1, row[j]));
-                        if (j < row.length - 1) {
-                            writer.write(",");
-                        }
-                        writer.newLine();
-                    }
-                    writer.write(i < data.length - 1 ? "  },\n" : "  }\n");
-                }
-            }
-            writer.write("]");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return outputStream.toString();
     }
 
     public void writeMatrixToFile(String[][] matrix, String fileName) {

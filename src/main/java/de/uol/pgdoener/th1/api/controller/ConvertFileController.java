@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -35,9 +36,10 @@ public class ConvertFileController implements ConverterApiDelegate {
 
     //TODO: File kleiner machen, muss nicht nur 10 zurück geben sondern auch weniger datenpunkte umwandeln
     @Override
-    public ResponseEntity<String> previewConvertTable(MultipartFile file, TableStructureDto request) {
+    public ResponseEntity<List<List<String>>> previewConvertTable(MultipartFile file, TableStructureDto request) {
         ConverterResult result = convertFileService.convertTest(request, file);
-        return ResponseEntity.ok(result.dataAsJson());
+        List<List<String>> previewLines = result.dataAsListOfLists().stream().limit(10).toList();
+        return ResponseEntity.ok(previewLines);
     }
 
     /// TODO: immer den aktuellen Datentyp setzen.
@@ -48,7 +50,7 @@ public class ConvertFileController implements ConverterApiDelegate {
         // Return the full converted file as a download
         ByteArrayOutputStream outputStream;
         try {
-            outputStream = result.dataAsStream();
+            outputStream = result.dataAsCsvStream();
         } catch (IOException e) {
             throw new RuntimeException("Error while preparing file for download", e);
         }
