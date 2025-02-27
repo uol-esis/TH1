@@ -20,17 +20,6 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
         return outputStream;
     }
 
-    // Convert the data to CSV format and return it as a ByteArrayOutputStream
-    public String dataAsCsv() {
-        ByteArrayOutputStream outputStream = null;
-        try {
-            outputStream = dataAsStream();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not convert data to CSV", e);
-        }
-        return outputStream.toString();
-    }
-
     public String dataAsJson() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
