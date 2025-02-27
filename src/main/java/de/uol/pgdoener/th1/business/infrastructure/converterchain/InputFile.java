@@ -3,7 +3,6 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -16,6 +15,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This class takes a {@link MultipartFile} and a {@link TableStructureDto} and provides the file as a 2D-String Array.
@@ -66,19 +66,26 @@ public class InputFile {
 
     private String[][] readCsvToMatrix() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            int colLength = tableStructure.getEndRow();
-            int rowLength = tableStructure.getEndColumn();
-            String[][] matrix = createMatrix();
-
-            Iterable<CSVRecord> records = CSVFormat.EXCEL.builder()
+            List<String[]> rows = CSVFormat.EXCEL.builder()
                     .setDelimiter(tableStructure.getDelimiter())
-                    .get().parse(reader);
+                    .get()
+                    .parse(reader)
+                    .stream()
+                    .map(r -> r.stream().toArray(String[]::new))
+                    .toList();
 
-            Iterator<CSVRecord> iterator = records.iterator();
-            for (int i = 0; iterator.hasNext() && i < colLength; i++) {
-                CSVRecord r = iterator.next();
-                String[] row = r.stream().toArray(String[]::new);
-                System.arraycopy(row, 0, matrix[i], 0, rowLength);
+            int maxRow = rows.size();
+            int maxCol = rows.getFirst().length;
+
+            // Falls endRow oder endColumn nicht gesetzt sind, bestimmen wir die Größe dynamisch
+            int rowLength = tableStructure.getEndRow().orElse(maxRow);
+            int colLength = tableStructure.getEndColumn().orElse(maxCol);
+            // Matrix initialisieren
+            String[][] matrix = new String[rowLength][colLength];
+
+            // Daten in die Matrix kopieren
+            for (int i = 0; i < rowLength && i < rows.size(); i++) {
+                System.arraycopy(rows.get(i), 0, matrix[i], 0, Math.min(rows.get(i).length, colLength));
             }
             return matrix;
         }
@@ -97,13 +104,15 @@ public class InputFile {
             Iterator<Sheet> sheetIterator = workbook.sheetIterator();
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
-            String[][] matrix = createMatrix();
+            int endRow = tableStructure.getEndRow().orElse(sheet.getLastRowNum());
+            int endColumn = tableStructure.getEndColumn().orElse((int) sheet.getRow(0).getLastCellNum());
+            String[][] matrix = new String[endRow][endColumn];
             for (Row row : sheet) {
                 int rowNum = row.getRowNum();
-                if (rowNum >= tableStructure.getEndRow()) {
+                if (rowNum >= endRow) {
                     break;
                 }
-                for (int i = 0; i < tableStructure.getEndColumn(); i++) {
+                for (int i = 0; i < endColumn; i++) {
                     switch (row.getCell(i).getCellType()) {
                         case STRING -> matrix[rowNum][i] = row.getCell(i).getStringCellValue();
                         case NUMERIC -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getNumericCellValue());
@@ -117,10 +126,6 @@ public class InputFile {
             }
             return matrix;
         }
-    }
-
-    private String[][] createMatrix() {
-        return new String[tableStructure.getEndRow()][tableStructure.getEndColumn()];
     }
 
     private interface WorkbookFactory {
