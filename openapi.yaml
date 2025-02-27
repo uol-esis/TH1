@@ -42,8 +42,6 @@ components:
         - name
         - delimiter
         - structures
-        - endRow
-        - endColumn
       properties:
         id:
           type: integer
@@ -79,13 +77,13 @@ components:
           $ref: '#/components/schemas/converterType'
         columnIndex:
           type: array
-          minItems: 1
+          minItems: 0
           items:
             type: integer
             minimum: 0
         rowIndex:
           type: array
-          minItems: 1
+          minItems: 0
           items:
             type: integer
             minimum: 0
@@ -101,6 +99,12 @@ components:
         endColumn:
           type: integer
           minimum: 0
+        headerNames:
+          type: array
+          minItems: 0
+          items:
+            type: string
+            minimum: 0
 
     tableStructureSummary:
       type: object
@@ -135,9 +139,10 @@ components:
       x-field-extra-annotation: "@de.uol.pgdoener.th1.api.validation.ValidConverterType"
       enum:
         - REMOVE_GROUPED_HEADER
-        - FILL_EMPTY_CELLS
+        - FILL_EMPTY_ROW
         - REMOVE_COLUMN_BY_INDEX
         - REMOVE_ROW_BY_INDEX
+        - ADD_HEADER_NAME
 
 paths:
   /table-structures:

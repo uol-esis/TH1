@@ -15,7 +15,7 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
         return Stream.of(data).map(List::of).toList();
     }
 
-    public ByteArrayOutputStream dataAsCSVStream() throws IOException {
+    public ByteArrayOutputStream dataAsCsvStream() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
             for (String[] row : data) {
