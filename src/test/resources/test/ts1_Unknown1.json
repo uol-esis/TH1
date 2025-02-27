@@ -1,0 +1,11 @@
+{
+  "name": "Table Structure 1",
+  "delimiter": ";",
+  "structures": [
+    {
+      "converterType": "STUFF"
+    }
+  ],
+  "endRow": 4,
+  "endColumn": 2
+}

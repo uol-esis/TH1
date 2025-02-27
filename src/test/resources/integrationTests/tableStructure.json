@@ -1,0 +1,21 @@
+{
+  "name": "Table structure 1",
+  "delimiter": ";",
+  "structures": [
+    {
+      "converterType": "REMOVE_COLUMN_BY_INDEX",
+      "columnIndex": [
+        0
+      ],
+      "rowIndex": [
+        1
+      ],
+      "startRow": 0,
+      "startColumn": 0,
+      "endRow": 0,
+      "endColumn": 0
+    }
+  ],
+  "endRow": 66,
+  "endColumn": 3
+}
