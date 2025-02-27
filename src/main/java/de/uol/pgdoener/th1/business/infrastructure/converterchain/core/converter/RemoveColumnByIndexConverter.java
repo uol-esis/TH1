@@ -21,6 +21,10 @@ public class RemoveColumnByIndexConverter extends Converter {
 
         Set<Integer> deleteSet = new HashSet<>();
         for (int col : columnsToDelete) {
+
+            if (totalColumns < col) {
+                throw new IllegalArgumentException("Index out of bounds, max index is" + totalColumns);
+            }
             if (col >= 0 && col < totalColumns) {
                 deleteSet.add(col);
             }

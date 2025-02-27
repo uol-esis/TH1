@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures;
 
-public record FillEmptyStructure(
+public record FillEmptyRowStructure(
         Integer[] rows
 ) implements IStructure {
 }

@@ -3,6 +3,8 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converte
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveGroupedHeaderStructure;
 
+import java.util.Arrays;
+
 //TODO: Bedingung hinzufügen? wann der converter genutzt werden kann.Z.B. am Ende vorher muss immer laufen oder muss vor .. laufen usw.
 public class RemoveGroupedHeaderConverter extends Converter {
     private final RemoveGroupedHeaderStructure structure;
@@ -15,37 +17,56 @@ public class RemoveGroupedHeaderConverter extends Converter {
     public String[][] handleRequest(String[][] matrix) {
         Integer[] rows = structure.rows();
         Integer[] columns = structure.columns();
-        int startRow = structure.startRow();
-        int startColumn = structure.startColumn();
-        int endRow = structure.endRow();
-        int endColumn = structure.endColumn();
 
-        String[][] rowValues = new String[rows.length][structure.endRow()];
+        int defaultStartRow = rows[rows.length - 1] + 1;
+        int defaultStartColumn = columns[columns.length - 1] + 1;
+        int startRow = structure.startRow() == null ? defaultStartRow : structure.startRow();
+        int startColumn = structure.startColumn() == null ? defaultStartColumn : structure.startColumn();
+
+        int endRow = matrix.length;
+        int endColumn = matrix[0].length;
+
+        for (int rowIndex : rows) {
+            if (rowIndex >= startRow) {
+                throw new IllegalArgumentException("Row index must be less than startRow: " + startRow);
+            }
+            if (rowIndex >= endRow) {
+                throw new IllegalArgumentException("Row index must be less than endRow: " + endRow);
+            }
+        }
+        for (int columnIndex : columns) {
+            if (columnIndex >= startColumn) {
+                throw new IllegalArgumentException("Column index must be less than startColumn: " + startRow);
+            }
+            if (columnIndex >= endColumn) {
+                throw new IllegalArgumentException("Column index must be less than endColumn: " + endRow);
+            }
+        }
+
+        if (startRow >= endRow) {
+            throw new IllegalArgumentException("Start row out of bounds");
+        }
+        if (startColumn >= endColumn) {
+            throw new IllegalArgumentException("Start row out of bounds");
+        }
+
+
+        //Add header row dynamically based on grouped headers
+        String defaultHeaderName = "undefined";
+        int headerSize = rows.length + columns.length + 1;
+        String[] headerRow = new String[headerSize];
+        Arrays.fill(headerRow, defaultHeaderName);
+
+        String[][] rowValues = new String[rows.length][endRow];
         for (int rowI : rows) {
             rowValues[rowI] = matrix[rowI];
         }
 
         int resultRows = (endRow - startRow) * (endColumn - startColumn);
-        String[][] transformedMatrix = new String[resultRows + 1][];
+        String[][] transformedMatrix = new String[resultRows + 1][]; // +1 wegen dem header
         int index = 0;
 
-        //TODO: Header überlegen auszulagern. Eigener Converter? Gehört aber auch irgednwie zum header auflösen dazu
-
-        // Add header row dynamically based on grouped headers
-        String[] headerRow = new String[rows.length + columns.length + 1];
-        int headerIndex = 0;
-
-        // Add column group headers (e.g., "Alter der Person")
-        for (int colI : columns) {
-            headerRow[headerIndex++] = matrix[rows.length][0]; // Assume first row contains column headers
-        }
-
-        // Add row group headers (e.g., "Geschlecht")
-        for (int rowI : rows) {
-            headerRow[headerIndex++] = matrix[rowI][0]; // Assume first column contains group headers
-        }
-
-        headerRow[headerIndex] = "Anzahl";
+        //Header setzen
         transformedMatrix[index++] = headerRow;
 
         for (int i = startRow; i < endRow; i++) {

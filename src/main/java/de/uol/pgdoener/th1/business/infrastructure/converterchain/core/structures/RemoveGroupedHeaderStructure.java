@@ -3,9 +3,7 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structur
 public record RemoveGroupedHeaderStructure(
         Integer[] columns,
         Integer[] rows,
-        int startRow,
-        int endRow,
-        int startColumn,
-        int endColumn
+        Integer startRow,
+        Integer startColumn
 ) implements IStructure {
 }
