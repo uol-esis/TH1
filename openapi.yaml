@@ -29,17 +29,28 @@ servers:
 
 security:
   - BasicAuth: [ ]
-  - BearerAuth: [ ]
+  # - BearerAuth: [ ]
+  - OAuth2:
+      - write_access
+      - read_access
 
 components:
   securitySchemes:
     BasicAuth:
       type: http
       scheme: basic
-    BearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
+    # BearerAuth:
+    #  type: http
+    #  scheme: bearer
+    #  bearerFormat: JWT
+    OAuth2:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: http://pg-doener-dev.virt.uni-oldenburg.de:8081/auth/realms/dev/protocol/openid-connect/auth
+          scopes:
+            read_access: read data
+            write_access: modify data
   schemas:
     tableStructure:
       type: object
