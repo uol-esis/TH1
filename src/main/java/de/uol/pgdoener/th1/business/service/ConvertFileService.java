@@ -3,8 +3,7 @@ package de.uol.pgdoener.th1.business.service;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterResult;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.ConverterChainService;
-import de.uol.pgdoener.th1.business.infrastructure.csv_converter.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.InputFile;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
@@ -41,7 +40,8 @@ public class ConvertFileService {
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
 
         try {
-            String[][] transformedMatrix = converterService.performTransformation(file).data();
+            InputFile inputFile = new InputFile(file, tableStructureDto);
+            String[][] transformedMatrix = converterService.performTransformation(inputFile).data();
 
             String tableName = "dynamic_table_" + tableStructureId;
 
@@ -58,7 +58,7 @@ public class ConvertFileService {
         InputFile inputFile = new InputFile(file, tableStructureDto);
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
         try {
-            return converterService.performTransformation(file);
+            return converterService.performTransformation(inputFile);
         } catch (Exception e) {
             throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);
         }

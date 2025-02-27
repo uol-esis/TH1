@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.csv_converter;
+package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 
 import org.springframework.web.multipart.MultipartFile;
 
@@ -7,7 +7,8 @@ import java.util.List;
 enum FileType {
 
     CSV(List.of("text/csv"), List.of(".csv")),
-    EXCEL(List.of("application/vnd.ms-excel"), List.of(".xls", ".xlsx"));
+    EXCEL_OLE2(List.of(), List.of(".xls")),
+    EXCEL_OOXML(List.of(), List.of(".xlsx"));
 
     private final List<String> contentTypes;
     private final List<String> fileExtensions;
