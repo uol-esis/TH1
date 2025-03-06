@@ -14,11 +14,12 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
 
   db:
     image: postgres:17-alpine
-    ports:
-      - "5432:5432"
+    # ports:
+    #  - "5432:5432"
     env_file:
       - db.env
     networks:
@@ -27,6 +28,7 @@ services:
       - db-data:/var/lib/postgresql/data
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready" ]
+    restart: unless-stopped
 
 networks:
   server-side:

@@ -45,16 +45,20 @@ While the project is running, you can access the Swagger UI at http://localhost:
 In order to run and test the application locally, you need to set up a database for the app to connect to. This might be
 done using docker.
 
-In the `docker` directory, you will find a `docker-compose.yml` file which defines all necessary variables to set start
+In the `docker` directory, you will find a `docker-compose.yaml` file which defines all necessary variables to set start
 a postgres database. Make sure, Docker and Docker compose are installed. Also, make sure to duplicate the `*.env.sample`
 files and remove the `.sample` ending. The env files are filled with the necessary environment variables for the
-application to start. However, it is **strongly** recommended to change the variables values to avoid any security
-issues even in the dev environment.
+application
+to start. However, it is **strongly** recommended to change the variables values to avoid any security issues even in
+the dev environment.
 
 Then, run the following command in the root directory of the project:
 
+> **NOTE:** The docker commands will be much simpler if you `cd` into the `docker` directory. This will allow you to not
+> pass the `-f docker/docker-compose.yaml` flag to the docker commands.
+
 ```bash
-docker compose -f docker/docker-compose.yml up -d db && docker compose logs -f
+docker compose -f docker/docker-compose.yaml up -d db && docker compose -f docker/docker-compose.yaml logs -f
 ```
 
 This will pull (if not already done) and start a postgres database in a docker container. The logs will be shown in the
@@ -67,17 +71,17 @@ To test the whole application inside docker, prepare the `*.env` files as descri
 command:
 
 ```bash
-docker compose -f docker/docker-compose.yml up -d --build && docker compose logs -f backend
+docker compose -f docker/docker-compose.yaml up -d --build && docker compose -f docker/docker-compose.yaml logs -f backend
 ```
 
 This will build the th1 application from the current state of the repository and start it in a docker container. The
-logs will be shown in the console. You might at any time press CTRL+C to stop the logs from showing. The application
+logs will be shown in the console. You might at any time press CTRL+C to stop the logs from showing. The application 
 will keep running in the background.
 
 To stop the application, run the following command:
 
 ```bash
-docker compose down
+docker compose -f docker/docker-compose.yaml down
 ```
 
 > **Note:** Please consult the wiki page for further information about the docker setup.
