@@ -20,7 +20,7 @@ java -jar target/TH1-1.0-SNAPSHOT.jar
 ## OpenAPI
 
 This project uses OpenAPI to document the API and generate the server code.
-The OpenAPI specification is located in the `openapi.yaml` file.
+The OpenAPI Document is located [here](https://github.com/uol-esis/TH1-OpenAPI).
 You can read up on OpenAPI and the specification [here](https://spec.openapis.org/oas/v3.0.3) and use the
 [Reference Guide](https://swagger.io/docs/specification/v3_0/about/) by Swagger.
 
@@ -40,17 +40,16 @@ While the project is running, you can access the Swagger UI at http://localhost:
 > **Note:** If you are using an IDE, you might have to set `target/generated-sources/openapi/src/main/java` as a
 > generated sources root to avoid compilation errors.
 
-
 ## Docker
 
-In order to run and test the application locally, you need to set up a database for the app to connect to. This might be 
+In order to run and test the application locally, you need to set up a database for the app to connect to. This might be
 done using docker.
 
-In the `docker` directory, you will find a `docker-compose.yml` file which defines all necessary variables to set start 
-a postgres database. Make sure, Docker and Docker compose are installed. Also, make sure to duplicate the `*.env.sample` 
-files and remove the `.sample` ending. The env files are filled with the necessary environment variables for the application
-to start. However, it is **strongly** recommended to change the variables values to avoid any security issues even in 
-the dev environment.
+In the `docker` directory, you will find a `docker-compose.yml` file which defines all necessary variables to set start
+a postgres database. Make sure, Docker and Docker compose are installed. Also, make sure to duplicate the `*.env.sample`
+files and remove the `.sample` ending. The env files are filled with the necessary environment variables for the
+application to start. However, it is **strongly** recommended to change the variables values to avoid any security
+issues even in the dev environment.
 
 Then, run the following command in the root directory of the project:
 
@@ -59,19 +58,21 @@ docker compose -f docker/docker-compose.yml up -d db && docker compose logs -f
 ```
 
 This will pull (if not already done) and start a postgres database in a docker container. The logs will be shown in the
-console. You might at any time press CTRL+C to stop the logs from showing. The database will keep running in the background.
+console. You might at any time press CTRL+C to stop the logs from showing. The database will keep running in the
+background.
 
 ### Testing whole docker stack
 
-To test the whole application inside docker, prepare the `*.env` files as described above. Then run the following command:
+To test the whole application inside docker, prepare the `*.env` files as described above. Then run the following
+command:
 
 ```bash
 docker compose -f docker/docker-compose.yml up -d --build && docker compose logs -f backend
 ```
 
-This will build the th1 application from the current state of the repository and start it in a docker container. The logs
-will be shown in the console. You might at any time press CTRL+C to stop the logs from showing. The application will keep
-running in the background.
+This will build the th1 application from the current state of the repository and start it in a docker container. The
+logs will be shown in the console. You might at any time press CTRL+C to stop the logs from showing. The application
+will keep running in the background.
 
 To stop the application, run the following command:
 
