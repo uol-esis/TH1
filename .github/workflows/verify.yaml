@@ -6,7 +6,7 @@ on:
       - src/**
       - pom.xml
       - openapi/**
-      - .github/workflows/test.yml
+      - verify.yaml
   workflow_call:
 
 jobs:
