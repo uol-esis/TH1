@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class TableStructureMapper {
@@ -26,14 +27,15 @@ public abstract class TableStructureMapper {
             structureDtoList.set(structure.getPosition(), structureDto);
         }
 
-        return new TableStructureDto(
-                tableStructure.getName(),
-                String.valueOf(tableStructure.getDelimiter()),
-                structureDtoList
-        )
-                .id(tableStructure.getId())
-                .endRow(tableStructure.getEndRow())
-                .endColumn(tableStructure.getEndColumn());
+        TableStructureDto dto = new TableStructureDto();
+        dto.setName(tableStructure.getName());
+        dto.setDelimiter(String.valueOf(tableStructure.getDelimiter()));
+        dto.setStructures(structureDtoList);
+        dto.setId(Optional.ofNullable(tableStructure.getId()));
+        dto.setEndRow(Optional.ofNullable(tableStructure.getEndRow()));
+        dto.setEndColumn(Optional.ofNullable(tableStructure.getEndColumn()));
+
+        return dto;
     }
 
     public static TableStructure toEntity(TableStructureDto tableStructureDto) {
