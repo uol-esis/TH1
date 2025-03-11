@@ -20,7 +20,7 @@ fi
 # 1. pull the latest state of the project
 
 cd "$(dirname "$0")" # change to the directory of the script (inside the repository)
-git pull origin main
+git pull origin dev
 
 # 2. build with docker
 
