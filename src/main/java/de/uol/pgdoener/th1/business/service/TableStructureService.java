@@ -10,6 +10,7 @@ import de.uol.pgdoener.th1.data.entity.TableStructure;
 import de.uol.pgdoener.th1.data.repository.StructureRepository;
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -19,6 +20,7 @@ import org.springframework.web.client.HttpServerErrorException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TableStructureService {
@@ -42,6 +44,7 @@ public class TableStructureService {
                         }
                     } catch (Exception e) {
                         status.setRollbackOnly();
+                        log.info("Error while saving table structure", e);
                         throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
                     }
                     return null;
@@ -66,6 +69,7 @@ public class TableStructureService {
     public TableStructureDto getById(Long id) {
         TableStructure tableStructure = tableStructureRepository.findById(id).orElse(null);
         if (tableStructure == null) {
+            log.info("Table structure with id {} not found", id);
             throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, "kein Eintrag");
         }
 
