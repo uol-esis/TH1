@@ -11,12 +11,14 @@ import de.uol.pgdoener.th1.data.repository.DynamicTableRepository;
 import de.uol.pgdoener.th1.data.repository.StructureRepository;
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ConvertFileService {
@@ -30,7 +32,8 @@ public class ConvertFileService {
 
         Optional<TableStructure> tableStructure = tableStructureRepository.findById(tableStructureId);
         if (tableStructure.isEmpty()) {
-            throw new RuntimeException("Could not find table structure with id " + tableStructureId);
+            log.debug("Could not find table structure with id {}", tableStructureId);
+            throw new IllegalArgumentException("Could not find table structure with id " + tableStructureId);
         }
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
@@ -39,29 +42,22 @@ public class ConvertFileService {
 
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
 
-        try {
-            InputFile inputFile = new InputFile(file, tableStructureDto);
-            String[][] transformedMatrix = converterService.performTransformation(inputFile).data();
+        InputFile inputFile = new InputFile(file, tableStructureDto);
+        String[][] transformedMatrix;
+        transformedMatrix = converterService.performTransformation(inputFile).data();
 
-            String tableName = "dynamic_table_" + tableStructureId;
+        String tableName = "dynamic_table_" + tableStructureId;
 
-            // Tabelle erstellen
-            dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
-            // Daten einfügen
-            dynamicTableRepository.insertData(tableName, transformedMatrix);
-        } catch (Exception e) {
-            throw new RuntimeException("Error processing CSV file", e);
-        }
+        // Tabelle erstellen
+        dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
+        // Daten einfügen
+        dynamicTableRepository.insertData(tableName, transformedMatrix);
     }
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
         InputFile inputFile = new InputFile(file, tableStructureDto);
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
-        try {
-            return converterService.performTransformation(inputFile);
-        } catch (Exception e) {
-            throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);
-        }
+        return converterService.performTransformation(inputFile);
     }
 
     /*public void convertAndSaveToMinio(ConvertFileDto convertFileDto) {
