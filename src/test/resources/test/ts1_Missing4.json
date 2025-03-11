@@ -1,0 +1,13 @@
+{
+  "delimiter": ";",
+  "structures": [
+    {
+      "converterType": "REMOVE_ROW_BY_INDEX",
+      "rowIndex": [
+        1
+      ]
+    }
+  ],
+  "endRow": 4,
+  "endColumn": 2
+}
