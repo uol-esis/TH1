@@ -28,9 +28,15 @@ public class ConverterChainService {
         }
     }
 
-    public ConverterResult performTransformation(InputFile inputFile) throws IOException {
+    public ConverterResult performTransformation(InputFile inputFile) throws TransformationException {
         Objects.requireNonNull(converterChain.getFirst());
-        String[][] transformedMatrix = converterChain.getFirst().handleRequest(inputFile.asStringArray());
+        String[][] transformedMatrix;
+        try {
+            transformedMatrix = converterChain.getFirst().handleRequest(inputFile.asStringArray());
+        } catch (IOException e) {
+            log.error("Error processing file: Could not read input file content", e);
+            throw new TransformationException("Error processing file: Could not read input file content", e);
+        }
         return new ConverterResult(tableStructure, transformedMatrix);
     }
 

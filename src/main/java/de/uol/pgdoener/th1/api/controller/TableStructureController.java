@@ -5,11 +5,13 @@ import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
 import de.uol.pgdoener.th1.business.service.TableStructureService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class TableStructureController implements TableStructuresApiDelegate {
@@ -18,22 +20,25 @@ public class TableStructureController implements TableStructuresApiDelegate {
 
     @Override
     public ResponseEntity<Void> createTableStructure(TableStructureDto request) {
+        log.debug("Creating table structure {}", request);
         tableStructureService.create(request);
-
+        log.debug("Table structure created");
         return ResponseEntity.ok().build();
     }
 
     @Override
     public ResponseEntity<TableStructureDto> getTableStructure(Long id) {
+        log.debug("Getting table structure with id {}", id);
         TableStructureDto tableStructureDto = tableStructureService.getById(id);
-
+        log.debug("Table structure found");
         return ResponseEntity.ok(tableStructureDto);
     }
 
     @Override
     public ResponseEntity<List<TableStructureSummaryDto>> getTableStructures() {
+        log.debug("Getting all table structures");
         List<TableStructureSummaryDto> tableStructuresDto = tableStructureService.getAll();
-
+        log.debug("Table structures found");
         return ResponseEntity.ok(tableStructuresDto);
     }
 
