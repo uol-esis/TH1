@@ -21,9 +21,6 @@ public class TableStructure {
     @Column(nullable = false)
     private char delimiter;
 
-    @Column(nullable = false)
-    private int endRow;
-
-    @Column(nullable = false)
-    private int endColumn;
+    private Integer endRow;
+    private Integer endColumn;
 }

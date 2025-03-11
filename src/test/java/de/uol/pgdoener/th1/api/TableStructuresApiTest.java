@@ -65,7 +65,7 @@ public class TableStructuresApiTest {
         // load from resources
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/api/v1/table-structures")
+        mockMvc.perform(post("/v1/table-structures")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -81,12 +81,12 @@ public class TableStructuresApiTest {
         // load from resources
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/api/v1/table-structures")
+        mockMvc.perform(post("/v1/table-structures")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
-        mockMvc.perform(post("/api/v1/table-structures")
+        mockMvc.perform(post("/v1/table-structures")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -101,13 +101,13 @@ public class TableStructuresApiTest {
         // upload test structure
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/api/v1/table-structures")
+        mockMvc.perform(post("/v1/table-structures")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tableStructureJson)
                 .accept(MediaType.APPLICATION_JSON));
 
         // begin test
-        mockMvc.perform(get("/api/v1/table-structures"))
+        mockMvc.perform(get("/v1/table-structures"))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
