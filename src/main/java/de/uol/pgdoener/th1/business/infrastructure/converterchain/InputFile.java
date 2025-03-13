@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -41,7 +42,7 @@ public class InputFile {
      * @param tableStructure the table structure
      * @throws IllegalArgumentException if the file type is not supported
      */
-    public InputFile(MultipartFile file, TableStructureDto tableStructure) {
+    public InputFile(@NonNull MultipartFile file, @NonNull TableStructureDto tableStructure) {
         this(file, tableStructure, FileType.getType(file));
     }
 
@@ -75,6 +76,8 @@ public class InputFile {
                     .toList();
 
             int maxRow = rows.size();
+            if (maxRow == 0)
+                return new String[0][0];
             int maxCol = rows.getFirst().length;
 
             // Falls endRow oder endColumn nicht gesetzt sind, bestimmen wir die Größe dynamisch
@@ -104,15 +107,15 @@ public class InputFile {
             Iterator<Sheet> sheetIterator = workbook.sheetIterator();
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
-            int endRow = tableStructure.getEndRow().orElse(sheet.getLastRowNum());
-            int endColumn = tableStructure.getEndColumn().orElse((int) sheet.getRow(0).getLastCellNum());
-            String[][] matrix = new String[endRow][endColumn];
+            int lastRow = tableStructure.getEndRow().orElse(sheet.getLastRowNum());
+            int lastColumn = tableStructure.getEndColumn().orElse((int) sheet.getRow(0).getLastCellNum());
+            String[][] matrix = new String[lastRow + 1][lastColumn];
             for (Row row : sheet) {
                 int rowNum = row.getRowNum();
-                if (rowNum >= endRow) {
+                if (rowNum > lastRow) {
                     break;
                 }
-                for (int i = 0; i < endColumn; i++) {
+                for (int i = 0; i < lastColumn; i++) {
                     switch (row.getCell(i).getCellType()) {
                         case STRING -> matrix[rowNum][i] = row.getCell(i).getStringCellValue();
                         case NUMERIC -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getNumericCellValue());
