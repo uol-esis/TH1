@@ -5,8 +5,7 @@ on:
     paths:
       - src/**
       - pom.xml
-      - openapi/**
-      - .github/workflows/test.yml
+      - .github/workflows/verify.yaml
   workflow_call:
 
 jobs:
