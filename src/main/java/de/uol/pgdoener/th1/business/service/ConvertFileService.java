@@ -10,6 +10,7 @@ import de.uol.pgdoener.th1.data.entity.TableStructure;
 import de.uol.pgdoener.th1.data.repository.DynamicTableRepository;
 import de.uol.pgdoener.th1.data.repository.StructureRepository;
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
+import de.uol.pgdoener.th1.metabase.MBService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -23,7 +24,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ConvertFileService {
 
-    //private final MinioClient minioClient;
+    private final MBService mbService;
     private final TableStructureRepository tableStructureRepository;
     private final StructureRepository structureRepository;
     private final DynamicTableRepository dynamicTableRepository;
@@ -52,6 +53,7 @@ public class ConvertFileService {
         dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
         // Daten einfügen
         dynamicTableRepository.insertData(tableName, transformedMatrix);
+        mbService.updateAllDatabases();
     }
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
