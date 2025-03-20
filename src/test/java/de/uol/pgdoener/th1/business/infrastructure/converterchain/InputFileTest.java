@@ -10,7 +10,6 @@ import org.springframework.mock.web.MockMultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -36,8 +35,6 @@ class InputFileTest {
         InputFile inputFile = new InputFile(file, tableStructure);
 
         String[][] result = inputFile.asStringArray();
-
-        System.out.println(Arrays.deepToString(result));
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, result);
     }
