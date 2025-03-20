@@ -108,7 +108,10 @@ public class InputFile {
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
             int lastRow = tableStructure.getEndRow().orElse(sheet.getLastRowNum());
-            int lastColumn = tableStructure.getEndColumn().orElse((int) sheet.getRow(0).getLastCellNum());
+            Row firstRowObject = sheet.getRow(0);
+            if (firstRowObject == null || firstRowObject.getLastCellNum() == -1)
+                return new String[0][0];
+            int lastColumn = tableStructure.getEndColumn().orElse((int) firstRowObject.getLastCellNum());
             String[][] matrix = new String[lastRow + 1][lastColumn];
             for (Row row : sheet) {
                 int rowNum = row.getRowNum();

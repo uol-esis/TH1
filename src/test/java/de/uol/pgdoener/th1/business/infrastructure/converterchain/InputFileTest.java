@@ -42,7 +42,6 @@ class InputFileTest {
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, result);
     }
 
-    // FIXME: This test is failing
     @ParameterizedTest
     @ValueSource(strings = {"csv", "xlsx", "xls"})
     void testEmptyAsStringArray(String extension) throws IOException {
