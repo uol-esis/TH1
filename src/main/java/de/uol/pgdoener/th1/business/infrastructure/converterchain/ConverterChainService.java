@@ -33,6 +33,10 @@ public class ConverterChainService {
         String[][] transformedMatrix;
         try {
             String[][] inputArray = inputFile.asStringArray();
+            if (inputArray.length == 0 || inputArray[0].length == 0) {
+                log.debug("Empty input file");
+                return new ConverterResult(tableStructure, inputArray);
+            }
             transformedMatrix = converterChain.getFirst().handleRequest(inputArray);
         } catch (IOException e) {
             log.error("Error processing file: Could not read input file content", e);
