@@ -32,7 +32,8 @@ public class ConverterChainService {
         Objects.requireNonNull(converterChain.getFirst());
         String[][] transformedMatrix;
         try {
-            transformedMatrix = converterChain.getFirst().handleRequest(inputFile.asStringArray());
+            String[][] inputArray = inputFile.asStringArray();
+            transformedMatrix = converterChain.getFirst().handleRequest(inputArray);
         } catch (IOException e) {
             log.error("Error processing file: Could not read input file content", e);
             throw new TransformationException("Error processing file: Could not read input file content", e);
