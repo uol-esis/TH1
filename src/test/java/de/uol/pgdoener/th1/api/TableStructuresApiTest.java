@@ -31,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("integrationTest")
-public class TableStructuresApiTest {
+class TableStructuresApiTest {
 
     @Container
     @ServiceConnection
@@ -102,7 +102,7 @@ public class TableStructuresApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(post("/v1/table-structures")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
