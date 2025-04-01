@@ -57,7 +57,6 @@ public class GenerateTableStructureService {
 
     private TableStructureDto getTableStructureFromMatrixInfo(MatrixInfo matrixInfo) {
         TableStructureDto tableStructure = new TableStructureDto();
-        tableStructure.setDelimiter(inputFile.getDelimiter());
         tableStructure.setName(inputFile.getFileName());
 
         StructureDto fillEmptyRowStructure = new StructureDto();

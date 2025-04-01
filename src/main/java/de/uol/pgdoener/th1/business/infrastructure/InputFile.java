@@ -64,13 +64,13 @@ public class InputFile {
         return nameWithoutExtension.replace(" ", "_");
     }
 
-    public String getDelimiter() {
-        return ";";
-    }
-
     // #################
     // Internal Methods
     // #################
+
+    private String getDelimiter() {
+        return ";";
+    }
 
     private String[][] readCsvToMatrix() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
