@@ -19,11 +19,11 @@ public class TableStructureController implements TableStructuresApiDelegate {
     private final TableStructureService tableStructureService;
 
     @Override
-    public ResponseEntity<Void> createTableStructure(TableStructureDto request) {
+    public ResponseEntity<Long> createTableStructure(TableStructureDto request) {
         log.debug("Creating table structure {}", request);
-        tableStructureService.create(request);
+        long id = tableStructureService.create(request);
         log.debug("Table structure created");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(201).body(id);
     }
 
     @Override

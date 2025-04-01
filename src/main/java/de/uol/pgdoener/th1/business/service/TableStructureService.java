@@ -29,11 +29,11 @@ public class TableStructureService {
     private final StructureRepository structureRepository;
     private final PlatformTransactionManager transactionManager;
 
-    public void create(TableStructureDto tableStructureDto) {
+    public long create(TableStructureDto tableStructureDto) {
         List<StructureDto> structureDtoList = tableStructureDto.getStructures();
         TableStructure tableStructure = TableStructureMapper.toEntity(tableStructureDto);
 
-        new TransactionTemplate(transactionManager).execute(
+        Long result = new TransactionTemplate(transactionManager).execute(
                 status -> {
                     try {
                         TableStructure savedTableStructure = tableStructureRepository.save(tableStructure);
@@ -42,14 +42,19 @@ public class TableStructureService {
                             Structure structure = StructureMapper.toEntity(structureDto, i, savedTableStructure.getId());
                             structureRepository.save(structure);
                         }
+                        return tableStructure.getId();
                     } catch (Exception e) {
                         status.setRollbackOnly();
                         log.info("Error while saving table structure", e);
                         throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
                     }
-                    return null;
                 }
         );
+        if (result == null) {
+            log.error("Could not get id of created table structure");
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return result;
     }
 
     /// TODO: Möglicherweise weniger zurück geben. Jetzt werden alle Informationen zurück gegeben.

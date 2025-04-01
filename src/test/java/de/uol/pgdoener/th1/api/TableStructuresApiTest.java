@@ -1,6 +1,8 @@
 package de.uol.pgdoener.th1.api;
 
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
 @ActiveProfiles("integrationTest")
-public class TableStructuresApiTest {
+class TableStructuresApiTest {
 
     @Container
     @ServiceConnection
@@ -69,7 +71,22 @@ public class TableStructuresApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().string(new BaseMatcher<>() {
+                    @Override
+                    public boolean matches(Object actual) {
+                        if (actual instanceof String id) {
+                            return tableStructureRepository.existsById(Long.parseLong(id));
+                        }
+                        return false;
+                    }
+
+                    @Override
+                    public void describeTo(Description description) {
+                        // irrelevant
+                    }
+                }));
 
         Assertions.assertEquals(1, tableStructureRepository.count());
 
@@ -85,7 +102,7 @@ public class TableStructuresApiTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isCreated());
         mockMvc.perform(post("/v1/table-structures")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
