@@ -25,7 +25,7 @@ public class GenerateTableStructureService {
         String[][] matrix = inputFile.asStringArray();
         MatrixInfo matrixInfo = getMatrixInfo(matrix);
 
-        return getTableStructureFromMatrixInfo(matrix, matrixInfo);
+        return getTableStructureFromMatrixInfo(matrixInfo);
     }
 
     private MatrixInfo getMatrixInfo(String[][] matrix) {
@@ -55,8 +55,10 @@ public class GenerateTableStructureService {
         return matrixInfo;
     }
 
-    private TableStructureDto getTableStructureFromMatrixInfo(String[][] matrix, MatrixInfo matrixInfo) {
+    private TableStructureDto getTableStructureFromMatrixInfo(MatrixInfo matrixInfo) {
         TableStructureDto tableStructure = new TableStructureDto();
+        tableStructure.setDelimiter(";");
+        tableStructure.setName(inputFile.getFileName());
 
         StructureDto fillEmptyRowStructure = new StructureDto();
         List<Integer> rowToFill = matrixInfo.getRowToFill();

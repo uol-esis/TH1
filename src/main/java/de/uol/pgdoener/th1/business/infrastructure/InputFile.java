@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * This class takes a {@link MultipartFile} and a {@link TableStructureDto} and provides the file as a 2D-String Array.
@@ -54,6 +55,13 @@ public class InputFile {
             case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
             case EXCEL_OOXML -> readExcelOOXMLToMatrix();
         };
+    }
+
+    public String getFileName() {
+        String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename()).toLowerCase();
+        int dotIndex = originalFilename.lastIndexOf('.');
+        String nameWithoutExtension = (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
+        return nameWithoutExtension.replace(" ", "_");
     }
 
     // #################
