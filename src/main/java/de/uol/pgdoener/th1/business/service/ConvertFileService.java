@@ -1,9 +1,9 @@
 package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
+import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterResult;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.InputFile;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
@@ -43,23 +43,35 @@ public class ConvertFileService {
 
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
 
-        InputFile inputFile = new InputFile(file, tableStructureDto);
-        String[][] transformedMatrix;
-        transformedMatrix = converterService.performTransformation(inputFile).data();
+        try {
+            InputFile inputFile = new InputFile(file);
+            String[][] transformedMatrix = converterService.performTransformation(inputFile).data();
 
-        String tableName = "dynamic_table_" + tableStructureId;
+            String tableName = tableStructure.get().getName()
+                    .toLowerCase()
+                    .trim()
+                    .replace(" ", "_")
+                    .replace(",", "_") + "_" + tableStructureId;
 
-        // Tabelle erstellen
-        dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
-        // Daten einfügen
-        dynamicTableRepository.insertData(tableName, transformedMatrix);
-        mbService.updateAllDatabases();
+            System.out.println(tableName);
+
+            // Tabelle erstellen
+            dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
+            // Daten einfügen
+            dynamicTableRepository.insertData(tableName, transformedMatrix);
+        } catch (Exception e) {
+            throw new RuntimeException("Error processing CSV file", e);
+        }
     }
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
-        InputFile inputFile = new InputFile(file, tableStructureDto);
+        InputFile inputFile = new InputFile(file);
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
-        return converterService.performTransformation(inputFile);
+        try {
+            return converterService.performTransformation(inputFile);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);
+        }
     }
 
     /*public void convertAndSaveToMinio(ConvertFileDto convertFileDto) {

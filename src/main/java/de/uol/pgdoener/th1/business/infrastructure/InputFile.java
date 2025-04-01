@@ -1,8 +1,7 @@
-package de.uol.pgdoener.th1.business.infrastructure.converterchain;
+package de.uol.pgdoener.th1.business.infrastructure;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -24,12 +23,10 @@ import java.util.List;
 public class InputFile {
 
     private final MultipartFile file;
-    private final TableStructureDto tableStructure;
     private final FileType fileType;
 
-    private InputFile(MultipartFile file, TableStructureDto tableStructure, FileType fileType) {
+    private InputFile(MultipartFile file, FileType fileType) {
         this.file = file;
-        this.tableStructure = tableStructure;
         this.fileType = fileType;
         log.debug("Created InputFile with type: {}", fileType);
     }
@@ -37,12 +34,11 @@ public class InputFile {
     /**
      * Constructor for InputFile
      *
-     * @param file           the file to be read
-     * @param tableStructure the table structure
+     * @param file the file to be read
      * @throws IllegalArgumentException if the file type is not supported
      */
-    public InputFile(MultipartFile file, TableStructureDto tableStructure) {
-        this(file, tableStructure, FileType.getType(file));
+    public InputFile(MultipartFile file) {
+        this(file, FileType.getType(file));
     }
 
     /**
@@ -64,29 +60,31 @@ public class InputFile {
     // Internal Methods
     // #################
 
+    private String getDelimiter() {
+        return ";";
+    }
+
     private String[][] readCsvToMatrix() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            List<String[]> rows = CSVFormat.EXCEL.builder()
-                    .setDelimiter(tableStructure.getDelimiter())
-                    .get()
-                    .parse(reader)
-                    .stream()
-                    .map(r -> r.stream().toArray(String[]::new))
+            String delimiter = getDelimiter();
+            List<String[]> rows = reader.lines()
+                    .map(String::trim)
+                    .filter(line -> line.contains(delimiter) && !line.startsWith("\""))
+                    .map(line -> line.split(delimiter, -1))
+                    .filter(row -> row.length > 0 && !row[0].isEmpty())
                     .toList();
 
-            int maxRow = rows.size();
-            int maxCol = rows.getFirst().length;
-
-            // Falls endRow oder endColumn nicht gesetzt sind, bestimmen wir die Größe dynamisch
-            int rowLength = tableStructure.getEndRow().orElse(maxRow);
-            int colLength = tableStructure.getEndColumn().orElse(maxCol);
-            // Matrix initialisieren
-            String[][] matrix = new String[rowLength][colLength];
-
-            // Daten in die Matrix kopieren
-            for (int i = 0; i < rowLength && i < rows.size(); i++) {
-                System.arraycopy(rows.get(i), 0, matrix[i], 0, Math.min(rows.get(i).length, colLength));
+            if (rows.isEmpty()) {
+                return new String[0][0];
             }
+
+            int maxCol = rows.getFirst().length;
+            String[][] matrix = new String[rows.size()][maxCol];
+
+            for (int i = 0; i < rows.size(); i++) {
+                System.arraycopy(rows.get(i), 0, matrix[i], 0, rows.get(i).length);
+            }
+
             return matrix;
         }
     }
@@ -104,8 +102,8 @@ public class InputFile {
             Iterator<Sheet> sheetIterator = workbook.sheetIterator();
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
-            int endRow = tableStructure.getEndRow().orElse(sheet.getLastRowNum());
-            int endColumn = tableStructure.getEndColumn().orElse((int) sheet.getRow(0).getLastCellNum());
+            int endRow = sheet.getLastRowNum();
+            int endColumn = sheet.getRow(0).getLastCellNum();
             String[][] matrix = new String[endRow][endColumn];
             for (Row row : sheet) {
                 int rowNum = row.getRowNum();
@@ -131,5 +129,4 @@ public class InputFile {
     private interface WorkbookFactory {
         Workbook create(InputStream inputStream) throws IOException;
     }
-
 }

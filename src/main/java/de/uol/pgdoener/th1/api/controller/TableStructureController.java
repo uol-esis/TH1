@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -40,6 +41,12 @@ public class TableStructureController implements TableStructuresApiDelegate {
         List<TableStructureSummaryDto> tableStructuresDto = tableStructureService.getAll();
         log.debug("Table structures found");
         return ResponseEntity.ok(tableStructuresDto);
+    }
+
+    @Override
+    public ResponseEntity<TableStructureDto> generateTableStructure(MultipartFile file) {
+        TableStructureDto newTableStructureDto = tableStructureService.generateTableStructure(file);
+        return ResponseEntity.ok(newTableStructureDto);
     }
 
 }

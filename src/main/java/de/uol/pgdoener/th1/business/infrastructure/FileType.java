@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.converterchain;
+package de.uol.pgdoener.th1.business.infrastructure;
 
 import org.springframework.web.multipart.MultipartFile;
 

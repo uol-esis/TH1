@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.converterchain;
+package de.uol.pgdoener.th1.business.infrastructure;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 
