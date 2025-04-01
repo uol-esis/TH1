@@ -3,9 +3,7 @@ package de.uol.pgdoener.th1.business.infrastructure;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -115,9 +113,10 @@ public class InputFile {
             String[][] matrix = new String[endRow][endColumn];
             for (Row row : sheet) {
                 int rowNum = row.getRowNum();
-                if (rowNum >= endRow) {
-                    break;
-                }
+
+                if (rowNum >= endRow) return matrix;
+                if (isFilterRow(row)) continue;
+
                 for (int i = 0; i < endColumn; i++) {
                     switch (row.getCell(i).getCellType()) {
                         case STRING -> matrix[rowNum][i] = row.getCell(i).getStringCellValue();
@@ -132,6 +131,35 @@ public class InputFile {
             }
             return matrix;
         }
+    }
+
+    private boolean isFilterRow(Row row) {
+        // filter out empty rows
+        if (row.getLastCellNum() == -1)
+            return true;
+
+        int blankCells = 0;
+        int nonBlankCells = 0;
+        Iterator<Cell> cellIterator = row.cellIterator();
+        while (cellIterator.hasNext()) {
+            Cell cell = cellIterator.next();
+            if (cell.getCellType() == CellType.BLANK) {
+                blankCells++;
+            } else if (cell.getCellType() == CellType.STRING) {
+                String cellValue = cell.getStringCellValue();
+                if (cellValue.isBlank()) blankCells++;
+                else nonBlankCells++;
+            } else {
+                nonBlankCells++;
+            }
+        }
+
+        // filter out rows with only blank cells
+        if (blankCells == row.getLastCellNum())
+            return true;
+
+        // filter out rows with only one non-blank cell
+        return nonBlankCells == 1;
     }
 
     private interface WorkbookFactory {
