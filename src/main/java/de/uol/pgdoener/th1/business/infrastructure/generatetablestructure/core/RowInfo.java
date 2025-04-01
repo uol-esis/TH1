@@ -31,9 +31,9 @@ public class RowInfo {
 
     public List<Integer> getFilledPositions() {
         return columnInfos.stream()
-                .filter(ColumnInfo::hasEntry) // Nur Spalten mit Einträgen behalten
-                .map(ColumnInfo::getColumnId) // Spalten-IDs extrahieren
-                .toList(); // In eine Liste umwandeln
+                .filter(ColumnInfo::hasEntry)
+                .map(ColumnInfo::getColumnId)
+                .toList();
 
     }
 }
