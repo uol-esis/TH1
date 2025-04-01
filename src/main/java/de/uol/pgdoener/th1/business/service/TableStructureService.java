@@ -4,7 +4,7 @@ import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablesructure.GenerateTableStructureService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.GenerateTableStructureService;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
