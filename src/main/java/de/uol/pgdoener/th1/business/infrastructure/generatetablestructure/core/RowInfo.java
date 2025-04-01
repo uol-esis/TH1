@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablesructure.core;
+package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core;
 
 import lombok.Getter;
 import lombok.Setter;

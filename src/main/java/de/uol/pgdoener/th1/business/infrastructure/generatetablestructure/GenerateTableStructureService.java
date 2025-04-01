@@ -1,12 +1,12 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablesructure;
+package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.dto.ConverterTypeDto;
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablesructure.core.ColumnInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablesructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablesructure.core.RowInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
