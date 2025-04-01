@@ -3,16 +3,22 @@ name: Deploy to dev
 on:
   push:
     branches:
-      - main
       - dev
 
 jobs:
+  verify:
+    name: Verify
+    uses: ./.github/workflows/verify.yaml
+  docker:
+    needs: verify
+    uses: ./.github/workflows/docker.yaml
   deploy:
+    needs: docker
     name: Deploy
     runs-on: ubuntu-latest
     steps:
       - name: Execute deploy script on dev server
-        uses: appleboy/ssh-action@v1.2.0
+        uses: appleboy/ssh-action@v1.2.2
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USERNAME }}
