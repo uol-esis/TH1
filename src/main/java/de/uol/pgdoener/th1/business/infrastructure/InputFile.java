@@ -1,5 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure;
 
+import com.univocity.parsers.csv.CsvParser;
+import com.univocity.parsers.csv.CsvParserSettings;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -66,13 +68,22 @@ public class InputFile {
     // Internal Methods
     // #################
 
-    private String getDelimiter() {
-        return ";";
+    // https://stackoverflow.com/questions/49235863/how-to-determine-the-delimiter-in-csv-file
+    private String getDelimiter() throws IOException {
+        CsvParserSettings settings = new CsvParserSettings();
+        settings.detectFormatAutomatically();
+
+        CsvParser parser = new CsvParser(settings);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            parser.parseAll(reader);
+        }
+        return parser.getDetectedFormat().getDelimiterString();
     }
 
     private String[][] readCsvToMatrix() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String delimiter = getDelimiter();
+            log.debug("Detected delimiter: {}", delimiter);
             List<String[]> rows = reader.lines()
                     .map(String::trim)
                     .filter(line -> line.contains(delimiter) && !line.startsWith("\""))
