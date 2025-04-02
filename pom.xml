@@ -22,7 +22,7 @@
         <mapstruct.version>1.6.3</mapstruct.version>
         <testcontainers.version>1.20.6</testcontainers.version>
         <apache.poi.version>5.4.0</apache.poi.version>
-        <apache.commons.csv.version>1.13.0</apache.commons.csv.version>
+        <apache.commons.csv.version>1.14.0</apache.commons.csv.version>
     </properties>
     <dependencies>
         <dependency>
