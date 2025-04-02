@@ -11,7 +11,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -68,18 +71,21 @@ public class InputFile {
     // #################
 
     // https://stackoverflow.com/questions/49235863/how-to-determine-the-delimiter-in-csv-file
-    private String getDelimiter(Reader reader) {
+    private String getDelimiter() throws IOException {
         CsvParserSettings settings = new CsvParserSettings();
         settings.detectFormatAutomatically();
 
         CsvParser parser = new CsvParser(settings);
-        parser.parseAll(reader);
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            parser.parseAll(reader);
+        }
         return parser.getDetectedFormat().getDelimiterString();
     }
 
     private String[][] readCsvToMatrix() throws IOException {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String delimiter = getDelimiter(reader);
+            String delimiter = getDelimiter();
+            log.debug("Detected delimiter: {}", delimiter);
             List<String[]> rows = reader.lines()
                     .map(String::trim)
                     .filter(line -> line.contains(delimiter) && !line.startsWith("\""))
