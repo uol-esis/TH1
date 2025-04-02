@@ -2,8 +2,10 @@ package de.uol.pgdoener.th1.business.infrastructure;
 
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 
-import java.io.*;
-import java.nio.file.Files;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -19,14 +21,14 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {
             for (String[] row : data) {
-                writer.write(String.join(tableStructure.getDelimiter(), row));
+                writer.write(String.join(";", row));
                 writer.newLine();
             }
         }
         return outputStream;
     }
 
-    public void writeMatrixToFile(String[][] matrix, String fileName) {
+   /* public void writeMatrixToFile(String[][] matrix, String fileName) {
         File newFile = new File(fileName);
         try (BufferedWriter writer = Files.newBufferedWriter(newFile.toPath())) {
             for (String[] row : matrix) {
@@ -36,7 +38,7 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
+    }*/
 
     @Override
     public boolean equals(Object o) {

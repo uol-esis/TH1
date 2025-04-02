@@ -1,5 +1,4 @@
 {
-  "delimiter": ";",
   "structures": [
     {
       "converterType": "REMOVE_ROW_BY_INDEX",
