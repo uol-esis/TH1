@@ -155,7 +155,7 @@ public class InputFile {
 
     private String[][] cutOff(String[][] raw) {
         // cut off rows before the first non-empty row
-        int firstRelevantRow = 0;
+        int firstRelevantRow = -1;
         for (int i = 0; i < raw.length; i++) {
             if (isFilterRow(raw[i])) {
                 firstRelevantRow = i;
@@ -163,8 +163,12 @@ public class InputFile {
                 break;
             }
         }
-        List<String[]> rows = new ArrayList<>(Arrays.asList(raw).subList(firstRelevantRow, raw.length));
-        log.debug("Cut off {} rows from the beginning", firstRelevantRow);
+        List<String[]> rows = new ArrayList<>(Arrays.asList(raw));
+        if (firstRelevantRow != -1) {
+            rows = new ArrayList<>(Arrays.asList(raw).subList(firstRelevantRow + 1, raw.length));
+            log.debug("Cut off {} rows from the beginning", firstRelevantRow + 1);
+        }
+        final int rowCountAfterCutOff = rows.size();
 
         // cut off rows after the last non-empty row
         Iterator<String[]> rowIterator = rows.reversed().iterator();
@@ -176,7 +180,7 @@ public class InputFile {
                 break;
             }
         }
-        log.debug("Cut off {} rows from the end", raw.length - rows.size());
+        log.debug("Cut off {} rows from the end", rowCountAfterCutOff - rows.size());
 
         return rows.toArray(new String[rows.size()][]);
     }
