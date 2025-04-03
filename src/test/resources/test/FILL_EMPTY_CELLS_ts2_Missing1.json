@@ -1,6 +1,5 @@
 {
   "name": "Table Structure 1",
-  "delimiter": ";",
   "structures": [
     {
       "converterType": "FILL_EMPTY_CELLS"

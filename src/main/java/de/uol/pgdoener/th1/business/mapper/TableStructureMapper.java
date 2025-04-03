@@ -29,7 +29,6 @@ public abstract class TableStructureMapper {
 
         TableStructureDto dto = new TableStructureDto();
         dto.setName(tableStructure.getName());
-        dto.setDelimiter(String.valueOf(tableStructure.getDelimiter()));
         dto.setStructures(structureDtoList);
         dto.setId(Optional.ofNullable(tableStructure.getId()));
         dto.setEndRow(Optional.ofNullable(tableStructure.getEndRow()));
@@ -42,7 +41,6 @@ public abstract class TableStructureMapper {
         return new TableStructure(
                 null,
                 tableStructureDto.getName(),
-                tableStructureDto.getDelimiter().charAt(0),
                 tableStructureDto.getEndRow().orElse(null),
                 tableStructureDto.getEndColumn().orElse(null)
         );

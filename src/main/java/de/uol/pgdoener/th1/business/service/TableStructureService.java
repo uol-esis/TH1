@@ -3,6 +3,8 @@ package de.uol.pgdoener.th1.business.service;
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
+import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.GenerateTableStructureService;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,11 +33,11 @@ public class TableStructureService {
     private final StructureRepository structureRepository;
     private final PlatformTransactionManager transactionManager;
 
-    public void create(TableStructureDto tableStructureDto) {
+    public long create(TableStructureDto tableStructureDto) {
         List<StructureDto> structureDtoList = tableStructureDto.getStructures();
         TableStructure tableStructure = TableStructureMapper.toEntity(tableStructureDto);
 
-        new TransactionTemplate(transactionManager).execute(
+        Long result = new TransactionTemplate(transactionManager).execute(
                 status -> {
                     try {
                         TableStructure savedTableStructure = tableStructureRepository.save(tableStructure);
@@ -42,14 +46,19 @@ public class TableStructureService {
                             Structure structure = StructureMapper.toEntity(structureDto, i, savedTableStructure.getId());
                             structureRepository.save(structure);
                         }
+                        return tableStructure.getId();
                     } catch (Exception e) {
                         status.setRollbackOnly();
                         log.info("Error while saving table structure", e);
                         throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
                     }
-                    return null;
                 }
         );
+        if (result == null) {
+            log.error("Could not get id of created table structure");
+            throw new HttpServerErrorException(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return result;
     }
 
     /// TODO: Möglicherweise weniger zurück geben. Jetzt werden alle Informationen zurück gegeben.
@@ -75,6 +84,16 @@ public class TableStructureService {
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructure.getId());
         return TableStructureMapper.toDto(tableStructure, structureList);
+    }
+
+    public TableStructureDto generateTableStructure(MultipartFile file) {
+        InputFile inputFile = new InputFile(file);
+        GenerateTableStructureService generateTableStructureService = new GenerateTableStructureService(inputFile);
+        try {
+            return generateTableStructureService.generateTableStructure();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

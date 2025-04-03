@@ -2,6 +2,8 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
+import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
@@ -32,12 +34,9 @@ public class ConverterChainService {
         Objects.requireNonNull(converterChain.getFirst());
         String[][] transformedMatrix;
         try {
-            String[][] inputArray = inputFile.asStringArray();
-            if (inputArray.length == 0 || inputArray[0].length == 0) {
-                log.debug("Empty input file");
-                return new ConverterResult(tableStructure, inputArray);
-            }
-            transformedMatrix = converterChain.getFirst().handleRequest(inputArray);
+            String[][] rawMatrix = inputFile.asStringArray();
+            String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
+            transformedMatrix = converterChain.getFirst().handleRequest(matrix);
         } catch (IOException e) {
             log.error("Error processing file: Could not read input file content", e);
             throw new TransformationException("Error processing file: Could not read input file content", e);
@@ -45,4 +44,25 @@ public class ConverterChainService {
         return new ConverterResult(tableStructure, transformedMatrix);
     }
 
+    private static String[][] cutOffMatrix(String[][] inputMatrix, TableStructureDto tableStructure) {
+        if (tableStructure.getEndColumn().isPresent() || tableStructure.getEndRow().isPresent()) {
+
+            int maxRow = inputMatrix.length;
+            int maxCol = inputMatrix[0].length;
+
+            // Falls endRow oder endColumn nicht gesetzt sind, bestimmen wir die Größe dynamisch
+            int rowLength = Math.min(tableStructure.getEndRow().orElse(maxRow), maxRow);
+            int colLength = Math.min(tableStructure.getEndColumn().orElse(maxCol), maxCol);
+
+            // Matrix initialisieren
+            String[][] outputMatrix = new String[rowLength][colLength];
+
+            // Daten in die Matrix kopieren
+            for (int i = 0; i < rowLength; i++) {
+                System.arraycopy(inputMatrix[i], 0, outputMatrix[i], 0, Math.min(inputMatrix[i].length, colLength));
+            }
+            return outputMatrix;
+        }
+        return inputMatrix;
+    }
 }

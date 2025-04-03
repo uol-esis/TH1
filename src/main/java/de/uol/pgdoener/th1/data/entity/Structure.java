@@ -13,6 +13,7 @@ import org.hibernate.annotations.Type;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(schema = "th1-internal")
 public class Structure {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(schema = "th1-internal")
 public class TableStructure {
 
     @Id
@@ -17,9 +18,6 @@ public class TableStructure {
 
     @Column(nullable = false, unique = true)
     private String name;
-
-    @Column(nullable = false)
-    private char delimiter;
 
     private Integer endRow;
     private Integer endColumn;

@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1;
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.TransformationException;
+import de.uol.pgdoener.th1.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -20,6 +21,13 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(MetabaseException.class)
+    public ResponseEntity<Object> handleMetabaseException(MetabaseException ex) {
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        log.debug("MetabaseException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse.getBody());
+    }
 
     @ExceptionHandler(ArrayIndexOutOfBoundsException.class)
     public ResponseEntity<Object> handleArrayIndexOutOfBoundsException(ArrayIndexOutOfBoundsException ex) {
