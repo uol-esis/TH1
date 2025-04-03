@@ -93,14 +93,7 @@ public class InputFile {
                 return new String[0][0];
             }
 
-            int maxCol = rows.getFirst().length;
-            String[][] matrix = new String[rows.size()][maxCol];
-
-            for (int i = 0; i < rows.size(); i++) {
-                System.arraycopy(rows.get(i), 0, matrix[i], 0, rows.get(i).length);
-            }
-
-            return matrix;
+            return rows.toArray(new String[rows.size()][]);
         }
     }
 
