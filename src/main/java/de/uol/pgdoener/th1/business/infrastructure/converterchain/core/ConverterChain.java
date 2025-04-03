@@ -1,6 +1,10 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
+import lombok.Getter;
+
 public class ConverterChain {
+
+    @Getter
     private Converter first;
     private Converter last;
 
@@ -13,8 +17,4 @@ public class ConverterChain {
         this.last = converter;
     }
 
-    public Converter getFirst() {
-        return this.first;
-    }
 }
-

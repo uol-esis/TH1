@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure;
 
+import lombok.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -28,7 +29,7 @@ enum FileType {
                 .anyMatch(originalFilename.toLowerCase()::endsWith);
     }
 
-    static FileType getType(MultipartFile file) {
+    static FileType getType(@NonNull MultipartFile file) {
         for (FileType fileType : FileType.values()) {
             if (fileType.isType(file)) {
                 return fileType;

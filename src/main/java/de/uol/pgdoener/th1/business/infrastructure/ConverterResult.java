@@ -52,4 +52,12 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
         return Objects.hash(tableStructure, Arrays.deepHashCode(data));
     }
 
+    @Override
+    public String toString() {
+        return "ConverterResult{" +
+                "tableStructure=" + tableStructure +
+                ", data=" + Arrays.toString(data) +
+                '}';
+    }
+
 }
