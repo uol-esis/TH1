@@ -126,6 +126,10 @@ public class InputFile {
                 if (rowNum >= endRow) return matrix;
 
                 for (int i = 0; i < endColumn; i++) {
+                    if (row.getCell(i) == null) {
+                        matrix[rowNum][i] = "";
+                        continue;
+                    }
                     switch (row.getCell(i).getCellType()) {
                         case STRING -> matrix[rowNum][i] = row.getCell(i).getStringCellValue();
                         case NUMERIC -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getNumericCellValue());
