@@ -59,10 +59,9 @@ public class InputFile {
     }
 
     public String getFileName() {
-        String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename()).toLowerCase();
+        String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename());
         int dotIndex = originalFilename.lastIndexOf('.');
-        String nameWithoutExtension = (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
-        return nameWithoutExtension.replace(" ", "_");
+        return (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
     }
 
     // #################
