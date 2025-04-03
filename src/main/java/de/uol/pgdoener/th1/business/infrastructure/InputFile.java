@@ -5,7 +5,9 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,9 +15,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 
 /**
  * This class takes a {@link MultipartFile} and a {@link TableStructureDto} and provides the file as a 2D-String Array.
@@ -50,11 +50,11 @@ public class InputFile {
      * @throws IOException if the file cannot be read
      */
     public String[][] asStringArray() throws IOException {
-        return switch (fileType) {
+        return mapNulls(cutOff(switch (fileType) {
             case CSV -> readCsvToMatrix();
             case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
             case EXCEL_OOXML -> readExcelOOXMLToMatrix();
-        };
+        }));
     }
 
     public String getFileName() {
@@ -86,9 +86,7 @@ public class InputFile {
             log.debug("Detected delimiter: {}", delimiter);
             List<String[]> rows = reader.lines()
                     .map(String::trim)
-                    .filter(line -> line.contains(delimiter) && !line.startsWith("\""))
                     .map(line -> line.split(delimiter, -1))
-                    .filter(row -> row.length > 0 && !row[0].isEmpty())
                     .toList();
 
             if (rows.isEmpty()) {
@@ -126,7 +124,6 @@ public class InputFile {
                 int rowNum = row.getRowNum();
 
                 if (rowNum >= endRow) return matrix;
-                if (isFilterRow(row)) continue;
 
                 for (int i = 0; i < endColumn; i++) {
                     switch (row.getCell(i).getCellType()) {
@@ -144,36 +141,74 @@ public class InputFile {
         }
     }
 
-    private boolean isFilterRow(Row row) {
+    private interface WorkbookFactory {
+        Workbook create(InputStream inputStream) throws IOException;
+    }
+
+    // ################
+    // Cut Off Methods
+    // ################
+
+    private String[][] cutOff(String[][] raw) {
+        // cut off rows before the first non-empty row
+        int firstRelevantRow = 0;
+        for (int i = 0; i < raw.length; i++) {
+            if (isFilterRow(raw[i])) {
+                firstRelevantRow = i;
+            } else {
+                break;
+            }
+        }
+        List<String[]> rows = new ArrayList<>(Arrays.asList(raw).subList(firstRelevantRow, raw.length));
+        log.debug("Cut off {} rows from the beginning", firstRelevantRow);
+
+        // cut off rows after the last non-empty row
+        Iterator<String[]> rowIterator = rows.reversed().iterator();
+        while (rowIterator.hasNext()) {
+            String[] row = rowIterator.next();
+            if (isFilterRow(row)) {
+                rowIterator.remove();
+            } else {
+                break;
+            }
+        }
+        log.debug("Cut off {} rows from the end", raw.length - rows.size());
+
+        return rows.toArray(new String[rows.size()][]);
+    }
+
+    private boolean isFilterRow(String[] row) {
         // filter out empty rows
-        if (row.getLastCellNum() == -1)
+        if (row.length == 0)
             return true;
 
         int blankCells = 0;
         int nonBlankCells = 0;
-        Iterator<Cell> cellIterator = row.cellIterator();
-        while (cellIterator.hasNext()) {
-            Cell cell = cellIterator.next();
-            if (cell.getCellType() == CellType.BLANK) {
+        for (String cell : row) {
+            if (cell == null || cell.isBlank()) {
                 blankCells++;
-            } else if (cell.getCellType() == CellType.STRING) {
-                String cellValue = cell.getStringCellValue();
-                if (cellValue.isBlank()) blankCells++;
-                else nonBlankCells++;
             } else {
                 nonBlankCells++;
             }
         }
 
         // filter out rows with only blank cells
-        if (blankCells == row.getLastCellNum())
+        if (blankCells == row.length)
             return true;
 
         // filter out rows with only one non-blank cell
         return nonBlankCells == 1;
     }
 
-    private interface WorkbookFactory {
-        Workbook create(InputStream inputStream) throws IOException;
+    private String[][] mapNulls(String[][] raw) {
+        for (int i = 0; i < raw.length; i++) {
+            for (int j = 0; j < raw[i].length; j++) {
+                if (raw[i][j] == null) {
+                    raw[i][j] = "";
+                }
+            }
+        }
+        return raw;
     }
+
 }
