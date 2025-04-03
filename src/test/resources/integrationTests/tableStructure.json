@@ -1,6 +1,5 @@
 {
   "name": "Table structure 1",
-  "delimiter": ";",
   "structures": [
     {
       "converterType": "REMOVE_COLUMN_BY_INDEX",

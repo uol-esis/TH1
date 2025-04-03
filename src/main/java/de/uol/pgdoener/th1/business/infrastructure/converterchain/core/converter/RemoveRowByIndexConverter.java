@@ -3,8 +3,6 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converte
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveRowByIndexStructure;
 
-import java.util.Arrays;
-
 public class RemoveRowByIndexConverter extends Converter {
 
     private final RemoveRowByIndexStructure structure;

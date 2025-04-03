@@ -3,6 +3,8 @@ package de.uol.pgdoener.th1.business.service;
 import de.uol.pgdoener.th1.business.dto.StructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
+import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.GenerateTableStructureService;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -16,7 +18,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.HttpServerErrorException;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,6 +84,16 @@ public class TableStructureService {
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructure.getId());
         return TableStructureMapper.toDto(tableStructure, structureList);
+    }
+
+    public TableStructureDto generateTableStructure(MultipartFile file) {
+        InputFile inputFile = new InputFile(file);
+        GenerateTableStructureService generateTableStructureService = new GenerateTableStructureService(inputFile);
+        try {
+            return generateTableStructureService.generateTableStructure();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
