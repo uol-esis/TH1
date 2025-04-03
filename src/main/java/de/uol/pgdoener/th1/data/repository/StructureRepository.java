@@ -12,4 +12,6 @@ public interface StructureRepository extends
         CrudRepository<Structure, Long>,
         JpaSpecificationExecutor<Structure> {
     List<Structure> findByTableStructureId(Long tableStructureId);
+
+    void deleteByTableStructureId(Long tableStructureId);
 }

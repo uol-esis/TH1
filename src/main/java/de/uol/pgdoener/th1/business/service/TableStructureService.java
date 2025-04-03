@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -94,6 +95,28 @@ public class TableStructureService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public boolean deleteById(long id) {
+        Optional<TableStructure> tableStructure = tableStructureRepository.findById(id);
+        if (tableStructure.isEmpty()) {
+            log.info("Table structure with id {} not found", id);
+            return false;
+        }
+        Boolean success = new TransactionTemplate(transactionManager).execute(
+                status -> {
+                    try {
+                        tableStructureRepository.deleteById(id);
+                        structureRepository.deleteByTableStructureId(id);
+                    } catch (Exception e) {
+                        status.setRollbackOnly();
+                        log.info("Error while deleting table structure", e);
+                        throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
+                    }
+                    return true;
+                }
+        );
+        return success != null && success;
     }
 
 }
