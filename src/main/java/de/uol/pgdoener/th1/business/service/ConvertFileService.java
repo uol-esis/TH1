@@ -51,16 +51,27 @@ public class ConvertFileService {
                     .toLowerCase()
                     .trim()
                     .replace(" ", "_")
-                    .replace(",", "_") + "_" + tableStructureId;
+                    .replace(",", "_")
+                    .replace("-", "_")
+                    .replace(".", "_")
+                    .replace(":", "_")
+                    .replace(";", "_")
+                    .replace("(", "_")
+                    .replace(")", "_")
+                    + "_" + tableStructureId;
+            if (tableName.matches("\\d.*")) {
+                tableName = "d" + tableName;
+            }
 
-            System.out.println(tableName);
+            log.debug("Name for table: {}", tableName);
 
             // Tabelle erstellen
             dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
             // Daten einfügen
             dynamicTableRepository.insertData(tableName, transformedMatrix);
         } catch (Exception e) {
-            throw new RuntimeException("Error processing CSV file", e);
+            log.error("Error processing file", e);
+            throw new RuntimeException("Error processing file", e);
         }
     }
 

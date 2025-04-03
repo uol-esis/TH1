@@ -89,7 +89,7 @@ public class DynamicTableRepository {
         switch (columnType.toUpperCase()) {
             case "INTEGER":
                 return Integer.parseInt(value);
-            case "DECIMAL":
+            case "NUMERIC":
                 return Double.parseDouble(value);
             case "BOOLEAN":
                 return Boolean.parseBoolean(value);
