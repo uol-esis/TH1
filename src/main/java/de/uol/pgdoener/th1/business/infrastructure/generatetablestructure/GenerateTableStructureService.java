@@ -1,8 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
-import de.uol.pgdoener.th1.business.dto.ConverterTypeDto;
-import de.uol.pgdoener.th1.business.dto.StructureDto;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
@@ -59,7 +57,7 @@ public class GenerateTableStructureService {
         TableStructureDto tableStructure = new TableStructureDto();
         tableStructure.setName(inputFile.getFileName());
 
-        StructureDto fillEmptyRowStructure = new StructureDto();
+        FillEmptyRowStructureDto fillEmptyRowStructure = new FillEmptyRowStructureDto();
         List<Integer> rowToFill = matrixInfo.getRowToFill();
         if (!rowToFill.isEmpty()) {
             fillEmptyRowStructure.setConverterType(ConverterTypeDto.FILL_EMPTY_ROW);
@@ -90,13 +88,13 @@ public class GenerateTableStructureService {
             }*/
 
         if (matrixInfo.isGroupedHeader()) {
-            StructureDto groupHeaderStructure = new StructureDto();
+            RemoveGroupedHeaderStructureDto groupHeaderStructure = new RemoveGroupedHeaderStructureDto();
             groupHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_GROUPED_HEADER);
             groupHeaderStructure.setColumnIndex(matrixInfo.getColumnIndexes());
             groupHeaderStructure.setRowIndex(matrixInfo.getRowIndexes());
             groupHeaderStructure.setStartRow(Optional.of(matrixInfo.getStartRow()));
 
-            StructureDto addHeaderNamesStructure = new StructureDto();
+            AddHeaderNameStructureDto addHeaderNamesStructure = new AddHeaderNameStructureDto();
             addHeaderNamesStructure.setConverterType(ConverterTypeDto.ADD_HEADER_NAME);
             addHeaderNamesStructure.setHeaderNames(matrixInfo.getHeaderNames());
 

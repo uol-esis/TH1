@@ -1,46 +1,119 @@
 package de.uol.pgdoener.th1.business.mapper;
 
-import de.uol.pgdoener.th1.business.dto.ConverterTypeDto;
-import de.uol.pgdoener.th1.business.dto.StructureDto;
-import de.uol.pgdoener.th1.business.dto.StructureSummaryDto;
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.*;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.Optional;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class StructureMapper {
 
     public static StructureDto toDto(Structure entity) {
-        StructureDto dto = new StructureDto();
-        dto.setConverterType(ConverterTypeMapper.toDto(entity.getConverterType()));
-        dto.setColumnIndex(List.of(entity.getColumns()));
-        dto.setRowIndex(List.of(entity.getRows()));
-        dto.setHeaderNames(List.of(entity.getHeaderNames()));
-        dto.setStartRow(Optional.ofNullable(entity.getStartRow()));
-        dto.setEndRow(Optional.ofNullable(entity.getEndRow()));
-        dto.setStartColumn(Optional.ofNullable(entity.getStartColumn()));
-        dto.setEndColumn(Optional.ofNullable(entity.getEndColumn()));
-        return dto;
+        return switch (entity.getConverterType()) {
+            case REMOVE_GROUPED_HEADER -> new RemoveGroupedHeaderStructureDto(
+                    ConverterTypeMapper.toDto(entity.getConverterType()),
+                    List.of(entity.getColumns()),
+                    List.of(entity.getRows())
+            )
+                    .startRow(entity.getStartRow())
+                    .startColumn(entity.getStartColumn());
+            case FILL_EMPTY_ROW -> new FillEmptyRowStructureDto(
+                    ConverterTypeMapper.toDto(entity.getConverterType()),
+                    List.of(entity.getRows())
+            );
+            case REMOVE_COLUMN_BY_INDEX -> new RemoveColumnByIndexStructureDto(
+                    ConverterTypeMapper.toDto(entity.getConverterType()),
+                    List.of(entity.getColumns())
+            );
+            case REMOVE_ROW_BY_INDEX -> new RemoveRowByIndexStructureDto(
+                    ConverterTypeMapper.toDto(entity.getConverterType()),
+                    List.of(entity.getRows())
+            );
+            case ADD_HEADER_NAME -> new AddHeaderNameStructureDto(
+                    ConverterTypeMapper.toDto(entity.getConverterType()),
+                    List.of(entity.getHeaderNames())
+            );
+        };
     }
 
     public static Structure toEntity(StructureDto dto, int position, Long tableStructureId) {
-        return new Structure(
-                null, // ID wird von der Datenbank generiert
-                ConverterTypeMapper.toEntity(dto.getConverterType()),
-                dto.getColumnIndex().toArray(new Integer[0]),
-                dto.getRowIndex().toArray(new Integer[0]),
-                dto.getHeaderNames().toArray(new String[0]),
-                dto.getStartRow().orElse(null),
-                dto.getEndRow().orElse(null),
-                dto.getStartColumn().orElse(null),
-                dto.getEndColumn().orElse(null),
-                position,
-                tableStructureId
-        );
+        return switch (dto) {
+            case RemoveGroupedHeaderStructureDto structure:
+                yield new Structure(
+                        null, // ID wird von der Datenbank generiert
+                        ConverterTypeMapper.toEntity(dto.getConverterType()),
+                        structure.getColumnIndex().toArray(new Integer[0]),
+                        structure.getRowIndex().toArray(new Integer[0]),
+                        new String[0],
+                        structure.getStartRow().orElse(null),
+                        null,
+                        structure.getStartColumn().orElse(null),
+                        null,
+                        position,
+                        tableStructureId
+                );
+            case FillEmptyRowStructureDto structure:
+                yield new Structure(
+                        null, // ID wird von der Datenbank generiert
+                        ConverterTypeMapper.toEntity(dto.getConverterType()),
+                        new Integer[0],
+                        structure.getRowIndex().toArray(new Integer[0]),
+                        new String[0],
+                        null,
+                        null,
+                        null,
+                        null,
+                        position,
+                        tableStructureId
+                );
+            case RemoveColumnByIndexStructureDto structure:
+                yield new Structure(
+                        null, // ID wird von der Datenbank generiert
+                        ConverterTypeMapper.toEntity(dto.getConverterType()),
+                        structure.getColumnIndex().toArray(new Integer[0]),
+                        new Integer[0],
+                        new String[0],
+                        null,
+                        null,
+                        null,
+                        null,
+                        position,
+                        tableStructureId
+                );
+            case RemoveRowByIndexStructureDto structure:
+                yield new Structure(
+                        null, // ID wird von der Datenbank generiert
+                        ConverterTypeMapper.toEntity(dto.getConverterType()),
+                        new Integer[0],
+                        structure.getRowIndex().toArray(new Integer[0]),
+                        new String[0],
+                        null,
+                        null,
+                        null,
+                        null,
+                        position,
+                        tableStructureId
+                );
+            case AddHeaderNameStructureDto structure:
+                yield new Structure(
+                        null, // ID wird von der Datenbank generiert
+                        ConverterTypeMapper.toEntity(dto.getConverterType()),
+                        new Integer[0],
+                        new Integer[0],
+                        structure.getHeaderNames().toArray(new String[0]),
+                        null,
+                        null,
+                        null,
+                        null,
+                        position,
+                        tableStructureId
+                );
+            default:
+                throw new IllegalStateException("Unexpected value: " + dto);
+        };
     }
 
     public static StructureSummaryDto toSummaryDto(Structure entity) {
@@ -50,43 +123,42 @@ public abstract class StructureMapper {
     }
 
     public static IStructure toConverterStructure(StructureDto structureDto) {
-        ConverterTypeDto converterType = structureDto.getConverterType();
-        return switch (converterType) {
-            case REMOVE_GROUPED_HEADER:
-                if (structureDto.getColumnIndex().isEmpty()) {
+        return switch (structureDto) {
+            case RemoveGroupedHeaderStructureDto structure:
+                if (structure.getColumnIndex().isEmpty()) {
                     throw new IllegalArgumentException("Columns missing");
                 }
-                if (structureDto.getRowIndex().isEmpty()) {
+                if (structure.getRowIndex().isEmpty()) {
                     throw new IllegalArgumentException("Rows missing");
                 }
                 yield new RemoveGroupedHeaderStructure(
-                        structureDto.getColumnIndex().toArray(new Integer[0]),
-                        structureDto.getRowIndex().toArray(new Integer[0]),
-                        structureDto.getStartRow().orElse(null),
-                        structureDto.getStartColumn().orElse(null)
+                        structure.getColumnIndex().toArray(new Integer[0]),
+                        structure.getRowIndex().toArray(new Integer[0]),
+                        structure.getStartRow().orElse(null),
+                        structure.getStartColumn().orElse(null)
                 );
-            case FILL_EMPTY_ROW:
-                if (structureDto.getRowIndex().isEmpty()) {
+            case FillEmptyRowStructureDto structure:
+                if (structure.getRowIndex().isEmpty()) {
                     throw new IllegalArgumentException("Rows missing");
                 }
-                yield new FillEmptyRowStructure(structureDto.getRowIndex().toArray(new Integer[0]));
-            case REMOVE_COLUMN_BY_INDEX:
-                if (structureDto.getColumnIndex().isEmpty()) {
+                yield new FillEmptyRowStructure(structure.getRowIndex().toArray(new Integer[0]));
+            case RemoveColumnByIndexStructureDto structure:
+                if (structure.getColumnIndex().isEmpty()) {
                     throw new IllegalArgumentException("Columns missing");
                 }
-                yield new RemoveColumnByIndexStructure(structureDto.getColumnIndex().toArray(new Integer[0]));
-            case REMOVE_ROW_BY_INDEX:
-                if (structureDto.getRowIndex().isEmpty()) {
+                yield new RemoveColumnByIndexStructure(structure.getColumnIndex().toArray(new Integer[0]));
+            case RemoveRowByIndexStructureDto structure:
+                if (structure.getRowIndex().isEmpty()) {
                     throw new IllegalArgumentException("Rows missing");
                 }
-                yield new RemoveRowByIndexStructure(structureDto.getRowIndex().toArray(new Integer[0]));
-            case ADD_HEADER_NAME:
-                if (structureDto.getHeaderNames().isEmpty()) {
+                yield new RemoveRowByIndexStructure(structure.getRowIndex().toArray(new Integer[0]));
+            case AddHeaderNameStructureDto structure:
+                if (structure.getHeaderNames().isEmpty()) {
                     throw new IllegalArgumentException("HeaderNames missing");
                 }
-                yield new HeaderRowStructure(structureDto.getHeaderNames().toArray(new String[0]));
-            case UNKNOWN_DEFAULT_OPEN_API:
-                throw new IllegalArgumentException("Unknown converterType");
+                yield new HeaderRowStructure(structure.getHeaderNames().toArray(new String[0]));
+            default:
+                throw new IllegalStateException("Unexpected value: " + structureDto);
         };
     }
 
