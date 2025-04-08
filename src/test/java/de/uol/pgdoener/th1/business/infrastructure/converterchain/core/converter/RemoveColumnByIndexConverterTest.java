@@ -44,15 +44,25 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestIndexOutOfBounds() {
+    void testHandleRequestIndexOutOfBoundsPositive() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{4});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
-        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+        assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
-        assertArrayEquals(matrix, result);
+    }
+
+    @Test
+    void testHandleRequestIndexOutOfBoundsNegative() {
+        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{-1});
+        RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
+        String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
+
+        assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+
+        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -64,6 +74,18 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"s", "t"}, {"r", "d"}}, result);
+        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
+    }
+
+    @Test
+    void testHandleRequestDuplicateColumns() {
+        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{1, 1});
+        RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
+        String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
+
+        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t", "s", "t"}, {"w", "r", "d"}}, result);
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 

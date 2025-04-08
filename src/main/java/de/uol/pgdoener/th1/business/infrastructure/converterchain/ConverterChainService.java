@@ -43,6 +43,9 @@ public class ConverterChainService {
         } catch (IOException e) {
             log.error("Error processing file: Could not read input file content", e);
             throw new TransformationException("Error processing file: Could not read input file content", e);
+        } catch (Exception e) {
+            log.error("Error processing file: Could not process input file content", e);
+            throw new TransformationException("Error processing file: Could not process input file content", e);
         }
         return new ConverterResult(tableStructure, transformedMatrix);
     }

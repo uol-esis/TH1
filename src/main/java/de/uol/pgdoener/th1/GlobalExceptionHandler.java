@@ -38,7 +38,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TransformationException.class)
     public ResponseEntity<Object> handleTransformationException(TransformationException ex) {
-        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        String detail = ex.getMessage();
+        detail += ex.getCause() != null ? ": " + ex.getCause().getMessage() : "";
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.INTERNAL_SERVER_ERROR, detail);
         log.debug("TransformationException: {}", ex.getMessage());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse.getBody());
     }
