@@ -1,0 +1,51 @@
+package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
+
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.HeaderRowStructure;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+class AddHeaderRowConverterTest {
+
+    @Test
+    void testHandleRequest() {
+        HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t", "e", "s", "t"});
+        AddHeaderRowConverter removeColumnByIndexConverter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"a", "b", "c", "d"}}, result);
+    }
+
+    @Test
+    void testHandleRequestEmptyMatrix() {
+        HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t", "e", "s", "t"});
+        AddHeaderRowConverter removeColumnByIndexConverter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{};
+
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+    }
+
+    @Test
+    void testHandleRequestEmptyHeaderRow() {
+        HeaderRowStructure structure = new HeaderRowStructure(new String[]{});
+        AddHeaderRowConverter removeColumnByIndexConverter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, result);
+    }
+
+    @Test
+    void testHandleRequestHeaderRowLongerThanMatrix() {
+        HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t", "e", "s", "t", "extra"});
+        AddHeaderRowConverter removeColumnByIndexConverter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+    }
+
+}
