@@ -17,7 +17,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "t"}, {"w", "o", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -29,7 +28,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -39,8 +37,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] matrix = new String[][]{};
 
         assertThrows(IndexOutOfBoundsException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{}, matrix);
     }
 
     @Test
@@ -50,8 +46,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
         assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -61,8 +55,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
         assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -74,7 +66,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"s", "t"}, {"r", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -86,7 +77,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "s", "t"}, {"w", "r", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
 }

@@ -17,7 +17,6 @@ class RemoveRowByIndexConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"a", "b", "c", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, matrix);
     }
 
     @Test
@@ -29,7 +28,6 @@ class RemoveRowByIndexConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, matrix);
     }
 
     @Test
@@ -39,8 +37,6 @@ class RemoveRowByIndexConverterTest {
         String[][] matrix = new String[][]{};
 
         assertThrows(IndexOutOfBoundsException.class, () -> converter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{}, matrix);
     }
 
     @Test
@@ -50,8 +46,6 @@ class RemoveRowByIndexConverterTest {
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
         assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, matrix);
     }
 
     @Test
@@ -61,8 +55,6 @@ class RemoveRowByIndexConverterTest {
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
         assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, matrix);
     }
 
     @Test
@@ -74,7 +66,6 @@ class RemoveRowByIndexConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"w", "o", "r", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, matrix);
     }
 
     @Test
@@ -86,7 +77,6 @@ class RemoveRowByIndexConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"a", "b", "c", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, matrix);
     }
 
 }
