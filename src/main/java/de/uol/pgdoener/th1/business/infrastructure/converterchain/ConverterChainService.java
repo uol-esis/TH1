@@ -34,6 +34,10 @@ public class ConverterChainService {
         try {
             String[][] rawMatrix = inputFile.asStringArray();
             String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
+            if (matrix.length == 0 || matrix[0].length == 0) {
+                log.debug("No data found in the input file");
+                return new ConverterResult(tableStructure, matrix);
+            }
             Converter first = converterChain.getFirst();
             if (first == null) {
                 log.debug("No converter found");

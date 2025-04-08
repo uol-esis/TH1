@@ -2,42 +2,38 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converte
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveRowByIndexStructure;
+import lombok.RequiredArgsConstructor;
 
+import java.util.HashSet;
+import java.util.Set;
+
+@RequiredArgsConstructor
 public class RemoveRowByIndexConverter extends Converter {
 
     private final RemoveRowByIndexStructure structure;
 
-    public RemoveRowByIndexConverter(RemoveRowByIndexStructure structure) {
-        this.structure = structure;
-    }
-
     @Override
     public String[][] handleRequest(String[][] matrix) {
-        Integer[] rowsToDelete = structure.rows(); // Annahme: "rows" enthält die Zeilenindizes, die gelöscht werden sollen
+        Integer[] rowsToDelete = structure.rows();
 
-        int endRow = matrix.length;
+        int totalRows = matrix.length;
 
-        for (int rowIndex : rowsToDelete) {
-            if (rowIndex >= endRow) {
-                throw new IllegalArgumentException("Row index must be less than endRow: " + endRow);
+        // Filter duplicates and out of bounds
+        Set<Integer> deleteSet = new HashSet<>();
+        for (int row : rowsToDelete) {
+            if (row < 0 || row >= totalRows) {
+                throw new IllegalArgumentException("Index " + row + " out of bounds for matrix with " + totalRows + " rows");
+            } else {
+                deleteSet.add(row);
             }
         }
 
-        // Neue Matrix erstellen, die die Zeilen ohne die zu löschenden enthält
-        String[][] newMatrix = new String[matrix.length - rowsToDelete.length][matrix[0].length];
+        // Create new matrix that contains the rows without the ones to be deleted
+        String[][] newMatrix = new String[matrix.length - deleteSet.size()][matrix[0].length];
         int newRowIndex = 0;
 
         for (int i = 0; i < matrix.length; i++) {
-            // Wenn die Zeile nicht zum Löschen gehört, kopiere sie in die neue Matrix
-            boolean isRowToDelete = false;
-            for (int rowIndex : rowsToDelete) {
-                if (i == rowIndex) {
-                    isRowToDelete = true;
-                    break;
-                }
-            }
-
-            if (!isRowToDelete) {
+            if (!deleteSet.contains(i)) {
                 newMatrix[newRowIndex++] = matrix[i];
             }
         }
