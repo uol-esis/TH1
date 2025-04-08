@@ -3,6 +3,7 @@ package de.uol.pgdoener.th1.business.infrastructure;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
@@ -38,7 +39,7 @@ public class InputFile {
      * @param file the file to be read
      * @throws IllegalArgumentException if the file type is not supported
      */
-    public InputFile(MultipartFile file) {
+    public InputFile(@NonNull MultipartFile file) {
         this(file, FileType.getType(file));
     }
 
@@ -58,10 +59,9 @@ public class InputFile {
     }
 
     public String getFileName() {
-        String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename()).toLowerCase();
+        String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename());
         int dotIndex = originalFilename.lastIndexOf('.');
-        String nameWithoutExtension = (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
-        return nameWithoutExtension.replace(" ", "_");
+        return (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
     }
 
     // #################
@@ -110,7 +110,10 @@ public class InputFile {
             Iterator<Sheet> sheetIterator = workbook.sheetIterator();
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
-            int endRow = sheet.getLastRowNum();
+            int endRow = sheet.getLastRowNum() + 1;
+            if (endRow == 0 || sheet.getRow(0) == null || sheet.getRow(0).getLastCellNum() == -1) {
+                return new String[0][0];
+            }
             int endColumn = sheet.getRow(0).getLastCellNum();
             String[][] matrix = new String[endRow][endColumn];
             for (Row row : sheet) {

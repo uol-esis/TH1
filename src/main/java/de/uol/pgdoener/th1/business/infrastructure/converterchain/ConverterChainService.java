@@ -12,7 +12,6 @@ import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.Objects;
 
 @Slf4j
 public class ConverterChainService {
@@ -31,12 +30,16 @@ public class ConverterChainService {
     }
 
     public ConverterResult performTransformation(InputFile inputFile) throws TransformationException {
-        Objects.requireNonNull(converterChain.getFirst());
         String[][] transformedMatrix;
         try {
             String[][] rawMatrix = inputFile.asStringArray();
             String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
-            transformedMatrix = converterChain.getFirst().handleRequest(matrix);
+            Converter first = converterChain.getFirst();
+            if (first == null) {
+                log.debug("No converter found");
+                return new ConverterResult(tableStructure, rawMatrix);
+            }
+            transformedMatrix = first.handleRequest(matrix);
         } catch (IOException e) {
             log.error("Error processing file: Could not read input file content", e);
             throw new TransformationException("Error processing file: Could not read input file content", e);
