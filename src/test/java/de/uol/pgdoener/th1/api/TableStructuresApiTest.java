@@ -21,8 +21,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -128,5 +127,35 @@ class TableStructuresApiTest {
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
+    @Test
+    void deleteTableStructuresEndpoint() throws Exception {
+
+        // load from resources
+        String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
+
+        mockMvc.perform(post("/v1/table-structures")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(tableStructureJson)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(status().isCreated());
+
+        Long id = tableStructureRepository.findAll().iterator().next().getId();
+
+        mockMvc.perform(delete("/v1/table-structures?id=" + id))
+                .andExpect(status().isOk());
+
+        Assertions.assertEquals(0, tableStructureRepository.count());
+
+    }
+
+    @Test
+    void deleteTableStructuresEndpointNonExistent() throws Exception {
+
+        mockMvc.perform(delete("/v1/table-structures?id=1"))
+                .andExpect(status().isBadRequest());
+
+        Assertions.assertEquals(0, tableStructureRepository.count());
+
+    }
 
 }
