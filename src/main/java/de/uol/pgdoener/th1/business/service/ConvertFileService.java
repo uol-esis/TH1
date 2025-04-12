@@ -69,6 +69,7 @@ public class ConvertFileService {
             dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
             // Daten einfügen
             dynamicTableRepository.insertData(tableName, transformedMatrix);
+            mbService.updateAllDatabases();
         } catch (Exception e) {
             log.error("Error processing file", e);
             throw new RuntimeException("Error processing file", e);
