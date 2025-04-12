@@ -26,30 +26,7 @@ public class RemoveGroupedHeaderConverter extends Converter {
         int endRow = matrix.length;
         int endColumn = matrix[0].length;
 
-        for (int rowIndex : rows) {
-            if (rowIndex >= startRow) {
-                throw new IllegalArgumentException("Row index must be less than startRow: " + startRow);
-            }
-            if (rowIndex >= endRow) {
-                throw new IllegalArgumentException("Row index must be less than endRow: " + endRow);
-            }
-        }
-        for (int columnIndex : columns) {
-            if (columnIndex >= startColumn) {
-                throw new IllegalArgumentException("Column index must be less than startColumn: " + startRow);
-            }
-            if (columnIndex >= endColumn) {
-                throw new IllegalArgumentException("Column index must be less than endColumn: " + endRow);
-            }
-        }
-
-        if (startRow >= endRow) {
-            throw new IllegalArgumentException("Start row out of bounds");
-        }
-        if (startColumn >= endColumn) {
-            throw new IllegalArgumentException("Start row out of bounds");
-        }
-
+        validateInputs(startRow, startColumn, endRow, endColumn);
 
         //Add header row dynamically based on grouped headers
         String defaultHeaderName = "undefined";
@@ -89,4 +66,31 @@ public class RemoveGroupedHeaderConverter extends Converter {
         }
         return super.handleRequest(transformedMatrix);
     }
+
+    private void validateInputs(int startRow, int startColumn, int endRow, int endColumn) {
+        for (int rowIndex : structure.rows()) {
+            if (rowIndex >= startRow) {
+                throw new IllegalArgumentException("Row index must be less than startRow: " + startRow);
+            }
+            if (rowIndex >= endRow) {
+                throw new IllegalArgumentException("Row index must be less than endRow: " + endRow);
+            }
+        }
+        for (int columnIndex : structure.columns()) {
+            if (columnIndex >= startColumn) {
+                throw new IllegalArgumentException("Column index must be less than startColumn: " + startRow);
+            }
+            if (columnIndex >= endColumn) {
+                throw new IllegalArgumentException("Column index must be less than endColumn: " + endRow);
+            }
+        }
+
+        if (startRow >= endRow) {
+            throw new IllegalArgumentException("Start row out of bounds");
+        }
+        if (startColumn >= endColumn) {
+            throw new IllegalArgumentException("Start row out of bounds");
+        }
+    }
+
 }

@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RemoveColumnByIndexConverterTest {
 
     @Test
-    void testHandleRequest() {
+    void testHandleRequest() throws Exception {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{2});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -20,7 +20,7 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestEmptyIndexArray() {
+    void testHandleRequestEmptyIndexArray() throws Exception {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -58,7 +58,7 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestMultipleColumns() {
+    void testHandleRequestMultipleColumns() throws Exception {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0, 1});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -69,7 +69,7 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestDuplicateColumns() {
+    void testHandleRequestDuplicateColumns() throws Exception {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{1, 1});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};

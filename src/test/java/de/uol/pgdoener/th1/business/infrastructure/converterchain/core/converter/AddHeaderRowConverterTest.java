@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AddHeaderRowConverterTest {
 
     @Test
-    void testHandleRequest() {
+    void testHandleRequest() throws Exception {
         HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t", "e", "s", "t"});
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
@@ -29,7 +29,7 @@ class AddHeaderRowConverterTest {
     }
 
     @Test
-    void testHandleRequestEmptyHeaderRow() {
+    void testHandleRequestEmptyHeaderRow() throws Exception {
         HeaderRowStructure structure = new HeaderRowStructure(new String[]{});
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};

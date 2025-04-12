@@ -9,7 +9,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FillEmptyRowConverterTest {
 
     @Test
-    void testHandleRequest() {
+    void testHandleRequest() throws Exception {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
@@ -20,7 +20,7 @@ class FillEmptyRowConverterTest {
     }
 
     @Test
-    void testHandleRequestMultipleRows() {
+    void testHandleRequestMultipleRows() throws Exception {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0, 1});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "", "d"}};
@@ -40,7 +40,7 @@ class FillEmptyRowConverterTest {
     }
 
     @Test
-    void testHandleRequestEmptyIndexArray() {
+    void testHandleRequestEmptyIndexArray() throws Exception {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
