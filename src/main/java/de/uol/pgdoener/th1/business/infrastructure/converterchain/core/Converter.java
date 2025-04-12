@@ -26,13 +26,16 @@ public abstract class Converter {
      * @throws Exception if an error occurs during processing
      */
     public String[][] handleRequest(@NonNull String[][] matrix) throws Exception {
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            throw new IllegalArgumentException("Previous converter returned an empty matrix");
+        }
         if (nextConverter != null) {
             return nextConverter.handleRequest(matrix);
         }
         return matrix;
     }
 
-    public void setNextHandler(Converter nextConverter) {
+    public void setNextHandler(@NonNull Converter nextConverter) {
         this.nextConverter = nextConverter;
     }
 }
