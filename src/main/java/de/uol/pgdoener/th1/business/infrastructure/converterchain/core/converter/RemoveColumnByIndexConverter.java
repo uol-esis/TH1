@@ -13,7 +13,7 @@ public class RemoveColumnByIndexConverter extends Converter {
     private final RemoveColumnByIndexStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) {
+    public String[][] handleRequest(String[][] matrix) throws Exception {
         Integer[] columnsToDelete = structure.columns();
 
         int totalColumns = matrix[0].length;

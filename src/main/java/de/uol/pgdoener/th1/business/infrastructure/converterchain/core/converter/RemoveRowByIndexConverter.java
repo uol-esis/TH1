@@ -13,7 +13,7 @@ public class RemoveRowByIndexConverter extends Converter {
     private final RemoveRowByIndexStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) {
+    public String[][] handleRequest(String[][] matrix) throws Exception {
         Integer[] rowsToDelete = structure.rows();
 
         int totalRows = matrix.length;

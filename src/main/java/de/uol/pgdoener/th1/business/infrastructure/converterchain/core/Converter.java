@@ -1,5 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
+import lombok.NonNull;
+
 /**
  * This is the super class for all converters in the converter chain.
  * Implementations of this class should implement the handleRequest method to process the matrix.
@@ -17,11 +19,13 @@ public abstract class Converter {
      * Implementations can modify the provided matrix as needed and return the modified matrix or
      * create a new matrix and return it.
      * Implementations can assume that the matrix is not null and has at least one row and one column.
+     * Any exception thrown in this method will be caught, logged, and sent to the user.
      *
      * @param matrix the matrix to be processed
      * @return the processed matrix
+     * @throws Exception if an error occurs during processing
      */
-    public String[][] handleRequest(String[][] matrix) {
+    public String[][] handleRequest(@NonNull String[][] matrix) throws Exception {
         if (nextConverter != null) {
             return nextConverter.handleRequest(matrix);
         }

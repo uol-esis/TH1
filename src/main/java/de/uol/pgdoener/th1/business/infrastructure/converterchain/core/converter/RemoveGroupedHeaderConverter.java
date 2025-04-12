@@ -14,7 +14,7 @@ public class RemoveGroupedHeaderConverter extends Converter {
     }
 
     @Override
-    public String[][] handleRequest(String[][] matrix) {
+    public String[][] handleRequest(String[][] matrix) throws Exception {
         Integer[] rows = structure.rows();
         Integer[] columns = structure.columns();
 

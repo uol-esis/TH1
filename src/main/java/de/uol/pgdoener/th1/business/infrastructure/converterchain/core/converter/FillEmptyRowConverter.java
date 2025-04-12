@@ -10,7 +10,7 @@ public class FillEmptyRowConverter extends Converter {
     private final FillEmptyRowStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) {
+    public String[][] handleRequest(String[][] matrix) throws Exception {
         Integer[] rowsToFill = structure.rows();
 
         for (int rowIndex : rowsToFill) {

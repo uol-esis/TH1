@@ -10,7 +10,7 @@ public class AddHeaderRowConverter extends Converter {
     private final HeaderRowStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) {
+    public String[][] handleRequest(String[][] matrix) throws Exception {
         String[] row = structure.headerRows();
 
         if (row.length > matrix[0].length) {
