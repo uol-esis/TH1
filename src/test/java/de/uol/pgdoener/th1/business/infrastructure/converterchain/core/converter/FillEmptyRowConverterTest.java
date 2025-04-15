@@ -77,4 +77,15 @@ class FillEmptyRowConverterTest {
         assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(matrix));
     }
 
+    @Test
+    void testHandleRequestMinimalMatrix() throws Exception {
+        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
+        FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
+        String[][] matrix = new String[][]{{"t"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t"}}, result);
+    }
+
 }

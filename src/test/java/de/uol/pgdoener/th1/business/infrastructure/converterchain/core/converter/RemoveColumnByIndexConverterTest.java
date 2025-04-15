@@ -79,4 +79,15 @@ class RemoveColumnByIndexConverterTest {
         assertArrayEquals(new String[][]{{"t", "s", "t"}, {"w", "r", "d"}}, result);
     }
 
+    @Test
+    void testHandleRequestMinimalMatrix() throws Exception {
+        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0});
+        RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
+        String[][] matrix = new String[][]{{"t"}};
+
+        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{}}, result);
+    }
+
 }

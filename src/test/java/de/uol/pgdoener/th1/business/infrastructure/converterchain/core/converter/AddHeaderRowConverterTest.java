@@ -48,4 +48,15 @@ class AddHeaderRowConverterTest {
         assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(matrix));
     }
 
+    @Test
+    void testHandleRequestMinimalMatrix() throws Exception {
+        HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t"});
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t"}}, result);
+    }
+
 }
