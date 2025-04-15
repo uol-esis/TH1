@@ -5,6 +5,8 @@ import com.univocity.parsers.csv.CsvParserSettings;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 /**
  * This class takes a {@link MultipartFile} and a {@link TableStructureDto} and provides the file as a 2D-String Array.
@@ -51,17 +54,25 @@ public class InputFile {
      * @throws IOException if the file cannot be read
      */
     public String[][] asStringArray() throws IOException {
-        return mapNulls(cutOff(switch (fileType) {
+        return mapNulls(switch (fileType) {
             case CSV -> readCsvToMatrix();
             case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
             case EXCEL_OOXML -> readExcelOOXMLToMatrix();
-        }));
+        });
     }
 
     public String getFileName() {
         String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename());
         int dotIndex = originalFilename.lastIndexOf('.');
-        return (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
+        String filenameWithoutExtension = (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
+
+        // Alle Zahlen entfernen (inkl. mögliche Datumsmuster)
+        String cleaned = filenameWithoutExtension.replaceAll("\\d+", "");
+
+        // Optional: Leerzeichen trimmen und evtl. doppelte Unterstriche oder Bindestriche bereinigen
+        cleaned = cleaned.replaceAll("[_\\-]{2,}", "_").replaceAll("^[_\\-]+|[_\\-]+$", "").trim();
+        return cleaned;
+
     }
 
     // #################
@@ -84,10 +95,20 @@ public class InputFile {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String delimiter = getDelimiter();
             log.debug("Detected delimiter: {}", delimiter);
-            List<String[]> rows = reader.lines()
-                    .map(String::trim)
-                    .map(line -> line.split(delimiter, -1))
-                    .toList();
+
+            CSVFormat format = CSVFormat.DEFAULT
+                    .withDelimiter(delimiter.charAt(0))
+                    .withQuote('"')
+                    .withIgnoreEmptyLines(true)
+                    .withTrim();
+
+            List<String[]> rows = new ArrayList<>();
+
+            for (CSVRecord record : format.parse(reader)) {
+                String[] row = StreamSupport.stream(record.spliterator(), false)
+                        .toArray(String[]::new);
+                rows.add(row);
+            }
 
             if (rows.isEmpty()) {
                 return new String[0][0];
