@@ -13,7 +13,7 @@ public class RemoveRowByIndexConverter extends Converter {
     private final RemoveRowByIndexStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) throws Exception {
+    public String[][] handleRequest(String[][] matrix) {
         Integer[] rowsToDelete = structure.rows();
 
         int totalRows = matrix.length;
@@ -22,7 +22,7 @@ public class RemoveRowByIndexConverter extends Converter {
         Set<Integer> deleteSet = new HashSet<>();
         for (int row : rowsToDelete) {
             if (row < 0 || row >= totalRows) {
-                throw new IllegalArgumentException("Index " + row + " out of bounds for matrix with " + totalRows + " rows");
+                throwCE("Index " + row + " out of bounds for matrix with " + totalRows + " rows");
             } else {
                 deleteSet.add(row);
             }

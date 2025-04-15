@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.HeaderRowStructure;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class AddHeaderRowConverterTest {
 
     @Test
-    void testHandleRequest() throws Exception {
+    void testHandleRequest() {
         HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t", "e", "s", "t"});
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
@@ -29,7 +30,7 @@ class AddHeaderRowConverterTest {
     }
 
     @Test
-    void testHandleRequestEmptyHeaderRow() throws Exception {
+    void testHandleRequestEmptyHeaderRow() {
         HeaderRowStructure structure = new HeaderRowStructure(new String[]{});
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
@@ -45,11 +46,11 @@ class AddHeaderRowConverterTest {
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
-        assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test
-    void testHandleRequestMinimalMatrix() throws Exception {
+    void testHandleRequestMinimalMatrix() {
         HeaderRowStructure structure = new HeaderRowStructure(new String[]{"t"});
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w"}};

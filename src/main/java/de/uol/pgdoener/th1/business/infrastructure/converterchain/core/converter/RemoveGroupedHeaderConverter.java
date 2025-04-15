@@ -14,7 +14,7 @@ public class RemoveGroupedHeaderConverter extends Converter {
     }
 
     @Override
-    public String[][] handleRequest(String[][] matrix) throws Exception {
+    public String[][] handleRequest(String[][] matrix) {
         Integer[] rows = structure.rows();
         Integer[] columns = structure.columns();
 
@@ -70,26 +70,26 @@ public class RemoveGroupedHeaderConverter extends Converter {
     private void validateInputs(int startRow, int startColumn, int endRow, int endColumn) {
         for (int rowIndex : structure.rows()) {
             if (rowIndex >= startRow) {
-                throw new IllegalArgumentException("Row index must be less than startRow: " + startRow);
+                throwCE("Row index must be less than startRow: " + startRow);
             }
             if (rowIndex >= endRow) {
-                throw new IllegalArgumentException("Row index must be less than endRow: " + endRow);
+                throwCE("Row index must be less than endRow: " + endRow);
             }
         }
         for (int columnIndex : structure.columns()) {
             if (columnIndex >= startColumn) {
-                throw new IllegalArgumentException("Column index must be less than startColumn: " + startRow);
+                throwCE("Column index must be less than startColumn: " + startRow);
             }
             if (columnIndex >= endColumn) {
-                throw new IllegalArgumentException("Column index must be less than endColumn: " + endRow);
+                throwCE("Column index must be less than endColumn: " + endRow);
             }
         }
 
         if (startRow >= endRow) {
-            throw new IllegalArgumentException("Start row out of bounds");
+            throwCE("Start row out of bounds");
         }
         if (startColumn >= endColumn) {
-            throw new IllegalArgumentException("Start row out of bounds");
+            throwCE("Start row out of bounds");
         }
     }
 

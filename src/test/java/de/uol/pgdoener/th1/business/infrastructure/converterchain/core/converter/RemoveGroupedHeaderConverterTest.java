@@ -8,7 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 class RemoveGroupedHeaderConverterTest {
 
     @Test
-    void testHandleRequest() throws Exception {
+    void testHandleRequest() {
         RemoveGroupedHeaderStructure structure = new RemoveGroupedHeaderStructure(
                 new Integer[]{0},
                 new Integer[]{0, 1},

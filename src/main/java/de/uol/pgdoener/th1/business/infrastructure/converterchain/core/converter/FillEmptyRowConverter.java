@@ -10,8 +10,14 @@ public class FillEmptyRowConverter extends Converter {
     private final FillEmptyRowStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) throws Exception {
+    public String[][] handleRequest(String[][] matrix) {
         Integer[] rowsToFill = structure.rows();
+
+        for (Integer row : rowsToFill) {
+            if (row < 0 || row >= matrix.length) {
+                throwCE("Index " + row + " out of bounds for matrix with " + matrix.length + " rows");
+            }
+        }
 
         for (int rowIndex : rowsToFill) {
             String[] row = matrix[rowIndex];
@@ -21,7 +27,7 @@ public class FillEmptyRowConverter extends Converter {
                     lastNonEmptyValue = row[i];
                 } else {
                     if (lastNonEmptyValue.isBlank()) {
-                        throw new IllegalArgumentException("No non-empty value found in the row to fill empty cells");
+                        throwCE("No non-empty value found in the row to fill empty cells");
                     }
                     row[i] = lastNonEmptyValue;
                 }

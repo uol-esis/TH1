@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.FillEmptyRowStructure;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class FillEmptyRowConverterTest {
 
     @Test
-    void testHandleRequest() throws Exception {
+    void testHandleRequest() {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
@@ -20,7 +21,7 @@ class FillEmptyRowConverterTest {
     }
 
     @Test
-    void testHandleRequestMultipleRows() throws Exception {
+    void testHandleRequestMultipleRows() {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0, 1});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "", "d"}};
@@ -36,11 +37,11 @@ class FillEmptyRowConverterTest {
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{};
 
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> converter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test
-    void testHandleRequestEmptyIndexArray() throws Exception {
+    void testHandleRequestEmptyIndexArray() {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
@@ -56,7 +57,7 @@ class FillEmptyRowConverterTest {
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
 
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> converter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test
@@ -65,7 +66,7 @@ class FillEmptyRowConverterTest {
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
 
-        assertThrows(ArrayIndexOutOfBoundsException.class, () -> converter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test
@@ -74,11 +75,11 @@ class FillEmptyRowConverterTest {
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"", "", "", ""}, {"", "o", "", "d"}};
 
-        assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test
-    void testHandleRequestMinimalMatrix() throws Exception {
+    void testHandleRequestMinimalMatrix() {
         FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t"}};

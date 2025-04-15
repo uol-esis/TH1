@@ -29,7 +29,7 @@ class ConverterTest {
 
         String[][] emptyMatrix = {};
 
-        assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(emptyMatrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(emptyMatrix));
     }
 
     @Test
@@ -39,7 +39,7 @@ class ConverterTest {
 
         String[][] emptyMatrix = {{}};
 
-        assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(emptyMatrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(emptyMatrix));
     }
 
     @Test
@@ -50,7 +50,7 @@ class ConverterTest {
 
         String[][] emptyMatrix = {{}};
 
-        assertThrows(IllegalArgumentException.class, () -> converter.handleRequest(emptyMatrix));
+        assertThrows(ConverterException.class, () -> converter.handleRequest(emptyMatrix));
     }
 
     @Test

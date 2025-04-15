@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
 import lombok.NonNull;
+import lombok.Setter;
 
 /**
  * This is the super class for all converters in the converter chain.
@@ -10,6 +11,8 @@ import lombok.NonNull;
 public abstract class Converter {
 
     protected Converter nextConverter;
+    @Setter
+    protected int index;
 
     /**
      * This method is called to process the matrix.
@@ -19,15 +22,14 @@ public abstract class Converter {
      * Implementations can modify the provided matrix as needed and return the modified matrix or
      * create a new matrix and return it.
      * Implementations can assume that the matrix is not null and has at least one row and one column.
-     * Any exception thrown in this method will be caught, logged, and sent to the user.
      *
      * @param matrix the matrix to be processed
      * @return the processed matrix
-     * @throws Exception if an error occurs during processing
+     * @throws ConverterException if an error occurs during processing
      */
-    public String[][] handleRequest(@NonNull String[][] matrix) throws Exception {
+    public String[][] handleRequest(@NonNull String[][] matrix) throws ConverterException {
         if (matrix.length == 0 || matrix[0].length == 0) {
-            throw new IllegalArgumentException("Previous converter returned an empty matrix");
+            throwCE("Previous converter returned an empty matrix");
         }
         if (nextConverter != null) {
             return nextConverter.handleRequest(matrix);
@@ -38,4 +40,9 @@ public abstract class Converter {
     public void setNextHandler(@NonNull Converter nextConverter) {
         this.nextConverter = nextConverter;
     }
+
+    protected void throwCE(String message) throws ConverterException {
+        throw new ConverterException(index, message);
+    }
+
 }

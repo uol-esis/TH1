@@ -13,7 +13,7 @@ public class RemoveColumnByIndexConverter extends Converter {
     private final RemoveColumnByIndexStructure structure;
 
     @Override
-    public String[][] handleRequest(String[][] matrix) throws Exception {
+    public String[][] handleRequest(String[][] matrix) {
         Integer[] columnsToDelete = structure.columns();
 
         int totalColumns = matrix[0].length;
@@ -22,7 +22,7 @@ public class RemoveColumnByIndexConverter extends Converter {
         Set<Integer> deleteSet = new HashSet<>();
         for (int col : columnsToDelete) {
             if (col < 0 || col >= totalColumns) {
-                throw new IllegalArgumentException("Index " + col + " out of bounds for matrix with " + totalColumns + " columns");
+                throwCE("Index " + col + " out of bounds for matrix with " + totalColumns + " columns");
             } else {
                 deleteSet.add(col);
             }

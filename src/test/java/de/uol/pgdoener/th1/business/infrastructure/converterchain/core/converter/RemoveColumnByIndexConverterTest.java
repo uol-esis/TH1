@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveColumnByIndexStructure;
 import org.junit.jupiter.api.Test;
 
@@ -9,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RemoveColumnByIndexConverterTest {
 
     @Test
-    void testHandleRequest() throws Exception {
+    void testHandleRequest() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{2});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -20,7 +21,7 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestEmptyIndexArray() throws Exception {
+    void testHandleRequestEmptyIndexArray() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -36,7 +37,7 @@ class RemoveColumnByIndexConverterTest {
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{};
 
-        assertThrows(IndexOutOfBoundsException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
     @Test
@@ -45,7 +46,7 @@ class RemoveColumnByIndexConverterTest {
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
-        assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
     @Test
@@ -54,11 +55,11 @@ class RemoveColumnByIndexConverterTest {
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
-        assertThrows(IllegalArgumentException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+        assertThrows(ConverterException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
     @Test
-    void testHandleRequestMultipleColumns() throws Exception {
+    void testHandleRequestMultipleColumns() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0, 1});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -69,7 +70,7 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestDuplicateColumns() throws Exception {
+    void testHandleRequestDuplicateColumns() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{1, 1});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
@@ -80,14 +81,12 @@ class RemoveColumnByIndexConverterTest {
     }
 
     @Test
-    void testHandleRequestMinimalMatrix() throws Exception {
+    void testHandleRequestMinimalMatrix() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t"}};
 
-        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
-
-        assertArrayEquals(new String[][]{{}}, result);
+        assertThrows(ConverterException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
 }

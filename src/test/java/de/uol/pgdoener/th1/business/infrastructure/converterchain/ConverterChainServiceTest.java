@@ -5,6 +5,7 @@ import de.uol.pgdoener.th1.business.dto.RemoveRowByIndexStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -122,7 +123,7 @@ class ConverterChainServiceTest {
 
         ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        assertThrows(TransformationException.class, () -> converterChainService.performTransformation(inputFile));
+        assertThrows(ConverterException.class, () -> converterChainService.performTransformation(inputFile));
     }
 
 }
