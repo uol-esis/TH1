@@ -42,7 +42,9 @@ public abstract class Converter {
     }
 
     protected void throwCE(String message) throws ConverterException {
-        throw new ConverterException(index, message);
+        String converterName = this.getClass().getSimpleName();
+        converterName = converterName.replace("Converter", "");
+        throw new ConverterException(index, converterName + ": " + message);
     }
 
 }
