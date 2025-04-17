@@ -17,6 +17,7 @@ public record ConverterResult(TableStructureDto tableStructure, String[][] data)
         return Stream.of(data).map(List::of).toList();
     }
 
+    // TODO handle delimiter in text
     public ByteArrayOutputStream dataAsCsvStream() throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(outputStream))) {

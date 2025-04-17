@@ -2,16 +2,15 @@ package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converte
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveColumnByIndexStructure;
+import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
 import java.util.Set;
 
+@RequiredArgsConstructor
 public class RemoveColumnByIndexConverter extends Converter {
-    private final RemoveColumnByIndexStructure structure;
 
-    public RemoveColumnByIndexConverter(RemoveColumnByIndexStructure structure) {
-        this.structure = structure;
-    }
+    private final RemoveColumnByIndexStructure structure;
 
     @Override
     public String[][] handleRequest(String[][] matrix) {
@@ -19,20 +18,19 @@ public class RemoveColumnByIndexConverter extends Converter {
 
         int totalColumns = matrix[0].length;
 
+        // Filter duplicates and out of bounds
         Set<Integer> deleteSet = new HashSet<>();
         for (int col : columnsToDelete) {
-
-            if (totalColumns < col) {
-                throw new IllegalArgumentException("Index out of bounds, max index is" + totalColumns);
-            }
-            if (col >= 0 && col < totalColumns) {
+            if (col < 0 || col >= totalColumns) {
+                throwConverterException("Index " + col + " out of bounds for matrix with " + totalColumns + " columns");
+            } else {
                 deleteSet.add(col);
             }
         }
 
         int newColumnCount = totalColumns - deleteSet.size();
 
-        // Neue Matrix erstellen
+        // Create new matrix that contains the columns without the ones to be deleted
         String[][] newMatrix = new String[matrix.length][newColumnCount];
         for (int i = 0; i < matrix.length; i++) {
             int newColIndex = 0;
