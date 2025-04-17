@@ -20,6 +20,8 @@ public abstract class ConverterFactory {
                 yield new RemoveRowByIndexConverter(removeRowStructure);
             case HeaderRowStructure headerRowStructure:
                 yield new AddHeaderRowConverter(headerRowStructure);
+            case RemoveFooterStructure removeFooterStructure:
+                yield new RemoveFooterConverter(removeFooterStructure);
         };
     }
 }
