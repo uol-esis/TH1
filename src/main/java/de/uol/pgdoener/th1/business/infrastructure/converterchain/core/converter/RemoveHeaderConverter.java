@@ -49,7 +49,6 @@ public class RemoveHeaderConverter extends Converter {
      */
     private long countValidElements(String[] row) {
         return Arrays.stream(row)
-                //.filter(entry -> !isInvalidEntry(entry))
                 .filter(this::isValidEntry)
                 .count();
     }

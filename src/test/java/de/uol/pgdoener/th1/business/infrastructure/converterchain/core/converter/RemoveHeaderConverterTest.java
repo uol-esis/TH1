@@ -57,7 +57,7 @@ public class RemoveHeaderConverterTest {
 
 
     @Test
-    void testHandleRequestNoValidHeaderRow() {
+    void testHandleRequestNoHeaderRowFoundWithNotValidElementsReturnsOriginal() {
         RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
         String[][] matrix = new String[][]{
@@ -72,18 +72,19 @@ public class RemoveHeaderConverterTest {
     }
 
     @Test
-    void testHandleRequestHeaderIsLastRow() {
+    void testHandleRequestNoHeaderRowFoundWithValidElementsReturnsOriginal() {
         RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
         String[][] matrix = new String[][]{
-                {"irrelevant"},              // will be removed
-                {"also"},                    // will be removed
-                {"valid", "header"}          // valid header, but last row
+                {"skip", "this"},
+                {"Header", "Valid"},
+                {"Row1", "Data1"},
+                {"Row2", "Data2"}
         };
 
         String[][] result = converter.handleRequest(matrix);
 
-        Assertions.assertEquals(3, result.length);
+        assertArrayEquals(matrix, result);
     }
 
     @Test
@@ -112,22 +113,6 @@ public class RemoveHeaderConverterTest {
     }
 
     @Test
-    void testHandleRequestNoHeaderRowFoundReturnsOriginal() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
-        RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
-        String[][] matrix = new String[][]{
-                {"skip", "this"},
-                {"Header", "Valid"},
-                {"Row1", "Data1"},
-                {"Row2", "Data2"}
-        };
-
-        String[][] result = converter.handleRequest(matrix);
-
-        assertArrayEquals(matrix, result);
-    }
-
-    @Test
     void testValidElementsOverridesDefaultValidation() {
         RemoveHeaderStructure structure = new RemoveHeaderStructure(null, new String[]{"a", "b", "c"});
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
@@ -135,7 +120,7 @@ public class RemoveHeaderConverterTest {
         String[][] matrix = {
                 {"a", "b", "d"},
                 {"a", "x", "d"},
-                {"x", "y", "z"},                // none valid
+                {"x", "y", "z"},
                 {"a", "*", null},              // 1 valid (below threshold)
                 {"a", "b", "c"},               // 3 valid → header row
                 {"d", "e", "f"}                // to remain
@@ -144,7 +129,7 @@ public class RemoveHeaderConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{
-                        {"x", "y", "z"},                // none valid
+                        {"x", "y", "z"},
                         {"a", "*", null},              // 1 valid (below threshold)
                         {"a", "b", "c"},               // 3 valid → header row
                         {"d", "e", "f"}},
