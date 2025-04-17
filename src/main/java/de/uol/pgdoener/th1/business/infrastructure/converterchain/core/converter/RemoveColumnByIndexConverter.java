@@ -22,7 +22,7 @@ public class RemoveColumnByIndexConverter extends Converter {
         Set<Integer> deleteSet = new HashSet<>();
         for (int col : columnsToDelete) {
             if (col < 0 || col >= totalColumns) {
-                throwCE("Index " + col + " out of bounds for matrix with " + totalColumns + " columns");
+                throwConverterException("Index " + col + " out of bounds for matrix with " + totalColumns + " columns");
             } else {
                 deleteSet.add(col);
             }

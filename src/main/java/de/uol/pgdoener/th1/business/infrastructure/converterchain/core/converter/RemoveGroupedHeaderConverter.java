@@ -70,26 +70,26 @@ public class RemoveGroupedHeaderConverter extends Converter {
     private void validateInputs(int startRow, int startColumn, int endRow, int endColumn) {
         for (int rowIndex : structure.rows()) {
             if (rowIndex >= startRow) {
-                throwCE("Row index must be less than startRow: " + startRow);
+                throwConverterException("Row index must be less than startRow: " + startRow);
             }
             if (rowIndex >= endRow) {
-                throwCE("Row index must be less than endRow: " + endRow);
+                throwConverterException("Row index must be less than endRow: " + endRow);
             }
         }
         for (int columnIndex : structure.columns()) {
             if (columnIndex >= startColumn) {
-                throwCE("Column index must be less than startColumn: " + startRow);
+                throwConverterException("Column index must be less than startColumn: " + startRow);
             }
             if (columnIndex >= endColumn) {
-                throwCE("Column index must be less than endColumn: " + endRow);
+                throwConverterException("Column index must be less than endColumn: " + endRow);
             }
         }
 
         if (startRow >= endRow) {
-            throwCE("Start row out of bounds");
+            throwConverterException("Start row out of bounds");
         }
         if (startColumn >= endColumn) {
-            throwCE("Start row out of bounds");
+            throwConverterException("Start row out of bounds");
         }
     }
 

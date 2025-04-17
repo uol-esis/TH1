@@ -29,7 +29,7 @@ public abstract class Converter {
      */
     public String[][] handleRequest(@NonNull String[][] matrix) throws ConverterException {
         if (matrix.length == 0 || matrix[0].length == 0) {
-            throwCE("Previous converter returned an empty matrix");
+            throwConverterException("Previous converter returned an empty matrix");
         }
         if (nextConverter != null) {
             return nextConverter.handleRequest(matrix);
@@ -41,7 +41,7 @@ public abstract class Converter {
         this.nextConverter = nextConverter;
     }
 
-    protected void throwCE(String message) throws ConverterException {
+    protected void throwConverterException(String message) throws ConverterException {
         String converterName = this.getClass().getSimpleName();
         converterName = converterName.replace("Converter", "");
         throw new ConverterException(index, converterName + ": " + message);

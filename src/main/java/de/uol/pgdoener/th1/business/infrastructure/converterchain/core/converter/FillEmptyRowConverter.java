@@ -15,7 +15,7 @@ public class FillEmptyRowConverter extends Converter {
 
         for (Integer row : rowsToFill) {
             if (row < 0 || row >= matrix.length) {
-                throwCE("Index " + row + " out of bounds for matrix with " + matrix.length + " rows");
+                throwConverterException("Index " + row + " out of bounds for matrix with " + matrix.length + " rows");
             }
         }
 
@@ -27,7 +27,7 @@ public class FillEmptyRowConverter extends Converter {
                     lastNonEmptyValue = row[i];
                 } else {
                     if (lastNonEmptyValue.isBlank()) {
-                        throwCE("No non-empty value found in the row to fill empty cells");
+                        throwConverterException("No non-empty value found in the row to fill empty cells");
                     }
                     row[i] = lastNonEmptyValue;
                 }

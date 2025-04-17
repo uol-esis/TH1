@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 public class ConverterChainService {
@@ -23,9 +24,11 @@ public class ConverterChainService {
         this.tableStructure = tableStructure;
         this.converterChain = new ConverterChain();
 
-        for (StructureDto structureDto : this.tableStructure.getStructures()) {
-            IStructure structure = StructureMapper.toConverterStructure(structureDto);
+        List<StructureDto> structures = this.tableStructure.getStructures();
+        for (int i = 0; i < structures.size(); i++) {
+            IStructure structure = StructureMapper.toConverterStructure(structures.get(i));
             Converter converter = ConverterFactory.createConverter(structure);
+            converter.setIndex(i);
             this.converterChain.add(converter);
         }
     }

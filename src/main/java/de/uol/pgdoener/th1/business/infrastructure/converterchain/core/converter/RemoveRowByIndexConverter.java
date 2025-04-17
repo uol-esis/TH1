@@ -22,7 +22,7 @@ public class RemoveRowByIndexConverter extends Converter {
         Set<Integer> deleteSet = new HashSet<>();
         for (int row : rowsToDelete) {
             if (row < 0 || row >= totalRows) {
-                throwCE("Index " + row + " out of bounds for matrix with " + totalRows + " rows");
+                throwConverterException("Index " + row + " out of bounds for matrix with " + totalRows + " rows");
             } else {
                 deleteSet.add(row);
             }

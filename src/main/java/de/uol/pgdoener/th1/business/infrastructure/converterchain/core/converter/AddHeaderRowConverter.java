@@ -14,7 +14,7 @@ public class AddHeaderRowConverter extends Converter {
         String[] row = structure.headerRows();
 
         if (row.length > matrix[0].length) {
-            throwCE("Header row length exceeds matrix column count");
+            throwConverterException("Header row length exceeds matrix column count");
         }
 
         System.arraycopy(row, 0, matrix[0], 0, row.length);
