@@ -33,7 +33,7 @@ public class ReplaceEntriesConverter extends Converter {
     }
 
     private UnaryOperator<String> getMapper() {
-        final UnaryOperator<String> mapper;
+        UnaryOperator<String> mapper = null;
 
         if (structure.search().isPresent()) {
             final String search = structure.search().get();
@@ -44,7 +44,7 @@ public class ReplaceEntriesConverter extends Converter {
             final String replacement = structure.replacement();
             mapper = value -> value.matches(regex) ? replacement : value;
         } else {
-            throw new IllegalArgumentException("Either search or regexSearch must be provided.");
+            throwConverterException("Either search or regexSearch must be provided.");
         }
         return mapper;
     }
