@@ -32,6 +32,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("integrationTest")
 class TableStructuresApiTest {
 
+    private static final String basePath = "/api/v1/table-structures";
+
     @Container
     @ServiceConnection
     static PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17-alpine")
@@ -66,7 +68,7 @@ class TableStructuresApiTest {
         // load from resources
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/v1/table-structures")
+        mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -97,12 +99,12 @@ class TableStructuresApiTest {
         // load from resources
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/v1/table-structures")
+        mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
-        mockMvc.perform(post("/v1/table-structures")
+        mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -117,13 +119,13 @@ class TableStructuresApiTest {
         // upload test structure
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/v1/table-structures")
+        mockMvc.perform(post(basePath)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tableStructureJson)
                 .accept(MediaType.APPLICATION_JSON));
 
         // begin test
-        mockMvc.perform(get("/v1/table-structures"))
+        mockMvc.perform(get(basePath))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
@@ -133,7 +135,7 @@ class TableStructuresApiTest {
         // load from resources
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
-        mockMvc.perform(post("/v1/table-structures")
+        mockMvc.perform(post(basePath)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -141,7 +143,7 @@ class TableStructuresApiTest {
 
         Long id = tableStructureRepository.findAll().iterator().next().getId();
 
-        mockMvc.perform(delete("/v1/table-structures?id=" + id))
+        mockMvc.perform(delete(basePath + "?id=" + id))
                 .andExpect(status().isOk());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
@@ -151,7 +153,7 @@ class TableStructuresApiTest {
     @Test
     void deleteTableStructuresEndpointNonExistent() throws Exception {
 
-        mockMvc.perform(delete("/v1/table-structures?id=1"))
+        mockMvc.perform(delete(basePath + "?id=1"))
                 .andExpect(status().isBadRequest());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
