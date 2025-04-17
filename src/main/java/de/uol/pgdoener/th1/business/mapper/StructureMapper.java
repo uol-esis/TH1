@@ -157,6 +157,10 @@ public abstract class StructureMapper {
                     throw new IllegalArgumentException("HeaderNames missing");
                 }
                 yield new HeaderRowStructure(structure.getHeaderNames().toArray(new String[0]));
+            case RemoveHeaderStructureDto structure:
+                yield new RemoveHeaderStructure(
+                        structure.getThreshold().orElse(null),
+                        structure.getBlackList().toArray(new String[0]));
             case RemoveFooterStructureDto structure:
                 yield new RemoveFooterStructure(
                         structure.getThreshold().orElse(null),
