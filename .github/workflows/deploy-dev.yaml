@@ -17,11 +17,12 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Execute deploy script on dev server
-        uses: appleboy/ssh-action@v1.2.2
-        with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USERNAME }}
-          key: ${{ secrets.DEPLOY_KEY }}
-          port: ${{ secrets.DEPLOY_PORT }}
-          script: ${{ secrets.DEPLOY_SCRIPT }}
+      - name: Perform deploy requests
+        run: |
+          data=$(curl -s ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }}/file \
+            -H "X-API-KEY: ${{ secrets.API_KEY }}"  | jq '.StackFileContent')
+          wrapped=$(jq -n --argjson data "$data" '{Env:[],id:${{ secrets.STACK_ID }},Prune:false,PullImage:true,StackFileContent: $data}')
+          curl -X PUT ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }}?endpointId=${{ secrets.ENDPOINT_ID }} \
+            -H "Content-Type: application/json" \
+            -H "X-API-KEY: ${{ secrets.API_KEY }}" \
+            -d "$wrapped"
