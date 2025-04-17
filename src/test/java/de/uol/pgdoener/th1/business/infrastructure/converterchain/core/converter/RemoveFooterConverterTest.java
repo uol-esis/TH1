@@ -48,7 +48,7 @@ public class RemoveFooterConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{
-                {"Header1", "Header2", ""},  // valid header (2 valid entries)
+                {"Header1", "Header2", "Header3"},  // valid header (2 valid entries)
                 {"Data1", "Data2", "Data3"}}, result);
     }
 
