@@ -15,7 +15,7 @@ public class RemoveHeaderConverterTest {
         RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, ""},       // not valid
-                {"Header1", "Header2", ""},  // valid header (2 valid entries)
+                {"Header1", "Header2", ""},  // not valid header (2 valid entries)
                 {"Data1", "Data2", "Data3"}  // should be kept
         };
 
@@ -45,7 +45,8 @@ public class RemoveHeaderConverterTest {
         RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, "", ""},       // not valid
-                {"Header1", "Header2", "", ""},  // valid header (2 valid entries)
+                {"Header1", "Header2", "", ""}, // not valid header (2 valid entries)
+                {"Header2", "Header3", "Header4", ""},  // not valid header (3 valid entries)
                 {"Data1", "Data2", "Data3", "Data4"}  // should be kept
         };
 
