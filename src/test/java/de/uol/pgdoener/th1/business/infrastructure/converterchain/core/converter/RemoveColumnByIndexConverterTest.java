@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveColumnByIndexStructure;
 import org.junit.jupiter.api.Test;
 
@@ -17,7 +18,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "t"}, {"w", "o", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -29,7 +29,6 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
     }
 
     @Test
@@ -38,21 +37,25 @@ class RemoveColumnByIndexConverterTest {
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{};
 
-        assertThrows(IndexOutOfBoundsException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
-
-        assertArrayEquals(new String[][]{}, matrix);
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
     @Test
-    void testHandleRequestIndexOutOfBounds() {
+    void testHandleRequestIndexOutOfBoundsPositive() {
         RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{4});
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
-        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+        assertThrows(ConverterException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
+    }
 
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
-        assertArrayEquals(matrix, result);
+    @Test
+    void testHandleRequestIndexOutOfBoundsNegative() {
+        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{-1});
+        RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
+        String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
+
+        assertThrows(ConverterException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
     @Test
@@ -64,7 +67,26 @@ class RemoveColumnByIndexConverterTest {
         String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"s", "t"}, {"r", "d"}}, result);
-        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}}, matrix);
+    }
+
+    @Test
+    void testHandleRequestDuplicateColumns() {
+        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{1, 1});
+        RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
+        String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
+
+        String[][] result = removeColumnByIndexConverter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t", "s", "t"}, {"w", "r", "d"}}, result);
+    }
+
+    @Test
+    void testHandleRequestMinimalMatrix() {
+        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0});
+        RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
+        String[][] matrix = new String[][]{{"t"}};
+
+        assertThrows(ConverterException.class, () -> removeColumnByIndexConverter.handleRequest(matrix));
     }
 
 }

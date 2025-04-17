@@ -9,31 +9,52 @@ import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.IStructure;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 public class ConverterChainService {
     private final TableStructureDto tableStructure;
     private final ConverterChain converterChain;
 
-    public ConverterChainService(TableStructureDto tableStructure) {
+    public ConverterChainService(@NonNull TableStructureDto tableStructure) {
         this.tableStructure = tableStructure;
         this.converterChain = new ConverterChain();
 
-        for (StructureDto structureDto : this.tableStructure.getStructures()) {
-            IStructure structure = StructureMapper.toConverterStructure(structureDto);
+        List<StructureDto> structures = this.tableStructure.getStructures();
+        for (int i = 0; i < structures.size(); i++) {
+            IStructure structure = StructureMapper.toConverterStructure(structures.get(i));
             Converter converter = ConverterFactory.createConverter(structure);
+            converter.setIndex(i);
             this.converterChain.add(converter);
         }
     }
 
-    public ConverterResult performTransformation(InputFile inputFile) throws TransformationException {
+    /**
+     * Performs the transformation on the input file.
+     * <p>
+     * This method reads the input file, applies the transformation defined in the converter chain,
+     * and returns the result.
+     * If the input file is empty or no converter is found, it returns the original data.
+     * If an error occurs during the transformation, it throws a TransformationException.
+     * To get more information about the error, check the cause of the exception.
+     *
+     * @param inputFile the input file to be transformed
+     * @return the result of the transformation
+     * @throws TransformationException if an error occurs during the transformation
+     */
+    public ConverterResult performTransformation(@NonNull InputFile inputFile) throws TransformationException {
         String[][] transformedMatrix;
         try {
             String[][] rawMatrix = inputFile.asStringArray();
             String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
+            if (matrix.length == 0 || matrix[0].length == 0) {
+                log.debug("No data found in the input file");
+                return new ConverterResult(tableStructure, matrix);
+            }
             Converter first = converterChain.getFirst();
             if (first == null) {
                 log.debug("No converter found");
