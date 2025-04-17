@@ -123,7 +123,8 @@ class ConverterChainServiceTest {
 
         ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        assertThrows(ConverterException.class, () -> converterChainService.performTransformation(inputFile));
+        ConverterException e = assertThrows(ConverterException.class, () -> converterChainService.performTransformation(inputFile));
+        assertEquals(0, e.getConverterIndex());
     }
 
 }
