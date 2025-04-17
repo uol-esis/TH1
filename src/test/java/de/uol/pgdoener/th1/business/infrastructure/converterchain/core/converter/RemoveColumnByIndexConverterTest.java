@@ -1,8 +1,10 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.RemoveColumnByIndexStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
-import de.uol.pgdoener.th1.data.entity.RemoveColumnByIndexStructure;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,7 +13,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequest() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{2});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of(2));
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
@@ -22,7 +24,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestEmptyIndexArray() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of());
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
@@ -33,7 +35,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestEmptyMatrix() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of());
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{};
 
@@ -42,7 +44,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestIndexOutOfBoundsPositive() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{4});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of(4));
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
@@ -51,7 +53,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestIndexOutOfBoundsNegative() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{-1});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of(-1));
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
@@ -60,7 +62,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestMultipleColumns() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0, 1});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of(0, 1));
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
@@ -71,7 +73,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestDuplicateColumns() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{1, 1});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of(1, 1));
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}};
 
@@ -82,7 +84,7 @@ class RemoveColumnByIndexConverterTest {
 
     @Test
     void testHandleRequestMinimalMatrix() {
-        RemoveColumnByIndexStructure structure = new RemoveColumnByIndexStructure(new Integer[]{0});
+        RemoveColumnByIndexStructureDto structure = new RemoveColumnByIndexStructureDto(null, List.of(0));
         RemoveColumnByIndexConverter removeColumnByIndexConverter = new RemoveColumnByIndexConverter(structure);
         String[][] matrix = new String[][]{{"t"}};
 

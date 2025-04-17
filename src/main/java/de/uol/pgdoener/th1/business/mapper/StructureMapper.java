@@ -14,8 +14,8 @@ public abstract class StructureMapper {
         return switch (entity) {
             case RemoveGroupedHeaderStructure structure -> new RemoveGroupedHeaderStructureDto(
                     ConverterTypeDto.REMOVE_GROUPED_HEADER,
-                    List.of(structure.getColumns()),
-                    List.of(structure.getRows())
+                    List.of(structure.getRows()),
+                    List.of(structure.getColumns())
             )
                     .startRow(structure.getStartRow())
                     .startColumn(structure.getStartColumn());
