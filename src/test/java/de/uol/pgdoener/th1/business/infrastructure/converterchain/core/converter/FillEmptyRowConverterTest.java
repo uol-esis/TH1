@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.FillEmptyRowStructure;
+import de.uol.pgdoener.th1.data.entity.FillEmptyRowStructure;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;

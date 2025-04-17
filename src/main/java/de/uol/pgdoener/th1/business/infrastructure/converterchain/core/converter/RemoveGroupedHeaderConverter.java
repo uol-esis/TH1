@@ -1,27 +1,26 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.RemoveGroupedHeaderStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveGroupedHeaderStructure;
+import lombok.RequiredArgsConstructor;
 
 import java.util.Arrays;
 
+@RequiredArgsConstructor
 //TODO: Bedingung hinzufügen? wann der converter genutzt werden kann.Z.B. am Ende vorher muss immer laufen oder muss vor .. laufen usw.
 public class RemoveGroupedHeaderConverter extends Converter {
-    private final RemoveGroupedHeaderStructure structure;
 
-    public RemoveGroupedHeaderConverter(RemoveGroupedHeaderStructure structure) {
-        this.structure = structure;
-    }
+    private final RemoveGroupedHeaderStructureDto structure;
 
     @Override
     public String[][] handleRequest(String[][] matrix) {
-        Integer[] rows = structure.rows();
-        Integer[] columns = structure.columns();
+        Integer[] rows = structure.getRowIndex().toArray(new Integer[0]);
+        Integer[] columns = structure.getColumnIndex().toArray(new Integer[0]);
 
         int defaultStartRow = rows[rows.length - 1] + 1;
         int defaultStartColumn = columns[columns.length - 1] + 1;
-        int startRow = structure.startRow() == null ? defaultStartRow : structure.startRow();
-        int startColumn = structure.startColumn() == null ? defaultStartColumn : structure.startColumn();
+        int startRow = structure.getStartRow().orElse(defaultStartRow);
+        int startColumn = structure.getStartColumn().orElse(defaultStartColumn);
 
         int endRow = matrix.length;
         int endColumn = matrix[0].length;
@@ -68,7 +67,7 @@ public class RemoveGroupedHeaderConverter extends Converter {
     }
 
     private void validateInputs(int startRow, int startColumn, int endRow, int endColumn) {
-        for (int rowIndex : structure.rows()) {
+        for (int rowIndex : structure.getRowIndex()) {
             if (rowIndex >= startRow) {
                 throwConverterException("Row index must be less than startRow: " + startRow);
             }
@@ -76,7 +75,7 @@ public class RemoveGroupedHeaderConverter extends Converter {
                 throwConverterException("Row index must be less than endRow: " + endRow);
             }
         }
-        for (int columnIndex : structure.columns()) {
+        for (int columnIndex : structure.getColumnIndex()) {
             if (columnIndex >= startColumn) {
                 throwConverterException("Column index must be less than startColumn: " + startRow);
             }

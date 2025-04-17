@@ -1,0 +1,26 @@
+package de.uol.pgdoener.th1.data.entity;
+
+import io.hypersistence.utils.hibernate.type.array.IntArrayType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Type;
+
+@Entity
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class FillEmptyRowStructure extends Structure {
+
+    public FillEmptyRowStructure(Long id, int position, Long tableStructureId, Integer[] rows) {
+        super(id, position, tableStructureId);
+        this.rows = rows;
+    }
+
+    @Type(IntArrayType.class)
+    @Column(columnDefinition = "integer[]", nullable = true)
+    private Integer[] rows;
+
+}
