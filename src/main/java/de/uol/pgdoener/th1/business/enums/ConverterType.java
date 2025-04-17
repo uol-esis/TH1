@@ -5,6 +5,7 @@ public enum ConverterType {
     FILL_EMPTY_ROW,
     REMOVE_COLUMN_BY_INDEX,
     REMOVE_ROW_BY_INDEX,
-    ADD_HEADER_NAME
+    ADD_HEADER_NAME,
+    REPLACE_ENTRIES,
 }
 

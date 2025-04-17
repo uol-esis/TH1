@@ -5,5 +5,6 @@ public sealed interface IStructure permits
         HeaderRowStructure,
         RemoveColumnByIndexStructure,
         RemoveGroupedHeaderStructure,
-        RemoveRowByIndexStructure {
+        RemoveRowByIndexStructure,
+        ReplaceEntriesStructure {
 }

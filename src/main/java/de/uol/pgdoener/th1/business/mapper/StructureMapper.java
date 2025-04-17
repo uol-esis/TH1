@@ -36,6 +36,16 @@ public abstract class StructureMapper {
                     ConverterTypeMapper.toDto(entity.getConverterType()),
                     List.of(entity.getHeaderNames())
             );
+            case REPLACE_ENTRIES -> new ReplaceEntriesStructureDto(
+                    ConverterTypeMapper.toDto(entity.getConverterType()),
+                    entity.getHeaderNames()[2]
+            )
+                    .search(entity.getHeaderNames()[0])
+                    .regexSearch(entity.getHeaderNames()[1])
+                    .startRow(entity.getStartRow())
+                    .endRow(entity.getEndRow())
+                    .startColumn(entity.getStartColumn())
+                    .endColumn(entity.getEndColumn());
         };
     }
 
@@ -111,6 +121,20 @@ public abstract class StructureMapper {
                         position,
                         tableStructureId
                 );
+            case ReplaceEntriesStructureDto structure:
+                yield new Structure(
+                        null, // ID wird von der Datenbank generiert
+                        ConverterTypeMapper.toEntity(dto.getConverterType()),
+                        new Integer[0],
+                        new Integer[0],
+                        new String[]{structure.getSearch().orElse(null), structure.getRegexSearch().orElse(null), structure.getReplacement()},
+                        structure.getStartRow().orElse(null),
+                        structure.getEndRow().orElse(null),
+                        structure.getStartColumn().orElse(null),
+                        structure.getEndColumn().orElse(null),
+                        position,
+                        tableStructureId
+                );
             default:
                 throw new IllegalStateException("Unexpected value: " + dto);
         };
@@ -157,6 +181,22 @@ public abstract class StructureMapper {
                     throw new IllegalArgumentException("HeaderNames missing");
                 }
                 yield new HeaderRowStructure(structure.getHeaderNames().toArray(new String[0]));
+            case ReplaceEntriesStructureDto structure:
+                if (structure.getSearch().isEmpty() && structure.getRegexSearch().isEmpty()) {
+                    throw new IllegalArgumentException("Search missing");
+                }
+                if (structure.getReplacement() == null) {
+                    throw new IllegalArgumentException("Replacement missing");
+                }
+                yield new ReplaceEntriesStructure(
+                        structure.getReplacement(),
+                        structure.getSearch(),
+                        structure.getRegexSearch(),
+                        structure.getStartRow(),
+                        structure.getEndRow(),
+                        structure.getStartColumn(),
+                        structure.getEndColumn()
+                );
             default:
                 throw new IllegalStateException("Unexpected value: " + structureDto);
         };
