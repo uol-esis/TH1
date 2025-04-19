@@ -98,6 +98,18 @@ public abstract class StructureMapper {
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
+            case ReplaceEntriesStructureDto structure -> new ReplaceEntriesStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getReplacement(),
+                    structure.getSearch().orElse(null),
+                    structure.getRegexSearch().orElse(null),
+                    structure.getStartRow().orElse(null),
+                    structure.getEndRow().orElse(null),
+                    structure.getStartColumn().orElse(null),
+                    structure.getEndColumn().orElse(null)
+            );
         };
     }
 

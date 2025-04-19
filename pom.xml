@@ -213,7 +213,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>
-                                https://raw.githubusercontent.com/uol-esis/TH1-OpenAPI/35bde6ac8743c21c1d36cbbec7b88c9da7576cea/openapi.yaml
+                                https://raw.githubusercontent.com/uol-esis/TH1-OpenAPI/d5d908c4727bcb0235aeb19e6151807bfb8d9611/openapi.yaml
                             </inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>de.uol.pgdoener.th1.api</apiPackage>
