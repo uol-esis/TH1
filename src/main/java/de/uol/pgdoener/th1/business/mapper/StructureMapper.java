@@ -98,7 +98,6 @@ public abstract class StructureMapper {
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
-            default -> throw new IllegalStateException("Unexpected value: " + dto);
         };
     }
 
