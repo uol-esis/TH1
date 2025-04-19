@@ -1,20 +1,21 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.RemoveColumnByIndexStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveColumnByIndexStructure;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
 public class RemoveColumnByIndexConverter extends Converter {
 
-    private final RemoveColumnByIndexStructure structure;
+    private final RemoveColumnByIndexStructureDto structure;
 
     @Override
     public String[][] handleRequest(String[][] matrix) {
-        Integer[] columnsToDelete = structure.columns();
+        List<Integer> columnsToDelete = structure.getColumnIndex();
 
         int totalColumns = matrix[0].length;
 

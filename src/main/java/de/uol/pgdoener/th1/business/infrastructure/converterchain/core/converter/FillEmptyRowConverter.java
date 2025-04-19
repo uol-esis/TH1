@@ -1,17 +1,19 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.FillEmptyRowStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.FillEmptyRowStructure;
 import lombok.RequiredArgsConstructor;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 public class FillEmptyRowConverter extends Converter {
 
-    private final FillEmptyRowStructure structure;
+    private final FillEmptyRowStructureDto structure;
 
     @Override
     public String[][] handleRequest(String[][] matrix) {
-        Integer[] rowsToFill = structure.rows();
+        List<Integer> rowsToFill = structure.getRowIndex();
 
         for (Integer row : rowsToFill) {
             if (row < 0 || row >= matrix.length) {

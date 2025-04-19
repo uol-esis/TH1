@@ -1,27 +1,22 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core;
 
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter.*;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class ConverterFactory {
 
-    public static Converter createConverter(IStructure structure) {
+    public static Converter createConverter(StructureDto structure) {
         return switch (structure) {
-            case RemoveGroupedHeaderStructure groupedHeaderStructure:
-                yield new RemoveGroupedHeaderConverter(groupedHeaderStructure);
-            case FillEmptyRowStructure fillEmptyRowStructure:
-                yield new FillEmptyRowConverter(fillEmptyRowStructure);
-            case RemoveColumnByIndexStructure removeColumnStructure:
-                yield new RemoveColumnByIndexConverter(removeColumnStructure);
-            case RemoveRowByIndexStructure removeRowStructure:
-                yield new RemoveRowByIndexConverter(removeRowStructure);
-            case HeaderRowStructure headerRowStructure:
-                yield new AddHeaderRowConverter(headerRowStructure);
-            case ReplaceEntriesStructure replaceEntriesStructure:
-                yield new ReplaceEntriesConverter(replaceEntriesStructure);
+            case RemoveGroupedHeaderStructureDto s -> new RemoveGroupedHeaderConverter(s);
+            case FillEmptyRowStructureDto s -> new FillEmptyRowConverter(s);
+            case RemoveColumnByIndexStructureDto s -> new RemoveColumnByIndexConverter(s);
+            case RemoveRowByIndexStructureDto s -> new RemoveRowByIndexConverter(s);
+            case AddHeaderNameStructureDto s -> new AddHeaderRowConverter(s);
+            case RemoveHeaderStructureDto s -> new RemoveHeaderConverter(s);
+            case RemoveFooterStructureDto s -> new RemoveFooterConverter(s);
         };
     }
 }

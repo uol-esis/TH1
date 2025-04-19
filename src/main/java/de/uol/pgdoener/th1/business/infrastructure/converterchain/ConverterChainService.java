@@ -7,8 +7,6 @@ import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.IStructure;
-import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
@@ -26,8 +24,7 @@ public class ConverterChainService {
 
         List<StructureDto> structures = this.tableStructure.getStructures();
         for (int i = 0; i < structures.size(); i++) {
-            IStructure structure = StructureMapper.toConverterStructure(structures.get(i));
-            Converter converter = ConverterFactory.createConverter(structure);
+            Converter converter = ConverterFactory.createConverter(structures.get(i));
             converter.setIndex(i);
             this.converterChain.add(converter);
         }
