@@ -35,6 +35,16 @@ public abstract class StructureMapper {
                     ConverterTypeDto.ADD_HEADER_NAME,
                     List.of(structure.getHeaderNames())
             );
+            case RemoveHeaderStructure structure -> new RemoveHeaderStructureDto(
+                    ConverterTypeDto.REMOVE_HEADER
+            )
+                    .threshold(structure.getThreshold())
+                    .blackList(List.of(structure.getBlackList()));
+            case RemoveFooterStructure structure -> new RemoveFooterStructureDto(
+                    ConverterTypeDto.REMOVE_FOOTER
+            )
+                    .threshold(structure.getThreshold())
+                    .blackList(List.of(structure.getBlackList()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
@@ -73,6 +83,20 @@ public abstract class StructureMapper {
                     position,
                     tableStructureId,
                     structure.getHeaderNames().toArray(new String[0])
+            );
+            case RemoveHeaderStructureDto structure -> new RemoveHeaderStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getThreshold().orElse(null),
+                    structure.getBlackList().toArray(new String[0])
+            );
+            case RemoveFooterStructureDto structure -> new RemoveFooterStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getThreshold().orElse(null),
+                    structure.getBlackList().toArray(new String[0])
             );
             default -> throw new IllegalStateException("Unexpected value: " + dto);
         };

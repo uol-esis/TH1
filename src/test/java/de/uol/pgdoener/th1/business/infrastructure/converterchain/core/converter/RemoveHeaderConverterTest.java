@@ -1,8 +1,10 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveHeaderStructure;
+import de.uol.pgdoener.th1.business.dto.RemoveHeaderStructureDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
@@ -11,7 +13,9 @@ public class RemoveHeaderConverterTest {
     @Test
     void testHandleRequestWithDefaultValues() {
         // threshold = 2 (default), blackList = empty
-        RemoveHeaderStructure removeHeaderStructure = new RemoveHeaderStructure(null, null);
+        RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, ""},       // not valid
@@ -26,7 +30,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHandleRequestsLowerThreshold() {
-        RemoveHeaderStructure removeHeaderStructure = new RemoveHeaderStructure(1, null);
+        RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto()
+                .threshold(1)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, ""},       // not valid
@@ -41,7 +47,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHandleRequestsHigherThreshold() {
-        RemoveHeaderStructure removeHeaderStructure = new RemoveHeaderStructure(3, null);
+        RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto()
+                .threshold(3)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, "", ""},       // not valid
@@ -58,7 +66,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHandleRequestNoHeaderRowFoundWithNotValidElementsReturnsOriginal() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
         String[][] matrix = new String[][]{
                 {null, "", ""},      // not valid
@@ -73,7 +83,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHandleRequestNoHeaderRowFoundWithValidElementsReturnsOriginal() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
         String[][] matrix = new String[][]{
                 {"skip", "this"},
@@ -89,7 +101,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHandleRequestEmptyMatrix() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
         String[][] matrix = new String[][]{};
 
@@ -100,7 +114,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHandleRequestNullValuesOnly() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, null);
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
         String[][] matrix = new String[][]{
                 {null, null, null},
@@ -114,7 +130,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testValidElementsOverridesDefaultValidation() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, new String[]{"a", "b", "c"});
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of("a", "b", "c"));
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
 
         String[][] matrix = {
@@ -139,7 +157,9 @@ public class RemoveHeaderConverterTest {
 
     @Test
     void testHeaderNotFoundDueToValidElementsMismatch() {
-        RemoveHeaderStructure structure = new RemoveHeaderStructure(null, new String[]{"x", "y"});
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blackList(List.of("x", "y"));
         RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
 
         String[][] matrix = {

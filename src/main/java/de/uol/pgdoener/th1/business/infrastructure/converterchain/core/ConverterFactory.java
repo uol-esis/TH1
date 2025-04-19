@@ -10,20 +10,22 @@ public abstract class ConverterFactory {
 
     public static Converter createConverter(StructureDto structure) {
         return switch (structure) {
-            case RemoveGroupedHeaderStructure groupedHeaderStructure:
+            case RemoveGroupedHeaderStructureDto groupedHeaderStructure:
                 yield new RemoveGroupedHeaderConverter(groupedHeaderStructure);
-            case FillEmptyRowStructure fillEmptyRowStructure:
+            case FillEmptyRowStructureDto fillEmptyRowStructure:
                 yield new FillEmptyRowConverter(fillEmptyRowStructure);
-            case RemoveColumnByIndexStructure removeColumnStructure:
+            case RemoveColumnByIndexStructureDto removeColumnStructure:
                 yield new RemoveColumnByIndexConverter(removeColumnStructure);
-            case RemoveRowByIndexStructure removeRowStructure:
+            case RemoveRowByIndexStructureDto removeRowStructure:
                 yield new RemoveRowByIndexConverter(removeRowStructure);
-            case HeaderRowStructure headerRowStructure:
+            case AddHeaderNameStructureDto headerRowStructure:
                 yield new AddHeaderRowConverter(headerRowStructure);
-            case RemoveHeaderStructure removeHeaderStructure:
+            case RemoveHeaderStructureDto removeHeaderStructure:
                 yield new RemoveHeaderConverter(removeHeaderStructure);
-            case RemoveFooterStructure removeFooterStructure:
+            case RemoveFooterStructureDto removeFooterStructure:
                 yield new RemoveFooterConverter(removeFooterStructure);
+            default:
+                throw new IllegalStateException("Unexpected value: " + structure);
         };
     }
 }

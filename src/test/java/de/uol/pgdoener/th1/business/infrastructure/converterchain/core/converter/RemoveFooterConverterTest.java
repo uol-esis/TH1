@@ -1,20 +1,22 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveFooterStructure;
+import de.uol.pgdoener.th1.business.dto.RemoveFooterStructureDto;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class RemoveFooterConverterTest {
 
-    final String[] emptyBlacklist = new String[]{};
-
     @Test
     void testHandleRequestWithDefaultValues() {
         // threshold = 2 (default), blackList = empty
-        RemoveFooterStructure RemoveFooterStructure = new RemoveFooterStructure(null, new String[]{});
-        RemoveFooterConverter converter = new RemoveFooterConverter(RemoveFooterStructure);
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of());
+        RemoveFooterConverter converter = new RemoveFooterConverter(structure);
 
         String[][] matrix = {
                 {"Data1", "Data2", "Data3"},
@@ -37,8 +39,10 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHandleRequestsLowerThreshold() {
-        RemoveFooterStructure RemoveFooterStructure = new RemoveFooterStructure(1, new String[]{});
-        RemoveFooterConverter converter = new RemoveFooterConverter(RemoveFooterStructure);
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(1)
+                .blackList(List.of());
+        RemoveFooterConverter converter = new RemoveFooterConverter(structure);
         String[][] matrix = new String[][]{
                 {"Header1", "Header2", "Header3"},   // valid header (2 valid entries)
                 {"Data1", "Data2", "Data3"},  // should be kept
@@ -54,8 +58,10 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHandleRequestsHigherThreshold() {
-        RemoveFooterStructure RemoveFooterStructure = new RemoveFooterStructure(3, new String[]{});
-        RemoveFooterConverter converter = new RemoveFooterConverter(RemoveFooterStructure);
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(3)
+                .blackList(List.of());
+        RemoveFooterConverter converter = new RemoveFooterConverter(structure);
         String[][] matrix = new String[][]{
                 {"Header1", "Header2", "Header3", "Header4"},
                 {"Data1", "Data2", "Data3", "Data4"},// valid header (2 valid entries)
@@ -72,7 +78,9 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHandleRequestWithNoValidElementsNoHeaderRowFound() {
-        RemoveFooterStructure structure = new RemoveFooterStructure(null, new String[]{});
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveFooterConverter converter = new RemoveFooterConverter(structure);
         String[][] matrix = new String[][]{
                 {null, "", ""},      // not valid
@@ -86,7 +94,9 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHandleRequestWithValidElementsNoHeaderRowFound() {
-        RemoveFooterStructure structure = new RemoveFooterStructure(null, new String[]{});
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveFooterConverter converter = new RemoveFooterConverter(structure);
         String[][] matrix = new String[][]{
                 {"skip", "this"},
@@ -102,7 +112,9 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHandleRequestEmptyMatrix() {
-        RemoveFooterStructure structure = new RemoveFooterStructure(null, new String[]{});
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveFooterConverter converter = new RemoveFooterConverter(structure);
         String[][] matrix = new String[][]{};
 
@@ -113,7 +125,9 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHandleRequestNullValuesOnly() {
-        RemoveFooterStructure structure = new RemoveFooterStructure(null, new String[]{});
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of());
         RemoveFooterConverter converter = new RemoveFooterConverter(structure);
         String[][] matrix = new String[][]{
                 {null, null, null},
@@ -127,7 +141,9 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testValidElementsOverridesDefaultValidation() {
-        RemoveFooterStructure structure = new RemoveFooterStructure(null, new String[]{"a", "b", "c"});
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of("a", "b", "c"));
         RemoveFooterConverter converter = new RemoveFooterConverter(structure);
 
         String[][] matrix = {
@@ -152,7 +168,9 @@ public class RemoveFooterConverterTest {
 
     @Test
     void testHeaderNotFoundDueToValidElementsMismatch() {
-        RemoveFooterStructure structure = new RemoveFooterStructure(null, new String[]{"x", "y"});
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blackList(List.of("x", "y"));
         RemoveFooterConverter converter = new RemoveFooterConverter(structure);
 
         String[][] matrix = {
