@@ -232,6 +232,7 @@
                                 <delegatePattern>true</delegatePattern>
                                 <booleanGetterPrefix>is</booleanGetterPrefix>
                                 <useOptional>true</useOptional>
+                                <useSealed>true</useSealed>
                             </configOptions>
                         </configuration>
                     </execution>

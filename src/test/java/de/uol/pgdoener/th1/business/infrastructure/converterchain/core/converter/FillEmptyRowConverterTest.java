@@ -1,8 +1,10 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.FillEmptyRowStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.FillEmptyRowStructure;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -11,7 +13,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequest() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
 
@@ -22,7 +24,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestMultipleRows() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0, 1});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0, 1));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "", "d"}};
 
@@ -33,7 +35,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestEmptyMatrix() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{};
 
@@ -42,7 +44,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestEmptyIndexArray() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of());
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
 
@@ -53,7 +55,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestIndexOutOfBoundsPositive() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{3});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(3));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
 
@@ -62,7 +64,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestIndexOutOfBoundsNegative() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{-1});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(-1));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
 
@@ -71,7 +73,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestMultipleRowsWithEmptyValues() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0, 1});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0, 1));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"", "", "", ""}, {"", "o", "", "d"}};
 
@@ -80,7 +82,7 @@ class FillEmptyRowConverterTest {
 
     @Test
     void testHandleRequestMinimalMatrix() {
-        FillEmptyRowStructure structure = new FillEmptyRowStructure(new Integer[]{0});
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t"}};
 

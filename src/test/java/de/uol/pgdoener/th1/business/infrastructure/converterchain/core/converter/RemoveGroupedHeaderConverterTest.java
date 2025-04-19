@@ -1,7 +1,9 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveGroupedHeaderStructure;
+import de.uol.pgdoener.th1.business.dto.RemoveGroupedHeaderStructureDto;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
@@ -9,12 +11,13 @@ class RemoveGroupedHeaderConverterTest {
 
     @Test
     void testHandleRequest() {
-        RemoveGroupedHeaderStructure structure = new RemoveGroupedHeaderStructure(
-                new Integer[]{0},
-                new Integer[]{0, 1},
-                3,
-                null
-        );
+        RemoveGroupedHeaderStructureDto structure = new RemoveGroupedHeaderStructureDto(
+                null,
+                List.of(0, 1),
+                List.of(0)
+        )
+                .startRow(3)
+                .startColumn(null);
         RemoveGroupedHeaderConverter converter = new RemoveGroupedHeaderConverter(structure);
         String[][] input = new String[][]{
                 {"test", "test1", "test2", "test2"},

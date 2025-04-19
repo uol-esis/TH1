@@ -1,22 +1,22 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.RemoveHeaderStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveHeaderStructure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 public class RemoveHeaderConverter extends Converter {
-    private final RemoveHeaderStructure removeHeaderStructure;
+    private final RemoveHeaderStructureDto removeHeaderStructure;
 
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
         Integer headerRowIndex = null;
-        int threshold = removeHeaderStructure.threshold() == null ? 2 : removeHeaderStructure.threshold();
+        int threshold = removeHeaderStructure.getThreshold().orElse(2);
 
         // Find the first line with at least two valid elements
         for (int i = 0; i < inputMatrix.length; i++) {
@@ -62,11 +62,11 @@ public class RemoveHeaderConverter extends Converter {
             return false;
         }
 
-        String[] validElements = removeHeaderStructure.blackList();
-        if (ArrayUtils.isEmpty(validElements)) {
+        List<String> validElements = removeHeaderStructure.getBlackList();
+        if (validElements.isEmpty()) {
             return true;
         }
 
-        return Arrays.stream(validElements).noneMatch(entry::contains);
+        return validElements.stream().noneMatch(entry::contains);
     }
 }

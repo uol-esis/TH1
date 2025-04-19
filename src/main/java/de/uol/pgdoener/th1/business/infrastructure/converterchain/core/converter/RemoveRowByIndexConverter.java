@@ -1,20 +1,21 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.RemoveRowByIndexStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveRowByIndexStructure;
 import lombok.RequiredArgsConstructor;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @RequiredArgsConstructor
 public class RemoveRowByIndexConverter extends Converter {
 
-    private final RemoveRowByIndexStructure structure;
+    private final RemoveRowByIndexStructureDto structure;
 
     @Override
     public String[][] handleRequest(String[][] matrix) {
-        Integer[] rowsToDelete = structure.rows();
+        List<Integer> rowsToDelete = structure.getRowIndex();
 
         int totalRows = matrix.length;
 

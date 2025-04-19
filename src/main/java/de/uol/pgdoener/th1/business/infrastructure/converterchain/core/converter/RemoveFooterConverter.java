@@ -1,22 +1,23 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.business.dto.RemoveFooterStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.structures.RemoveFooterStructure;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
 public class RemoveFooterConverter extends Converter {
-    private final RemoveFooterStructure removeFooterStructure;
+
+    private final RemoveFooterStructureDto removeFooterStructure;
 
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
         Integer lastValidRowIndex = null;
-        int threshold = removeFooterStructure.threshold() == null ? 2 : removeFooterStructure.threshold();
+        int threshold = removeFooterStructure.getThreshold().orElse(2);
 
         // Find the last line with valid elements
         for (int i = inputMatrix.length - 1; i >= 0; i--) {
@@ -62,11 +63,11 @@ public class RemoveFooterConverter extends Converter {
             return false;
         }
 
-        String[] validElements = removeFooterStructure.blackList();
-        if (ArrayUtils.isEmpty(validElements)) {
+        List<String> validElements = removeFooterStructure.getBlackList();
+        if (validElements.isEmpty()) {
             return true;
         }
 
-        return Arrays.stream(validElements).noneMatch(entry::contains);
+        return validElements.stream().noneMatch(entry::contains);
     }
 }
