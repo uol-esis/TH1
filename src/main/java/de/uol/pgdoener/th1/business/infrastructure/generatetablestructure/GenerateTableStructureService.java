@@ -77,6 +77,30 @@ public class GenerateTableStructureService {
     }
 
     /**
+     * Determines the maximum column length needed by finding the rightmost valid element.
+     * Valid = not null, not empty, not equal to "*"
+     */
+    private int getMaxColumnCount(String[][] inputMatrix) {
+        int maxColumnCount = 0;
+        ///  Muss nicht für alle sein
+        for (String[] row : inputMatrix) {
+
+            // Traverse from right to left to find the last valid entry
+            for (int colIndex = row.length - 1; colIndex >= 0; colIndex--) {
+                String entry = row[colIndex];
+
+                if (isInvalidEntry(entry)) {
+                    continue;
+                }
+
+                maxColumnCount = Math.max(maxColumnCount, colIndex + 1);
+                break;
+            }
+        }
+        return maxColumnCount;
+    }
+
+    /**
      * Determines if a given row is a data row (based on numeric cell values).
      */
     private boolean isDataRow(String[] row) {
@@ -111,7 +135,11 @@ public class GenerateTableStructureService {
         TableStructureDto tableStructure = new TableStructureDto();
         tableStructure.setName(inputFile.getFileName());
 
-        StructureDto removeOverheadStructure = buildRemoveOverheadStructure(matrixInfo);
+        StructureDto removeHeaderStructure = buildRemoveHeaderStructure(matrixInfo);
+        tableStructure.addStructuresItem(removeHeaderStructure);
+
+        StructureDto removeFooterStructure = buildRemoveFooterStructure(matrixInfo);
+        tableStructure.addStructuresItem(removeFooterStructure);
 
         if (matrixInfo.hasEmptyRow()) {
             StructureDto fillEmptyRowStructure = buildFillEmptyRowStructure(matrixInfo);
@@ -130,18 +158,25 @@ public class GenerateTableStructureService {
     }
 
     /**
-     * Builds converter structure for removing grouped header rows.
+     * Builds converter structure for removing header rows.
      */
-    private StructureDto buildRemoveOverheadStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildRemoveOverheadStructure");
-        RemoveGroupedHeaderStructureDto groupHeaderStructure = new RemoveGroupedHeaderStructureDto();
-        groupHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_GROUPED_HEADER);
-        groupHeaderStructure.setColumnIndex(matrixInfo.getColumnIndexes());
-        groupHeaderStructure.setRowIndex(matrixInfo.getRowIndexes());
-        groupHeaderStructure.setStartRow(Optional.of(matrixInfo.getStartRow()));
-        log.debug("Finish buildRemoveOverheadStructure");
+    private StructureDto buildRemoveHeaderStructure(MatrixInfo matrixInfo) {
+        log.debug("Start buildRemoveHeaderStructure");
+        RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto();
+        removeHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_HEADER);
+        log.debug("Finish buildRemoveHeaderStructure");
+        return removeHeaderStructure;
+    }
 
-        return groupHeaderStructure;
+    /**
+     * Builds converter structure for removing footer rows.
+     */
+    private StructureDto buildRemoveFooterStructure(MatrixInfo matrixInfo) {
+        log.debug("Start buildRemoveFooterStructure");
+        RemoveFooterStructureDto removeFooterStructure = new RemoveFooterStructureDto();
+        removeFooterStructure.setConverterType(ConverterTypeDto.REMOVE_HEADER);
+        log.debug("Finish buildRemoveFooterStructure");
+        return removeFooterStructure;
     }
 
     /**
@@ -226,29 +261,6 @@ public class GenerateTableStructureService {
     }
 
     /**
-     * Determines the maximum column length needed by finding the rightmost valid element.
-     * Valid = not null, not empty, not equal to "*"
-     */
-    private int getMaxColumnCount(String[][] inputMatrix) {
-        int maxColumnCount = 0;
-        for (String[] row : inputMatrix) {
-
-            // Traverse from right to left to find the last valid entry
-            for (int colIndex = row.length - 1; colIndex >= 0; colIndex--) {
-                String entry = row[colIndex];
-
-                if (isInvalidEntry(entry)) {
-                    continue;
-                }
-
-                maxColumnCount = Math.max(maxColumnCount, colIndex + 1);
-                break;
-            }
-        }
-        return maxColumnCount;
-    }
-
-    /**
      * Counts the number of valid elements in a row.
      * Valid = not null, not empty, not equal to "*"
      */
@@ -265,9 +277,6 @@ public class GenerateTableStructureService {
     private boolean isInvalidEntry(String entry) {
         return entry == null || entry.trim().isEmpty() || entry.equals("*");
     }
-
-
-
 
     /*public void searchMatrix(String[][] matrix, List<Integer> rowIndexes, List<Integer> colIndexes) {
         // if(remove size and gesamt)
