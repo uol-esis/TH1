@@ -10,14 +10,20 @@ public abstract class ConverterFactory {
 
     public static Converter createConverter(StructureDto structure) {
         return switch (structure) {
-            case RemoveGroupedHeaderStructureDto groupedHeaderStructure ->
-                    new RemoveGroupedHeaderConverter(groupedHeaderStructure);
-            case FillEmptyRowStructureDto fillEmptyRowStructure -> new FillEmptyRowConverter(fillEmptyRowStructure);
-            case RemoveColumnByIndexStructureDto removeColumnStructure ->
-                    new RemoveColumnByIndexConverter(removeColumnStructure);
-            case RemoveRowByIndexStructureDto removeRowStructure -> new RemoveRowByIndexConverter(removeRowStructure);
-            case AddHeaderNameStructureDto headerRowStructure -> new AddHeaderRowConverter(headerRowStructure);
-            default -> throw new IllegalStateException("Unexpected value: " + structure);
+            case RemoveGroupedHeaderStructure groupedHeaderStructure:
+                yield new RemoveGroupedHeaderConverter(groupedHeaderStructure);
+            case FillEmptyRowStructure fillEmptyRowStructure:
+                yield new FillEmptyRowConverter(fillEmptyRowStructure);
+            case RemoveColumnByIndexStructure removeColumnStructure:
+                yield new RemoveColumnByIndexConverter(removeColumnStructure);
+            case RemoveRowByIndexStructure removeRowStructure:
+                yield new RemoveRowByIndexConverter(removeRowStructure);
+            case HeaderRowStructure headerRowStructure:
+                yield new AddHeaderRowConverter(headerRowStructure);
+            case RemoveHeaderStructure removeHeaderStructure:
+                yield new RemoveHeaderConverter(removeHeaderStructure);
+            case RemoveFooterStructure removeFooterStructure:
+                yield new RemoveFooterConverter(removeFooterStructure);
         };
     }
 }
