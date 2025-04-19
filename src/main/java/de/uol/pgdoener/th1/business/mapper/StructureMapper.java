@@ -45,6 +45,16 @@ public abstract class StructureMapper {
             )
                     .threshold(structure.getThreshold())
                     .blackList(List.of(structure.getBlackList()));
+            case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
+                    ConverterTypeDto.REPLACE_ENTRIES,
+                    structure.getReplacement()
+            )
+                    .search(structure.getSearch())
+                    .regexSearch(structure.getRegexSearch())
+                    .startRow(structure.getStartRow())
+                    .endRow(structure.getEndRow())
+                    .startColumn(structure.getStartColumn())
+                    .endColumn(structure.getEndColumn());
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
