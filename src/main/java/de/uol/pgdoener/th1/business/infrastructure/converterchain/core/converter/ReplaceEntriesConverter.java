@@ -21,6 +21,10 @@ public class ReplaceEntriesConverter extends Converter {
         final int startColumn = structure.getStartColumn().orElse(0);
         final int endColumn = structure.getEndColumn().orElse(columns);
 
+        if (structure.getReplacement() == null) {
+            throwConverterException("Replacement value must not be null.");
+        }
+
         final UnaryOperator<String> mapper = getMapper();
 
         for (int i = startRow; i < endRow; i++) {
@@ -48,4 +52,5 @@ public class ReplaceEntriesConverter extends Converter {
         }
         return mapper;
     }
+
 }
