@@ -148,6 +148,13 @@ public abstract class StructureMapper {
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
             );
+            case RemoveInvalidRowsStructureDto structure -> new removeInvalidRowStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getThreshold().orElse(null),
+                    structure.getBlackList().toArray(new String[0])
+            );
         };
     }
 
