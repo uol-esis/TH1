@@ -5,6 +5,7 @@ import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -29,7 +30,12 @@ public class SplitRowConverter extends Converter {
             throwConverterException("Invalid column index");
         }
 
-        List<String[]> rows = new ArrayList<>();
+        List<String[]> rows;
+        // Add rows before the split
+        List<String[]> header = Arrays.asList(matrix).subList(0, startRow);
+        rows = new ArrayList<>(header);
+
+        // Split the specified column for each row in the specified range
         for (int i = startRow; i < endRow; i++) {
             String[] row = matrix[i];
             String multiValue = row[columnIndex];
@@ -41,6 +47,10 @@ public class SplitRowConverter extends Converter {
                 rows.add(newRow);
             }
         }
+
+        // Add rows after the split
+        List<String[]> footer = Arrays.asList(matrix).subList(endRow, matrix.length);
+        rows.addAll(footer);
 
         return rows.toArray(new String[0][]);
     }
