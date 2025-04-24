@@ -45,6 +45,11 @@ public abstract class StructureMapper {
             )
                     .threshold(structure.getThreshold())
                     .blackList(List.of(structure.getBlackList()));
+            case RemoveTrailingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
+                    ConverterTypeDto.REMOVE_TRAILING_COLUMN
+            )
+                    .threshold(structure.getThreshold())
+                    .blackList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
                     structure.getReplacement()
@@ -115,6 +120,13 @@ public abstract class StructureMapper {
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
+            case RemoveTrailingColumnStructureDto structure -> new RemoveTrailingColumnStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getThreshold().orElse(null),
+                    structure.getBlackList().toArray(new String[0])
+            );
             case ReplaceEntriesStructureDto structure -> new ReplaceEntriesStructure(
                     null, // ID wird von der Datenbank generiert
                     position,
@@ -136,6 +148,7 @@ public abstract class StructureMapper {
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
             );
+            default -> throw new IllegalStateException("Unexpected value: " + dto);
         };
     }
 
