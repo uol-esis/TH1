@@ -22,7 +22,6 @@ public class RemoveInvalidRowsConverter extends Converter {
 
         log.debug(Arrays.toString(inputMatrix));
 
-        // Find the first line with at least two valid elements
         for (int i = 0; i < inputMatrix.length; i++) {
             String[] row = inputMatrix[i];
             long validElementCount = countValidElements(row);
