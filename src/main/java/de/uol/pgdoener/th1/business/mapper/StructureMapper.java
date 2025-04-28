@@ -55,6 +55,13 @@ public abstract class StructureMapper {
                     .endRow(structure.getEndRow())
                     .startColumn(structure.getStartColumn())
                     .endColumn(structure.getEndColumn());
+            case SplitRowStructure structure -> new SplitRowStructureDto(
+                    ConverterTypeDto.SPLIT_ROW,
+                    structure.getColumnIndex()
+            )
+                    .delimiter(structure.getDelimiter())
+                    .startRow(structure.getStartRow())
+                    .endRow(structure.getEndRow());
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
@@ -119,6 +126,15 @@ public abstract class StructureMapper {
                     structure.getEndRow().orElse(null),
                     structure.getStartColumn().orElse(null),
                     structure.getEndColumn().orElse(null)
+            );
+            case SplitRowStructureDto structure -> new SplitRowStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getColumnIndex(),
+                    structure.getDelimiter().orElse(null),
+                    structure.getStartRow().orElse(null),
+                    structure.getEndRow().orElse(null)
             );
         };
     }
