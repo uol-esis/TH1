@@ -45,6 +45,11 @@ public abstract class StructureMapper {
             )
                     .threshold(structure.getThreshold())
                     .blackList(List.of(structure.getBlackList()));
+            case RemoveInvalidRowStructure structure -> new RemoveInvalidRowsStructureDto(
+                    ConverterTypeDto.REMOVE_INVALID_ROWS
+            )
+                    .threshold(structure.getThreshold())
+                    .blackList(List.of(structure.getBlackList()));
             case RemoveTrailingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
@@ -148,7 +153,7 @@ public abstract class StructureMapper {
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
             );
-            case RemoveInvalidRowsStructureDto structure -> new removeInvalidRowStructure(
+            case RemoveInvalidRowsStructureDto structure -> new RemoveInvalidRowStructure(
                     null,
                     position,
                     tableStructureId,
