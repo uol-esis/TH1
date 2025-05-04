@@ -34,7 +34,7 @@ public class RemoveInvalidRowsConverter extends Converter {
 
         if (removeIndexes.isEmpty()) {
             log.debug("No HeaderRow found");
-            return inputMatrix;
+            return super.handleRequest(inputMatrix);
         }
 
         int rowsToKeep = inputMatrix.length - removeIndexes.size();
@@ -50,12 +50,6 @@ public class RemoveInvalidRowsConverter extends Converter {
             cleanedMatrix[cleanedMatrixIndex] = inputMatrix[i];
             cleanedMatrixIndex++;
         }
-
-        if (Arrays.stream(cleanedMatrix).findAny().isEmpty()) {
-            log.warn("Cleaned matrix is null – returning original inputMatrix");
-            return inputMatrix;
-        }
-
         return super.handleRequest(cleanedMatrix);
     }
 
