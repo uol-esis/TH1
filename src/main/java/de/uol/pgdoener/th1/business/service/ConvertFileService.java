@@ -4,6 +4,7 @@ import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.TransformationException;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
@@ -11,6 +12,7 @@ import de.uol.pgdoener.th1.data.repository.DynamicTableRepository;
 import de.uol.pgdoener.th1.data.repository.StructureRepository;
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
 import de.uol.pgdoener.th1.metabase.MBService;
+import de.uol.pgdoener.th1.metabase.MetabaseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -69,11 +71,11 @@ public class ConvertFileService {
             dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
             // Daten einfügen
             dynamicTableRepository.insertData(tableName, transformedMatrix);
-            mbService.updateAllDatabases();
         } catch (Exception e) {
             log.error("Error processing file", e);
             throw new RuntimeException("Error processing file", e);
         }
+        mbService.updateAllDatabases();
     }
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
