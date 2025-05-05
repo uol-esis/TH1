@@ -14,8 +14,9 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class FillEmptyRowStructure extends Structure {
 
-    public FillEmptyRowStructure(Long id, int position, Long tableStructureId, Integer[] rows) {
-        super(id, position, tableStructureId);
+    public FillEmptyRowStructure(Long id, int position, Long tableStructureId, String name, String description,
+                                 Integer[] rows) {
+        super(id, position, tableStructureId, name, description);
         this.rows = rows;
     }
 

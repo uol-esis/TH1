@@ -11,8 +11,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReplaceEntriesStructure extends Structure {
 
-    public ReplaceEntriesStructure(Long id, int position, Long tableStructureId, String replacement, String search, String regexSearch, Integer startRow, Integer endRow, Integer startColumn, Integer endColumn) {
-        super(id, position, tableStructureId);
+    public ReplaceEntriesStructure(Long id, int position, Long tableStructureId, String name, String description,
+                                   String replacement, String search, String regexSearch,
+                                   Integer startRow, Integer endRow, Integer startColumn, Integer endColumn) {
+        super(id, position, tableStructureId, name, description);
         this.replacement = replacement;
         this.search = search;
         this.regexSearch = regexSearch;

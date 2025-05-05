@@ -11,8 +11,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SplitRowStructure extends Structure {
 
-    public SplitRowStructure(Long id, int position, Long tableStructureId, Integer columnIndex, String delimiter, Integer startRow, Integer endRow) {
-        super(id, position, tableStructureId);
+    public SplitRowStructure(Long id, int position, Long tableStructureId, String name, String description,
+                             Integer columnIndex, String delimiter, Integer startRow, Integer endRow) {
+        super(id, position, tableStructureId, name, description);
         this.columnIndex = columnIndex;
         this.delimiter = delimiter;
         this.startRow = startRow;

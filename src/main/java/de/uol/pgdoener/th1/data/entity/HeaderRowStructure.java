@@ -14,8 +14,9 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class HeaderRowStructure extends Structure {
 
-    public HeaderRowStructure(Long id, int position, Long tableStructureId, String[] headerNames) {
-        super(id, position, tableStructureId);
+    public HeaderRowStructure(Long id, int position, Long tableStructureId, String name, String description,
+                              String[] headerNames) {
+        super(id, position, tableStructureId, name, description);
         this.headerNames = headerNames;
     }
 
