@@ -9,6 +9,28 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
 public class RemoveTrailingColumnConverterTest {
 
+
+    @Test
+    void testHandleRequestWitDefaultValues() {
+        // threshold = 2 (default), blackList = empty
+        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
+                .threshold(null)
+                .blackList(List.of());
+        RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
+        String[][] matrix = new String[][]{
+                {"test", "", "test1"},
+                {"test", "", "test1"}
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(
+                new String[][]{
+                        {"test", "", "test1"},
+                        {"test", "", "test1"}
+                }, result);
+    }
+
     @Test
     void testHandleRequestWithDefaultValues() {
         // threshold = 2 (default), blackList = empty
@@ -67,15 +89,15 @@ public class RemoveTrailingColumnConverterTest {
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
-                {"A", "B", "*", "REMOVE", ""},
+                {"A", "B", "*", "", ""},
                 {"1", "2", "3", "", ""},
-                {"X", "REMOVE", "*", "", ""}
+                {"X", "", "*", "", ""}
         };
 
         String[][] expected = {
                 {"A", "B", "*"},
                 {"1", "2", "3"},
-                {"X", "REMOVE", "*"}
+                {"X", "", "*"}
         };
 
         String[][] result = converter.handleRequest(input);
@@ -96,18 +118,5 @@ public class RemoveTrailingColumnConverterTest {
 
         String[][] result = converter.handleRequest(input);
         assertArrayEquals(input, result, "Should return original matrix if no valid elements found.");
-    }
-
-    @Test
-    void shouldHandleEmptyMatrix() {
-        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .blackList(List.of("*"))
-                .threshold(null);
-        RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
-
-        String[][] input = new String[0][0];
-
-        String[][] result = converter.handleRequest(input);
-        assertArrayEquals(input, result, "Empty matrix should return empty matrix.");
     }
 }

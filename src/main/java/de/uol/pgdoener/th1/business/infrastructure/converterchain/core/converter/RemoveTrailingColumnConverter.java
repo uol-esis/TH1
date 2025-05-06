@@ -23,7 +23,7 @@ public class RemoveTrailingColumnConverter extends Converter {
      * - Not equal to "*".
      * <p>
      * This method first finds the maximum count of valid elements in any row
-     * of the input matrix using the {@link #findMaxValidElementCount} method.
+     * of the input matrix using the {@link #findMaxValidRowLength} method.
      * It then creates a new cleaned matrix, where each row is truncated to
      * the maximum count of valid elements.
      * If no valid elements are found (i.e., maxValidElementCount == 0),
@@ -38,20 +38,20 @@ public class RemoveTrailingColumnConverter extends Converter {
      */
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
-        int maxValidElementCount = findMaxValidElementCount(inputMatrix);
+        int maxValidRowLength = findMaxValidRowLength(inputMatrix);
 
-        if (maxValidElementCount == 0) {
-            log.debug("No column trailing found");
-            return inputMatrix;
+        if (maxValidRowLength == 0) {
+            log.debug("No valid elements");
+            return super.handleRequest(inputMatrix);
         }
 
-        log.debug("Max valid element count found: {}", maxValidElementCount);
+        log.debug("Max valid element count found: {}", maxValidRowLength);
 
         String[][] cleanedMatrix = new String[inputMatrix.length][];
 
         for (int i = 0; i < inputMatrix.length; i++) {
-            String[] cleanedRow = new String[maxValidElementCount];
-            System.arraycopy(inputMatrix[i], 0, cleanedRow, 0, maxValidElementCount);
+            String[] cleanedRow = new String[maxValidRowLength];
+            System.arraycopy(inputMatrix[i], 0, cleanedRow, 0, maxValidRowLength);
             cleanedMatrix[i] = cleanedRow;
             log.debug("Processed row {}: {}", i, Arrays.toString(cleanedRow));
         }
@@ -73,26 +73,26 @@ public class RemoveTrailingColumnConverter extends Converter {
      *                    Each row is checked individually for valid entries.
      * @return The maximum number of valid elements found in any row of the input array.
      */
-    private int findMaxValidElementCount(String[][] inputMatrix) {
-        int maxRowLength = 0;
+    private int findMaxValidRowLength(String[][] inputMatrix) {
+        int maxValidRowLength = 0;
         for (int i = 0; i < inputMatrix.length; i++) {
             String[] row = inputMatrix[i];
-            int validElementCount = countValidElements(row);
+            int validRowLength = getValidRowLength(row);
 
-            log.debug("Row {} has {} valid elements.", i, validElementCount);
+            log.debug("Row {} has {} valid elements.", i, validRowLength);
 
-            if (validElementCount > maxRowLength) {
-                log.debug("Find maxRowLength at id {} with {} valid elements", i, validElementCount);
-                maxRowLength = validElementCount;
+            if (validRowLength > maxValidRowLength) {
+                log.debug("Find maxRowLength at id {} with {} valid elements", i, validRowLength);
+                maxValidRowLength = validRowLength;
             }
 
-            if (maxRowLength == inputMatrix[i].length) {
-                log.debug("Max valid element count reached, stopping further checks.");
+            if (maxValidRowLength == row.length) {
+                log.debug("No column trailing found");
                 break;
             }
         }
-        log.info("Max valid element count in the matrix: {}", maxRowLength);
-        return maxRowLength;
+        log.info("Max valid element count in the matrix: {}", maxValidRowLength);
+        return maxValidRowLength;
     }
 
     /**
@@ -102,10 +102,16 @@ public class RemoveTrailingColumnConverter extends Converter {
      * @param row The row of elements to be checked.
      * @return The count of valid elements in the row.
      */
-    private int countValidElements(String[] row) {
-        return (int) Arrays.stream(row)
-                .filter(this::isValidEntry)
-                .count();
+    private int getValidRowLength(String[] row) {
+        int validRowLength = row.length;
+        for (int i = row.length - 1; i >= 0; i--) {
+            if (isValidEntry(row[i])) {
+                return validRowLength;
+            }
+            validRowLength--;
+        }
+
+        return validRowLength;
     }
 
     /**

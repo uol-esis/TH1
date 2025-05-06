@@ -148,7 +148,6 @@ public abstract class StructureMapper {
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
             );
-            default -> throw new IllegalStateException("Unexpected value: " + dto);
         };
     }
 
