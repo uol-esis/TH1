@@ -17,40 +17,57 @@ public class RemoveInvalidRowsConverter extends Converter {
 
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
-        List<Integer> removeIndexes = new ArrayList<>();
-        int threshold = removeHeaderStructure.getThreshold().orElse(2);
+        List<Integer> invalidRowIndices = findInvalidRowIndices(inputMatrix);
 
-        log.debug(Arrays.toString(inputMatrix));
+        if (invalidRowIndices.size() == inputMatrix.length) {
+            log.debug("All rows are invalid");
+            return super.handleRequest(inputMatrix);
+        }
+
+        if (invalidRowIndices.isEmpty()) {
+            log.debug("No invalid rows found.");
+            return super.handleRequest(inputMatrix);
+        }
+
+        String[][] cleanedMatrix = buildCleanMatrix(inputMatrix, invalidRowIndices);
+
+        return super.handleRequest(cleanedMatrix);
+    }
+
+    /**
+     * Finds all row indices that are considered invalid.
+     */
+    private List<Integer> findInvalidRowIndices(String[][] inputMatrix) {
+        List<Integer> invalidIndices = new ArrayList<>();
+        int threshold = removeHeaderStructure.getThreshold().orElse(2);
 
         for (int i = 0; i < inputMatrix.length; i++) {
             String[] row = inputMatrix[i];
             long validElementCount = countValidElements(row);
-
             if (validElementCount <= threshold) {
-                log.debug("Find invalid row at id {} with {} valid elements", i, validElementCount);
-                removeIndexes.add(i);
+                log.debug("Invalid row found at index {} with {} valid elements", i, validElementCount);
+                invalidIndices.add(i);
             }
         }
 
-        if (removeIndexes.isEmpty()) {
-            log.debug("No HeaderRow found");
-            return super.handleRequest(inputMatrix);
-        }
+        return invalidIndices;
+    }
 
-        int rowsToKeep = inputMatrix.length - removeIndexes.size();
-        String[][] cleanedMatrix = new String[rowsToKeep][];
+    /**
+     * Builds a new matrix without invalid rows.
+     */
+    private String[][] buildCleanMatrix(String[][] inputMatrix, List<Integer> invalidIndices) {
+        int validRowCount = inputMatrix.length - invalidIndices.size();
+        String[][] cleanedMatrix = new String[validRowCount][];
         int cleanedMatrixIndex = 0;
 
         for (int i = 0; i < inputMatrix.length; i++) {
-
-            if (removeIndexes.contains(i)) {
-                continue;
+            if (!invalidIndices.contains(i)) {
+                cleanedMatrix[cleanedMatrixIndex++] = inputMatrix[i];
             }
-
-            cleanedMatrix[cleanedMatrixIndex] = inputMatrix[i];
-            cleanedMatrixIndex++;
         }
-        return super.handleRequest(cleanedMatrix);
+
+        return cleanedMatrix;
     }
 
     /**

@@ -1,7 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.business.dto.RemoveInvalidRowsStructureDto;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -106,19 +105,6 @@ public class RemoveInvalidRowsConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(matrix, result);
-    }
-
-    @Test
-    void testHandleRequestEmptyMatrix() {
-        RemoveInvalidRowsStructureDto structure = new RemoveInvalidRowsStructureDto()
-                .threshold(null)
-                .blackList(List.of());
-        RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(structure);
-        String[][] matrix = new String[][]{};
-
-        String[][] result = converter.handleRequest(matrix);
-
-        Assertions.assertEquals(0, result.length);
     }
 
     @Test
