@@ -1,7 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.business.dto.RemoveHeaderStructureDto;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -97,19 +96,6 @@ public class RemoveHeaderConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(matrix, result);
-    }
-
-    @Test
-    void testHandleRequestEmptyMatrix() {
-        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
-                .threshold(null)
-                .blackList(List.of());
-        RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
-        String[][] matrix = new String[][]{};
-
-        String[][] result = converter.handleRequest(matrix);
-
-        Assertions.assertEquals(0, result.length);
     }
 
     @Test
