@@ -161,6 +161,8 @@ public abstract class StructureMapper {
                     null, // ID wird von der Datenbank generiert
                     position,
                     tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
@@ -193,6 +195,8 @@ public abstract class StructureMapper {
                     null,
                     position,
                     tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
