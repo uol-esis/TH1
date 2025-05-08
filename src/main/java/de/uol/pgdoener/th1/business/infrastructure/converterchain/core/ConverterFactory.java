@@ -20,6 +20,7 @@ public abstract class ConverterFactory {
             case RemoveTrailingColumnStructureDto s -> new RemoveTrailingColumnConverter(s);
             case ReplaceEntriesStructureDto s -> new ReplaceEntriesConverter(s);
             case SplitRowStructureDto s -> new SplitRowConverter(s);
+            case RemoveInvalidRowsStructureDto s -> new RemoveInvalidRowsConverter(s);
         };
     }
 }
