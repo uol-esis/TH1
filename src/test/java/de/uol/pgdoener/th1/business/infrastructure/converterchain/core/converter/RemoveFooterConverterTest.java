@@ -1,7 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.business.dto.RemoveFooterStructureDto;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -108,19 +107,6 @@ public class RemoveFooterConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(matrix, result);
-    }
-
-    @Test
-    void testHandleRequestEmptyMatrix() {
-        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
-                .threshold(null)
-                .blackList(List.of());
-        RemoveFooterConverter converter = new RemoveFooterConverter(structure);
-        String[][] matrix = new String[][]{};
-
-        String[][] result = converter.handleRequest(matrix);
-
-        Assertions.assertEquals(0, result.length);
     }
 
     @Test

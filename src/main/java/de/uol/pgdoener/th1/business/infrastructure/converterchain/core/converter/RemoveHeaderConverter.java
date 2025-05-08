@@ -32,7 +32,7 @@ public class RemoveHeaderConverter extends Converter {
 
         if (headerRowIndex == null) {
             log.debug("No HeaderRow found");
-            return inputMatrix;
+            return super.handleRequest(inputMatrix);
         }
 
         // Remove all lines up to and including the header line
