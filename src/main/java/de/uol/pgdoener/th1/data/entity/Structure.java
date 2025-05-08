@@ -23,4 +23,8 @@ public class Structure {
     @Column(name = "table_structure_id", nullable = false)
     private Long tableStructureId;
 
+    private String name;
+
+    private String description;
+
 }

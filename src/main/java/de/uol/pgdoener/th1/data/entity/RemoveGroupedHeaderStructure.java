@@ -14,8 +14,9 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class RemoveGroupedHeaderStructure extends Structure {
 
-    public RemoveGroupedHeaderStructure(Long id, int position, Long tableStructureId, Integer[] columns, Integer[] rows, Integer startRow, Integer startColumn) {
-        super(id, position, tableStructureId);
+    public RemoveGroupedHeaderStructure(Long id, int position, Long tableStructureId, String name, String description,
+                                        Integer[] columns, Integer[] rows, Integer startRow, Integer startColumn) {
+        super(id, position, tableStructureId, name, description);
         this.columns = columns;
         this.rows = rows;
         this.startRow = startRow;

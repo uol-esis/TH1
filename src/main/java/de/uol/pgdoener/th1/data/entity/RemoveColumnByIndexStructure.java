@@ -14,8 +14,9 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class RemoveColumnByIndexStructure extends Structure {
 
-    public RemoveColumnByIndexStructure(Long id, int position, Long tableStructureId, Integer[] columns) {
-        super(id, position, tableStructureId);
+    public RemoveColumnByIndexStructure(Long id, int position, Long tableStructureId, String name, String description,
+                                        Integer[] columns) {
+        super(id, position, tableStructureId, name, description);
         this.columns = columns;
     }
 

@@ -14,8 +14,9 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class RemoveFooterStructure extends Structure {
 
-    public RemoveFooterStructure(Long id, int position, Long tableStructureId, Integer threshold, String[] blackList) {
-        super(id, position, tableStructureId);
+    public RemoveFooterStructure(Long id, int position, Long tableStructureId, String name, String description,
+                                 Integer threshold, String[] blackList) {
+        super(id, position, tableStructureId, name, description);
         this.threshold = threshold;
         this.blackList = blackList;
     }

@@ -14,8 +14,9 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class RemoveInvalidRowStructure extends Structure {
 
-    public RemoveInvalidRowStructure(Long id, int position, Long tableStructureId, Integer threshold, String[] blackList) {
-        super(id, position, tableStructureId);
+    public RemoveInvalidRowStructure(Long id, int position, Long tableStructureId,String name, String description,
+                                     Integer threshold, String[] blackList) {
+        super(id, position, tableStructureId, name, description);
         this.threshold = threshold;
         this.blackList = blackList;
     }
