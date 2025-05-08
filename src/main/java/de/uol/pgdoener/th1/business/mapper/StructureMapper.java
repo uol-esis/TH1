@@ -59,6 +59,16 @@ public abstract class StructureMapper {
                     .description(structure.getDescription())
                     .threshold(structure.getThreshold())
                     .blackList(List.of(structure.getBlackList()));
+            case RemoveInvalidRowStructure structure -> new RemoveInvalidRowsStructureDto(
+                    ConverterTypeDto.REMOVE_INVALID_ROWS
+            )
+                    .threshold(structure.getThreshold())
+                    .blackList(List.of(structure.getBlackList()));
+            case RemoveTrailingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
+                    ConverterTypeDto.REMOVE_TRAILING_COLUMN
+            )
+                    .threshold(structure.getThreshold())
+                    .blackList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
                     structure.getReplacement()
@@ -147,6 +157,13 @@ public abstract class StructureMapper {
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
+            case RemoveTrailingColumnStructureDto structure -> new RemoveTrailingColumnStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getThreshold().orElse(null),
+                    structure.getBlackList().toArray(new String[0])
+            );
             case ReplaceEntriesStructureDto structure -> new ReplaceEntriesStructure(
                     null, // ID wird von der Datenbank generiert
                     position,
@@ -171,6 +188,13 @@ public abstract class StructureMapper {
                     structure.getDelimiter().orElse(null),
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
+            );
+            case RemoveInvalidRowsStructureDto structure -> new RemoveInvalidRowStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getThreshold().orElse(null),
+                    structure.getBlackList().toArray(new String[0])
             );
         };
     }

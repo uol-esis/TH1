@@ -33,7 +33,7 @@ public class RemoveFooterConverter extends Converter {
 
         if (lastValidRowIndex == null) {
             log.debug("No Footer to remove found");
-            return inputMatrix;
+            return super.handleRequest(inputMatrix);
         }
 
         // Remove all lines up to and including the header line

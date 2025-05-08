@@ -17,8 +17,10 @@ public abstract class ConverterFactory {
             case AddHeaderNameStructureDto s -> new AddHeaderRowConverter(s);
             case RemoveHeaderStructureDto s -> new RemoveHeaderConverter(s);
             case RemoveFooterStructureDto s -> new RemoveFooterConverter(s);
+            case RemoveTrailingColumnStructureDto s -> new RemoveTrailingColumnConverter(s);
             case ReplaceEntriesStructureDto s -> new ReplaceEntriesConverter(s);
             case SplitRowStructureDto s -> new SplitRowConverter(s);
+            case RemoveInvalidRowsStructureDto s -> new RemoveInvalidRowsConverter(s);
         };
     }
 }
