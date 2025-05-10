@@ -14,6 +14,7 @@ public class MergeColumnsConverter extends Converter {
 
     private final MergeColumnsStructureDto structure;
 
+    // the precedenceOrder list should only be modified by the fillPrecedenceOrder method
     private List<Integer> precedenceOrder;
 
     @Override
@@ -66,6 +67,15 @@ public class MergeColumnsConverter extends Converter {
         precedenceOrder = Collections.unmodifiableList(po);
     }
 
+    /**
+     * Constructs a new row by merging the specified columns.
+     * The merged column has the lowest index in the precedence order.
+     * Entries are taken from the columns in the precedence order.
+     * The first valid entry is used.
+     *
+     * @param row the row to merge
+     * @return the new row with merged columns
+     */
     private String[] constructMergedRow(String[] row) {
         String[] newRow = new String[row.length - precedenceOrder.size() + 1];
         int newRowIndex = 0;
