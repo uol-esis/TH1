@@ -21,6 +21,7 @@ public abstract class ConverterFactory {
             case ReplaceEntriesStructureDto s -> new ReplaceEntriesConverter(s);
             case SplitRowStructureDto s -> new SplitRowConverter(s);
             case RemoveInvalidRowsStructureDto s -> new RemoveInvalidRowsConverter(s);
+            case MergeColumnsStructureDto s -> new MergeColumnsConverter(s);
         };
     }
 }
