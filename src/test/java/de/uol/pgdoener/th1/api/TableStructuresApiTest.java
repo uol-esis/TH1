@@ -144,7 +144,7 @@ class TableStructuresApiTest {
         Long id = tableStructureRepository.findAll().iterator().next().getId();
 
         mockMvc.perform(delete(basePath + "/" + id))
-                .andExpect(status().isOk());
+                .andExpect(status().isNoContent());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
 
