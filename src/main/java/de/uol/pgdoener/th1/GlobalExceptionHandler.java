@@ -27,6 +27,7 @@ import java.util.Map;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
+    // Add request Id and code ?
     @ExceptionHandler(ServiceException.class)
     public ResponseEntity<Object> handleServiceException(ServiceException ex, HttpServletRequest request) {
         Map<String, Object> errorBody = new LinkedHashMap<>();
