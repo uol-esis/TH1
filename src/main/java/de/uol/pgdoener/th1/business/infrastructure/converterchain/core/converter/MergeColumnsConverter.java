@@ -90,6 +90,9 @@ public class MergeColumnsConverter extends Converter {
                         break;
                     }
                 }
+                if (newRow[mergedColumnIndex] == null) {
+                    newRow[mergedColumnIndex] = "";
+                }
                 newRowIndex++;
             } else if (!precedenceOrder.contains(i)) {
                 newRow[newRowIndex] = row[i];
