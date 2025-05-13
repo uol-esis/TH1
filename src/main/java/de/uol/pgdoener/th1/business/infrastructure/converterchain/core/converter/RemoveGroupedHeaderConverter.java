@@ -67,6 +67,9 @@ public class RemoveGroupedHeaderConverter extends Converter {
     }
 
     private void validateInputs(int startRow, int startColumn, int endRow, int endColumn) {
+        if (structure.getRowIndex().getFirst() != 0) {
+            throwConverterException("First row index must be 0 but is " + structure.getRowIndex().getFirst());
+        }
         for (int rowIndex : structure.getRowIndex()) {
             if (rowIndex >= startRow) {
                 throwConverterException("Row index must be less than startRow: " + startRow);
