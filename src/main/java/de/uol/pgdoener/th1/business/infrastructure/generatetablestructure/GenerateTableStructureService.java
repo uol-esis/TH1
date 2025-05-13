@@ -8,9 +8,7 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.R
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 // Remove empty cells at the end in the row
@@ -135,6 +133,8 @@ public class GenerateTableStructureService {
         TableStructureDto tableStructure = new TableStructureDto();
         tableStructure.setName(inputFile.getFileName());
 
+        StructureDto removeInvalidRowsStructure = buildRemoveRowsStructure;
+
         StructureDto removeHeaderStructure = buildRemoveHeaderStructure(matrixInfo);
         tableStructure.addStructuresItem(removeHeaderStructure);
 
@@ -155,6 +155,17 @@ public class GenerateTableStructureService {
             tableStructure.addStructuresItem(addHeaderNameStructure);
         }
         return tableStructure;
+    }
+
+    /**
+     * Builds converter structure for removing header rows.
+     */
+    private StructureDto buildRemoveRowsStructure(MatrixInfo matrixInfo) {
+        log.debug("Start buildRemoveRowsStructure");
+        RemoveInvalidRowsStructureDto removeInvalidRowStructure = new RemoveInvalidRowsStructureDto();
+        removeInvalidRowStructure.setConverterType(ConverterTypeDto.REMOVE_INVALID_ROWS);
+        log.debug("Finish buildRemoveRowsStructure");
+        return removeInvalidRowStructure;
     }
 
     /**
@@ -231,34 +242,6 @@ public class GenerateTableStructureService {
         return str.matches("-?\\d+(\\.\\d+)?"); // Regex für Ganzzahlen & Dezimalzahlen
     }
 
-    private String[][] filterAndTrimMatrix(String[][] inputMatrix) {
-        List<String[]> cleanedMatrix = new ArrayList<>();
-
-        // Determine the maximum number of meaningful columns across all rows
-        int maxColumnCount = getMaxColumnCount(inputMatrix);
-        log.debug("Determined max column count: {}", maxColumnCount);
-
-        for (int i = 0; i < inputMatrix.length; i++) {
-            String[] row = inputMatrix[i];
-
-            if (row == null) {
-                log.warn("Row {} is null and will be skipped", i);
-                continue;
-            }
-
-            long validElementCount = countValidElements(row);
-            if (validElementCount <= 2) {
-                log.debug("Skipping row {} with only {} valid elements", i, validElementCount);
-                continue;
-            }
-
-            String[] trimmedRow = new String[maxColumnCount];
-            System.arraycopy(row, 0, trimmedRow, 0, maxColumnCount);
-            cleanedMatrix.add(trimmedRow);
-        }
-        log.info("Filtered matrix contains {} rows", cleanedMatrix.size());
-        return cleanedMatrix.toArray(new String[cleanedMatrix.size()][]);
-    }
 
     /**
      * Counts the number of valid elements in a row.
@@ -277,53 +260,4 @@ public class GenerateTableStructureService {
     private boolean isInvalidEntry(String entry) {
         return entry == null || entry.trim().isEmpty() || entry.equals("*");
     }
-
-    /*public void searchMatrix(String[][] matrix, List<Integer> rowIndexes, List<Integer> colIndexes) {
-        // if(remove size and gesamt)
-         *//* List<Integer> rowIndexes = new ArrayList<>();
-            List<Integer> colIndexes = new ArrayList<>();
-
-            searchMatrix(matrix, rowIndexes, colIndexes);
-
-            StructureDto removeRowByIndex = new StructureDto();
-            StructureDto removeColByIndex = new StructureDto();
-            if (!rowIndexes.isEmpty()) {
-                removeRowByIndex.setConverterType(ConverterTypeDto.REMOVE_ROW_BY_INDEX);
-                removeRowByIndex.setRowIndex(rowIndexes);
-
-                tableStructure.addStructuresItem(removeRowByIndex);
-            }
-            if (!colIndexes.isEmpty()) {
-                removeColByIndex.setConverterType(ConverterTypeDto.REMOVE_COLUMN_BY_INDEX);
-                removeColByIndex.setColumnIndex(colIndexes);
-
-                tableStructure.addStructuresItem(removeColByIndex);
-            }*//*
-
-
-        List<String> keywords = List.of(
-                "sum", "total", "amount", "gesamt", "gesamtbetrag", "gesamtmenge", "summen", "totaal",
-                "summe", "gesamtwert", "grand total", "aggregate", "grand total", "quantity"
-        );
-
-        // Durchsuche die erste Zeile
-        for (int col = 0; col < matrix[0].length; col++) {
-            String value = matrix[0][col].toLowerCase();
-            for (String keyword : keywords) {
-                if (value.contains(keyword)) {
-                    colIndexes.add(col);  // Speichert den Index der Spalte, wenn ein Treffer in der ersten Zeile gefunden wurde
-                }
-            }
-        }
-
-        // Durchsuche die erste Spalte
-        for (int row = 0; row < matrix.length; row++) {
-            String value = matrix[row][0].toLowerCase();
-            for (String keyword : keywords) {
-                if (value.contains(keyword)) {
-                    rowIndexes.add(row);  // Speichert den Index der Zeile, wenn ein Treffer in der ersten Spalte gefunden wurde
-                }
-            }
-        }
-    }*/
 }
