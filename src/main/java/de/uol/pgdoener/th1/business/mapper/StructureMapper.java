@@ -90,6 +90,14 @@ public abstract class StructureMapper {
                     .delimiter(structure.getDelimiter())
                     .startRow(structure.getStartRow())
                     .endRow(structure.getEndRow());
+            case MergeColumnsStructure structure -> new MergeColumnsStructureDto(
+                    ConverterTypeDto.MERGE_COLUMNS,
+                    List.of(structure.getColumns()),
+                    structure.getHeaderName()
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription())
+                    .precedenceOrder(List.of(structure.getPrecedenceOrder()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
@@ -200,6 +208,17 @@ public abstract class StructureMapper {
                     structure.getThreshold().orElse(null),
                     structure.getBlackList().toArray(new String[0])
             );
+            case MergeColumnsStructureDto structure -> new MergeColumnsStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getColumnIndex().toArray(new Integer[0]),
+                    structure.getHeaderName(),
+                    structure.getPrecedenceOrder().toArray(new Integer[0])
+            );
+            // no default needed, all cases are handled
         };
     }
 
