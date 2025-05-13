@@ -46,13 +46,9 @@ public class TableStructureController implements TableStructuresApiDelegate {
     @Override
     public ResponseEntity<Void> deleteTableStructure(Long id) {
         log.debug("Deleting table structure with id {}", id);
-        boolean success = tableStructureService.deleteById(id);
-        if (!success) {
-            log.debug("Table structure with id {} not found", id);
-            return ResponseEntity.badRequest().build();
-        }
+        tableStructureService.deleteById(id);
         log.debug("Table structure deleted");
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     @Override

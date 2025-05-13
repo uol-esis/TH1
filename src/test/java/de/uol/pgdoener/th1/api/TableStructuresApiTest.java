@@ -143,7 +143,7 @@ class TableStructuresApiTest {
 
         Long id = tableStructureRepository.findAll().iterator().next().getId();
 
-        mockMvc.perform(delete(basePath + "?id=" + id))
+        mockMvc.perform(delete(basePath + "/" + id))
                 .andExpect(status().isOk());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
@@ -153,8 +153,8 @@ class TableStructuresApiTest {
     @Test
     void deleteTableStructuresEndpointNonExistent() throws Exception {
 
-        mockMvc.perform(delete(basePath + "?id=1"))
-                .andExpect(status().isBadRequest());
+        mockMvc.perform(delete(basePath + "/1"))
+                .andExpect(status().isNotFound());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
 
