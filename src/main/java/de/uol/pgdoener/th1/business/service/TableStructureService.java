@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -33,6 +33,7 @@ public class TableStructureService {
     private final TableStructureRepository tableStructureRepository;
     private final StructureRepository structureRepository;
     private final PlatformTransactionManager transactionManager;
+    private final ValidationService validationService;
 
     public long create(TableStructureDto tableStructureDto) {
         List<StructureDto> structureDtoList = tableStructureDto.getStructures();
@@ -77,11 +78,8 @@ public class TableStructureService {
     }
 
     public TableStructureDto getById(Long id) {
-        TableStructure tableStructure = tableStructureRepository.findById(id).orElse(null);
-        if (tableStructure == null) {
-            log.info("Table structure with id {} not found", id);
-            throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, "kein Eintrag");
-        }
+        validationService.validateTableStructureExists(id);
+        TableStructure tableStructure = tableStructureRepository.getReferenceById(id);
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructure.getId());
         return TableStructureMapper.toDto(tableStructure, structureList);
@@ -97,26 +95,14 @@ public class TableStructureService {
         }
     }
 
-    public boolean deleteById(long id) {
-        Optional<TableStructure> tableStructure = tableStructureRepository.findById(id);
-        if (tableStructure.isEmpty()) {
-            log.info("Table structure with id {} not found", id);
-            return false;
-        }
-        Boolean success = new TransactionTemplate(transactionManager).execute(
-                status -> {
-                    try {
-                        tableStructureRepository.deleteById(id);
-                        structureRepository.deleteByTableStructureId(id);
-                    } catch (Exception e) {
-                        status.setRollbackOnly();
-                        log.info("Error while deleting table structure", e);
-                        throw new HttpServerErrorException(HttpStatus.BAD_REQUEST, e.getMessage());
-                    }
-                    return true;
-                }
-        );
-        return success != null && success;
+    @Transactional
+    public void deleteById(long id) {
+        log.debug("Deleting table structure with id {}", id);
+        validationService.validateTableStructureExists(id);
+
+        tableStructureRepository.deleteById(id);
+        structureRepository.deleteByTableStructureId(id);
+        log.debug("Deleted table structure with id {}", id);
     }
 
 }

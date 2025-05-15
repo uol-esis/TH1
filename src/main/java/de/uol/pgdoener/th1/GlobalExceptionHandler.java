@@ -2,8 +2,10 @@ package de.uol.pgdoener.th1;
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.TransformationException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
+import de.uol.pgdoener.th1.business.service.ServiceException;
 import de.uol.pgdoener.th1.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -16,12 +18,34 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.time.Instant;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    // Add request Id and code ?
+    @ExceptionHandler(ServiceException.class)
+    public ResponseEntity<Object> handleServiceException(ServiceException ex, HttpServletRequest request) {
+        Map<String, Object> errorBody = new LinkedHashMap<>();
+        //errorBody.put("code", ex.getHttpStatus().value());
+        errorBody.put("message", ex.getMessage());
+        errorBody.put("details", ex.getDetails());
+        errorBody.put("timestamp", Instant.now().toString());
+        errorBody.put("path", request.getRequestURI());
+        errorBody.put("suggestion", ex.getSuggestion());
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", ex.getHttpStatus().isError() ? "error" : "success");
+        body.put("statusCode", ex.getHttpStatus().value());
+        body.put("error", errorBody);
+        //body.put("documentation_url", "https://example.com/docs/errors#" + ex.getHttpStatus().value());
+
+        return ResponseEntity.status(ex.getHttpStatus()).body(body);
+    }
 
     @ExceptionHandler(MetabaseException.class)
     public ResponseEntity<Object> handleMetabaseException(MetabaseException ex) {
