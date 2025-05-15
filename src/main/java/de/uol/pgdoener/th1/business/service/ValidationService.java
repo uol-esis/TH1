@@ -22,11 +22,11 @@ public class ValidationService {
      */
     public void validateTableStructureExists(Long id) {
         if (!tableStructureRepository.existsById(id)) {
-            log.error("Table structure with id {} not found", id);
+            log.warn("Table structure with id {} not found", id);
             throw new ServiceException(
                     "The requested resource was not found.",
                     HttpStatus.NOT_FOUND,
-                    "The user with the ID " + id + " does not exist in our records.",
+                    "The TableStructure with the ID " + id + " does not exist.",
                     "Check if the ID is correct or if the entry exists"
             );
         }
