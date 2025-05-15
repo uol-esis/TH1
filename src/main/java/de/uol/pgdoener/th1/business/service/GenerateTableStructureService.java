@@ -1,11 +1,15 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
+package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoFactory;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -21,12 +25,12 @@ import java.util.Optional;
  * Service for generating table structure from a given input file.
  */
 @Slf4j
+@Component
+@RequiredArgsConstructor
 public class GenerateTableStructureService {
-    private final InputFile inputFile;
 
-    public GenerateTableStructureService(InputFile inputFile) {
-        this.inputFile = inputFile;
-    }
+    private final MatrixInfoService matrixInfoService;
+    private final MatrixInfoFactory matrixInfoFactory;
 
     /**
      * Main entry point to generate a table structure from the input file.
@@ -34,68 +38,23 @@ public class GenerateTableStructureService {
      * @return the generated table structure DTO.
      * @throws IOException if the file cannot be read.
      */
-    public TableStructureDto generateTableStructure() throws IOException {
+    public TableStructureDto generateTableStructure(InputFile inputFile) throws IOException {
         try {
-            log.info("Start generating table structure for file: {}", inputFile.getFileName());
+            log.debug("Start generating table structure for file: {}", inputFile.getFileName());
             String[][] matrix = inputFile.asStringArray();
-            MatrixInfo matrixInfo = extractMatrixInfo(matrix);
-            TableStructureDto tableStructure = buildTableStructure(matrixInfo);
-            log.info("Successfully generated table structure: {}", tableStructure.getName());
+            MatrixInfo matrixInfo = matrixInfoFactory.create(matrix);
+            // analyze List<Error>
+            TableStructureDto tableStructure = buildTableStructure(matrixInfo //list);
+                    loop
+            log.debug("Successfully generated table structure: {}", tableStructure.getName());
             return tableStructure;
         } catch (IOException e) {
-            log.error("Failed to read input file: {}", inputFile.getFileName(), e);
+            log.warn("Failed to read input file: {}", inputFile.getFileName(), e);
             throw e;
         } catch (Exception e) {
-            log.error("Unexpected error during table structure generation", e);
+            log.warn("Unexpected error during table structure generation", e);
             throw new RuntimeException("Tabellenstruktur konnte nicht erstellt werden", e);
         }
-    }
-
-    /**
-     * Extracts metadata from the top rows of the matrix until the data row begins.
-     *
-     * @param matrix the raw matrix read from the file
-     * @return MatrixInfo object with structure metadata
-     */
-    private MatrixInfo extractMatrixInfo(String[][] matrix) {
-        MatrixInfo matrixInfo = new MatrixInfo();
-
-        for (int rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
-            String[] row = matrix[rowIndex];
-
-            if (isDataRow(row)) {
-                log.debug("Detected start of data at row: {}", rowIndex);
-                break;
-            }
-
-            RowInfo rowInfo = extractRowInfo(row, rowIndex);
-            matrixInfo.addRowInfo(rowInfo);
-        }
-        return matrixInfo;
-    }
-
-    /**
-     * Determines the maximum column length needed by finding the rightmost valid element.
-     * Valid = not null, not empty, not equal to "*"
-     */
-    private int getMaxColumnCount(String[][] inputMatrix) {
-        int maxColumnCount = 0;
-        ///  Muss nicht für alle sein
-        for (String[] row : inputMatrix) {
-
-            // Traverse from right to left to find the last valid entry
-            for (int colIndex = row.length - 1; colIndex >= 0; colIndex--) {
-                String entry = row[colIndex];
-
-                if (isInvalidEntry(entry)) {
-                    continue;
-                }
-
-                maxColumnCount = Math.max(maxColumnCount, colIndex + 1);
-                break;
-            }
-        }
-        return maxColumnCount;
     }
 
     /**
@@ -133,13 +92,15 @@ public class GenerateTableStructureService {
         TableStructureDto tableStructure = new TableStructureDto();
         tableStructure.setName(inputFile.getFileName());
 
-        StructureDto removeInvalidRowsStructure = buildRemoveRowsStructure;
-
+        // config to enable disable and setup threshold usw
         StructureDto removeHeaderStructure = buildRemoveHeaderStructure(matrixInfo);
         tableStructure.addStructuresItem(removeHeaderStructure);
 
         StructureDto removeFooterStructure = buildRemoveFooterStructure(matrixInfo);
         tableStructure.addStructuresItem(removeFooterStructure);
+
+        StructureDto removeTrailingColumn = buildRemoveTrailingColumnStructure(matrixInfo);
+        tableStructure.addStructuresItem(removeTrailingColumn);
 
         if (matrixInfo.hasEmptyRow()) {
             StructureDto fillEmptyRowStructure = buildFillEmptyRowStructure(matrixInfo);
@@ -158,7 +119,7 @@ public class GenerateTableStructureService {
     }
 
     /**
-     * Builds converter structure for removing header rows.
+     * Builds converter structure for removing invalid rows.
      */
     private StructureDto buildRemoveRowsStructure(MatrixInfo matrixInfo) {
         log.debug("Start buildRemoveRowsStructure");
@@ -166,6 +127,17 @@ public class GenerateTableStructureService {
         removeInvalidRowStructure.setConverterType(ConverterTypeDto.REMOVE_INVALID_ROWS);
         log.debug("Finish buildRemoveRowsStructure");
         return removeInvalidRowStructure;
+    }
+
+    /**
+     * Builds converter structure for removing trailing column.
+     */
+    private StructureDto buildRemoveTrailingColumnStructure(MatrixInfo matrixInfo) {
+        log.debug("Start buildRemoveTrailingColumnStructure");
+        RemoveTrailingColumnStructureDto removeTrailingColumnStructure = new RemoveTrailingColumnStructureDto();
+        removeTrailingColumnStructure.setConverterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN);
+        log.debug("Finish buildRemoveTrailingColumnStructure");
+        return removeTrailingColumnStructure;
     }
 
     /**
