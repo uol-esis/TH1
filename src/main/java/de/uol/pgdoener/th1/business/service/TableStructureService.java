@@ -77,6 +77,7 @@ public class TableStructureService {
         return tableStructuresDto;
     }
 
+    @Transactional
     public TableStructureDto getById(Long id) {
         validationService.validateTableStructureExists(id);
         TableStructure tableStructure = tableStructureRepository.getReferenceById(id);
