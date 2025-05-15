@@ -1,9 +1,14 @@
 package de.uol.pgdoener.th1.business.service;
 
-import de.uol.pgdoener.th1.business.dto.*;
+import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.Report;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
@@ -13,7 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
+import java.util.List;
 
 // Remove empty cells at the end in the row
 // mehrer Einträge in einer Zeile -> Converter Schreiben der eine column index braucht und dann nach abstätzrn /n die eintrage entschachtelt.
@@ -31,6 +36,7 @@ public class GenerateTableStructureService {
 
     private final MatrixInfoService matrixInfoService;
     private final MatrixInfoFactory matrixInfoFactory;
+    private final AnalyzeMatrixInfoService analyzeMatrixInfoService;
 
     /**
      * Main entry point to generate a table structure from the input file.
@@ -42,10 +48,16 @@ public class GenerateTableStructureService {
         try {
             log.debug("Start generating table structure for file: {}", inputFile.getFileName());
             String[][] matrix = inputFile.asStringArray();
-            MatrixInfo matrixInfo = matrixInfoFactory.create(matrix);
-            // analyze List<Error>
-            TableStructureDto tableStructure = buildTableStructure(matrixInfo //list);
-                    loop
+
+            TableStructureBuilder tableStructureBuilder = new TableStructureBuilder();
+            TableStructureDto tableStructure = tableStructureBuilder.getTableStructure();
+            for (int i = 0; i < 5; i++) {
+                String[][] convertedMatrix = runConverter(matrix, tableStructure);
+                MatrixInfo matrixInfo = matrixInfoFactory.create(convertedMatrix);
+                List<Report> reports = analyzeMatrixInfoService.analyze(matrixInfo);
+                tableStructure = tableStructureBuilder.buildTableStructure(reports);
+            }
+
             log.debug("Successfully generated table structure: {}", tableStructure.getName());
             return tableStructure;
         } catch (IOException e) {
@@ -55,6 +67,13 @@ public class GenerateTableStructureService {
             log.warn("Unexpected error during table structure generation", e);
             throw new RuntimeException("Tabellenstruktur konnte nicht erstellt werden", e);
         }
+    }
+
+    private String[][] runConverter(String[][] inputMatrix, TableStructureDto tableStructure) {
+        if (tableStructure.getStructures().isEmpty()) return inputMatrix;
+        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
+        ConverterResult result = converterChainService.performTransformation(inputMatrix);
+        return result.data();
     }
 
     /**
@@ -85,123 +104,6 @@ public class GenerateTableStructureService {
         return rowInfo;
     }
 
-    /**
-     * Constructs the full table structure with necessary converters applied.
-     */
-    private TableStructureDto buildTableStructure(MatrixInfo matrixInfo) {
-        TableStructureDto tableStructure = new TableStructureDto();
-        tableStructure.setName(inputFile.getFileName());
-
-        // config to enable disable and setup threshold usw
-        StructureDto removeHeaderStructure = buildRemoveHeaderStructure(matrixInfo);
-        tableStructure.addStructuresItem(removeHeaderStructure);
-
-        StructureDto removeFooterStructure = buildRemoveFooterStructure(matrixInfo);
-        tableStructure.addStructuresItem(removeFooterStructure);
-
-        StructureDto removeTrailingColumn = buildRemoveTrailingColumnStructure(matrixInfo);
-        tableStructure.addStructuresItem(removeTrailingColumn);
-
-        if (matrixInfo.hasEmptyRow()) {
-            StructureDto fillEmptyRowStructure = buildFillEmptyRowStructure(matrixInfo);
-
-            tableStructure.addStructuresItem(fillEmptyRowStructure);
-        }
-
-        if (matrixInfo.hasGroupedHeader()) {
-            StructureDto groupHeaderStructure = buildGroupHeaderStructure(matrixInfo);
-            StructureDto addHeaderNameStructure = buildHeaderNameStructure(matrixInfo);
-
-            tableStructure.addStructuresItem(groupHeaderStructure);
-            tableStructure.addStructuresItem(addHeaderNameStructure);
-        }
-        return tableStructure;
-    }
-
-    /**
-     * Builds converter structure for removing invalid rows.
-     */
-    private StructureDto buildRemoveRowsStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildRemoveRowsStructure");
-        RemoveInvalidRowsStructureDto removeInvalidRowStructure = new RemoveInvalidRowsStructureDto();
-        removeInvalidRowStructure.setConverterType(ConverterTypeDto.REMOVE_INVALID_ROWS);
-        log.debug("Finish buildRemoveRowsStructure");
-        return removeInvalidRowStructure;
-    }
-
-    /**
-     * Builds converter structure for removing trailing column.
-     */
-    private StructureDto buildRemoveTrailingColumnStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildRemoveTrailingColumnStructure");
-        RemoveTrailingColumnStructureDto removeTrailingColumnStructure = new RemoveTrailingColumnStructureDto();
-        removeTrailingColumnStructure.setConverterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN);
-        log.debug("Finish buildRemoveTrailingColumnStructure");
-        return removeTrailingColumnStructure;
-    }
-
-    /**
-     * Builds converter structure for removing header rows.
-     */
-    private StructureDto buildRemoveHeaderStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildRemoveHeaderStructure");
-        RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto();
-        removeHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_HEADER);
-        log.debug("Finish buildRemoveHeaderStructure");
-        return removeHeaderStructure;
-    }
-
-    /**
-     * Builds converter structure for removing footer rows.
-     */
-    private StructureDto buildRemoveFooterStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildRemoveFooterStructure");
-        RemoveFooterStructureDto removeFooterStructure = new RemoveFooterStructureDto();
-        removeFooterStructure.setConverterType(ConverterTypeDto.REMOVE_HEADER);
-        log.debug("Finish buildRemoveFooterStructure");
-        return removeFooterStructure;
-    }
-
-    /**
-     * Builds converter structure for removing grouped header rows.
-     */
-    private StructureDto buildGroupHeaderStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildGroupHeaderStructure");
-        RemoveGroupedHeaderStructureDto groupHeaderStructure = new RemoveGroupedHeaderStructureDto();
-        groupHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_GROUPED_HEADER);
-        groupHeaderStructure.setColumnIndex(matrixInfo.getColumnIndexes());
-        groupHeaderStructure.setRowIndex(matrixInfo.getRowIndexes());
-        groupHeaderStructure.setStartRow(Optional.of(matrixInfo.getStartRow()));
-        log.debug("Finish buildGroupHeaderStructure");
-
-        return groupHeaderStructure;
-    }
-
-    /**
-     * Builds converter structure for setting header names.
-     */
-    private StructureDto buildHeaderNameStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildHeaderNameStructure");
-        AddHeaderNameStructureDto addHeaderNamesStructure = new AddHeaderNameStructureDto();
-        addHeaderNamesStructure.setConverterType(ConverterTypeDto.ADD_HEADER_NAME);
-        addHeaderNamesStructure.setHeaderNames(matrixInfo.getHeaderNames());
-        log.debug("Finish buildHeaderNameStructure");
-
-        return addHeaderNamesStructure;
-    }
-
-    /**
-     * Builds converter structure to fill partially filled rows.
-     */
-    private StructureDto buildFillEmptyRowStructure(MatrixInfo matrixInfo) {
-        log.debug("Start buildFillEmptyRowStructure");
-        FillEmptyRowStructureDto fillEmptyRowStructure = new FillEmptyRowStructureDto();
-        fillEmptyRowStructure.setConverterType(ConverterTypeDto.FILL_EMPTY_ROW);
-        fillEmptyRowStructure.setRowIndex(matrixInfo.getRowToFill());
-        log.debug("Finish buildFillEmptyRowStructure");
-
-        return fillEmptyRowStructure;
-    }
 
     /**
      * Determines if a string is numeric (supports decimals with dot or comma).
