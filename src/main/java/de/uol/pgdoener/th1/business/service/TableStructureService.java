@@ -2,6 +2,7 @@ package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureGenerationException;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -85,18 +86,26 @@ public class TableStructureService {
         return TableStructureMapper.toDto(tableStructure, structureList);
     }
 
+    /**
+     * Generates a table structure for the given file.
+     * It returns the generated table structure and a list of reports which could not be resolved by the generator.
+     * The settings might not contain any values but must not be null.
+     *
+     * @param file             the file to create the table structure for
+     * @param optionalSettings setting for the generation
+     * @return the generated table structure and unresolved reports
+     */
     public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
             MultipartFile file,
             TableStructureGenerationSettingsDto optionalSettings
     ) {
         InputFile inputFile = new InputFile(file);
-        //Mapper
-        TableStructureGenerationSettingsDto settings = optionalSettings;
+        //Mapper ??? settings
         try {
-            return generateTableStructureService.generateTableStructure(inputFile, settings);
+            return generateTableStructureService.generateTableStructure(inputFile, optionalSettings);
         } catch (IOException e) {
             log.warn("Could not read file");
-            throw new RuntimeException(e);
+            throw new TableStructureGenerationException("Could not read file", e);
         }
     }
 

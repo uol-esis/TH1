@@ -75,11 +75,10 @@ public class MatrixInfoService {
      */
     public List<Integer> getRowToFill(MatrixInfo matrixInfo) {
         List<Integer> result = new ArrayList<>();
-        int maxRowSize = getMaxRowSize(matrixInfo);
         List<RowInfo> rowInfos = matrixInfo.rowInfos();
 
         for (RowInfo rowInfo : rowInfos) {
-            if (rowInfoService.hasRowToFill(maxRowSize, rowInfo.cellInfos())) {
+            if (rowInfoService.hasRowToFill(rowInfo)) {
                 result.add(rowInfo.rowId());
             }
         }

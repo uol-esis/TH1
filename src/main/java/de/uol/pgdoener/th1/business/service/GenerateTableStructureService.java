@@ -10,16 +10,14 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.Analyz
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 // Remove empty cells at the end in the row
@@ -51,18 +49,34 @@ public class GenerateTableStructureService {
     ) throws IOException {
         try {
             log.debug("Start generating table structure for file: {}", inputFile.getFileName());
+            // read file
             String[][] matrix = inputFile.asStringArray();
 
+            // setup defaults
             TableStructureBuilder tableStructureBuilder = new TableStructureBuilder(settings);
             TableStructureDto tableStructure = tableStructureBuilder.getTableStructure();
             Pair<TableStructureDto, List<ReportDto>> result = null;
+
+            // run converterChain if overhead converters were enabled
+            String[][] convertedMatrix = runIfConvertersPresent(tableStructure, matrix);
+            List<ReportDto> previousReports = new ArrayList<>();
+
+            int structureCount = 0;
             for (int i = 0; i < 5; i++) {
-                String[][] convertedMatrix = runConverter(matrix, tableStructure);
                 MatrixInfo matrixInfo = matrixInfoFactory.create(convertedMatrix);
+
                 List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo);
                 log.debug("Generated {} reports", reports.size());
+
                 result = tableStructureBuilder.buildTableStructure(reports);
                 tableStructure = result.getFirst();
+
+                previousReports = result.getSecond();
+
+                if (structureCount == tableStructure.getStructures().size()) break;
+                structureCount = tableStructure.getStructures().size();
+
+                convertedMatrix = runConverter(matrix, tableStructure);
             }
 
             log.debug("Successfully generated table structure: {}", tableStructure.getName());
@@ -76,6 +90,13 @@ public class GenerateTableStructureService {
         }
     }
 
+    private String[][] runIfConvertersPresent(TableStructureDto tableStructure, String[][] inputMatrix) {
+        if (!tableStructure.getStructures().isEmpty()) {
+            return runConverter(inputMatrix, tableStructure);
+        }
+        return inputMatrix;
+    }
+
     private String[][] runConverter(String[][] inputMatrix, TableStructureDto tableStructure) {
         if (tableStructure.getStructures().isEmpty()) return inputMatrix;
         ConverterChainService converterChainService = new ConverterChainService(tableStructure);
@@ -83,62 +104,4 @@ public class GenerateTableStructureService {
         return result.data();
     }
 
-    /**
-     * Determines if a given row is a data row (based on numeric cell values).
-     */
-    private boolean isDataRow(String[] row) {
-        for (String cell : row) {
-            if (isNumeric(cell)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Converts a string row into a RowInfo object with CellInfos.
-     */
-    private RowInfo extractRowInfo(String[] row, int rowIndex) {
-        RowInfo rowInfo = new RowInfo(rowIndex);
-
-        for (int cellIndex = 0; cellIndex < row.length; cellIndex++) {
-            String cell = row[cellIndex].trim();
-            boolean isNotEmpty = !cell.isEmpty();
-            rowInfo.addColumnInfo(new CellInfo(cellIndex, isNotEmpty));
-        }
-
-        rowInfo.setHeaderName(row[0].trim());
-        return rowInfo;
-    }
-
-
-    /**
-     * Determines if a string is numeric (supports decimals with dot or comma).
-     */
-    private boolean isNumeric(String str) {
-        if (str == null || str.trim().isEmpty()) {
-            return false;
-        }
-        str = str.trim().replace(",", "."); // Falls Komma als Dezimaltrenner genutzt wird
-        return str.matches("-?\\d+(\\.\\d+)?"); // Regex für Ganzzahlen & Dezimalzahlen
-    }
-
-
-    /**
-     * Counts the number of valid elements in a row.
-     * Valid = not null, not empty, not equal to "*"
-     */
-    private long countValidElements(String[] row) {
-        return Arrays.stream(row)
-                .filter(entry -> !isInvalidEntry(entry))
-                .count();
-    }
-
-    /**
-     * Returns true if the entry is considered invalid.
-     * Invalid = null, empty string, or a literal "*"
-     */
-    private boolean isInvalidEntry(String entry) {
-        return entry == null || entry.trim().isEmpty() || entry.equals("*");
-    }
 }
