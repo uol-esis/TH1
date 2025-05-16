@@ -15,29 +15,36 @@ public class RowInfoService {
 
     /**
      * Checks if this row is a valid Header.
+     * A valid header is either a string or is empty.
      *
      * @param rowInfo .
      * @return a boolean if the row is a headerRow.
      */
     public boolean isHeaderRow(RowInfo rowInfo) {
         List<CellInfo> cellInfos = rowInfo.cellInfos();
+        int strings = 0;
         for (CellInfo cellInfo : cellInfos) {
-            if (!cellInfoService.isString(cellInfo)) {
+            if (!cellInfoService.isEmpty(cellInfo) && !cellInfoService.isString(cellInfo)) {
                 return false;
             }
+            if (cellInfoService.isString(cellInfo)) {
+                strings++;
+            }
         }
-        return true;
+        return strings > 1;
     }
 
     /**
      * Checks if this row is partially filled but not complete.
      *
-     * @param columnSize total number of expected columns in the matrix.
      * @return true if the row is neither empty nor complete.
      */
-    public boolean hasRowToFill(int columnSize, List<CellInfo> cellInfos) {
+    public boolean hasRowToFill(RowInfo rowInfo) {
+        List<CellInfo> cellInfos = rowInfo.cellInfos();
+
         int filledPositionsSize = getFilledPositionsSize(cellInfos);
-        return filledPositionsSize > 2 && filledPositionsSize < columnSize;
+
+        return filledPositionsSize <= cellInfos.size();
     }
 
     /**
@@ -45,7 +52,8 @@ public class RowInfoService {
      */
     public int getFilledPositionsSize(List<CellInfo> cellInfos) {
         return (int) cellInfos.stream()
-                .filter(cellInfoService::hasEntry).count();
+                .filter(cellInfoService::hasEntry)
+                .count();
     }
 
     /**

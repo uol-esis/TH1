@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -57,6 +56,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
             MultipartFile file,
             TableStructureGenerationSettingsDto settings
     ) {
+        log.debug("Generating Table structure for file {} with settings {}", file.getOriginalFilename(), settings);
         Pair<TableStructureDto, List<ReportDto>> result = tableStructureService.generateTableStructure(file, settings);
         log.debug("Table structure generated");
         TableStructureGenerationResponseDto responseDto = new TableStructureGenerationResponseDto();

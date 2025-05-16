@@ -2,6 +2,7 @@ package de.uol.pgdoener.th1;
 
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.TransformationException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureGenerationException;
 import de.uol.pgdoener.th1.business.service.ServiceException;
 import de.uol.pgdoener.th1.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
@@ -118,6 +119,14 @@ public class GlobalExceptionHandler {
         log.debug("MethodArgumentNotValidException: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
+
+    @ExceptionHandler(TableStructureGenerationException.class)
+    public ResponseEntity<Object> handleTableStructureGenerationException(TableStructureGenerationException ex) {
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.debug("TableStructureGenerationException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse.getBody());
+    }
+
 }
 
 

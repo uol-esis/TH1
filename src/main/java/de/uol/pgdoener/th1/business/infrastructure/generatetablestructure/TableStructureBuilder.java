@@ -7,24 +7,33 @@ import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
+@Getter
 public class TableStructureBuilder {
 
-    @Getter
     private final TableStructureDto tableStructure;
 
     public TableStructureBuilder(TableStructureGenerationSettingsDto settings) {
         tableStructure = new TableStructureDto();
         tableStructure.setName("");
-        settings.getRemoveHeader().ifPresent(s -> {
-            if (s.isEnabled().orElse(false)) {
-                buildRemoveHeaderStructure(s.getThreshold().orElse(2), s.getBlockList());
-            }
-        });
-        buildRemoveFooterStructure();
-        buildRemoveTrailingColumnStructure();
+        RemoveHeaderSettingsDto removeHeaderSettings = settings.getRemoveHeader().orElse(new RemoveHeaderSettingsDto());
+        if (removeHeaderSettings.isEnabled()) {
+            buildRemoveHeaderStructure(removeHeaderSettings);
+        }
+        RemoveFooterSettingsDto removeFooterSettings = settings.getRemoveFooter().orElse(new RemoveFooterSettingsDto());
+        if (removeFooterSettings.isEnabled()) {
+            buildRemoveFooterStructure(removeFooterSettings);
+        }
+        RemoveColumnsSettingsDto removeColumnsSettings = settings.getRemoveColumns().orElse(new RemoveColumnsSettingsDto());
+        if (removeColumnsSettings.isEnabled()) {
+            buildRemoveTrailingColumnStructure(removeColumnsSettings);
+        }
+
+        RemoveInvalidRowsSettingsDto removeInvalidRowsSettings = settings.getRemoveInvalidRows().orElse(new RemoveInvalidRowsSettingsDto());
+        if (removeInvalidRowsSettings.isEnabled()) {
+            buildRemoveInvalidRowsStructure(removeInvalidRowsSettings);
+        }
     }
 
     /**
@@ -47,10 +56,12 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure for removing header rows.
      */
-    private void buildRemoveHeaderStructure() {
+    private void buildRemoveHeaderStructure(RemoveHeaderSettingsDto settings) {
         log.debug("Start buildRemoveHeaderStructure");
         RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto();
-        removeHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_HEADER);
+        removeHeaderStructure.converterType(ConverterTypeDto.REMOVE_HEADER)
+                .threshold(settings.getThreshold())
+                .setBlackList(settings.getBlockList());
         log.debug("Finish buildRemoveHeaderStructure");
         tableStructure.addStructuresItem(removeHeaderStructure);
     }
@@ -58,10 +69,12 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure for removing footer rows.
      */
-    private void buildRemoveFooterStructure() {
+    private void buildRemoveFooterStructure(RemoveFooterSettingsDto settings) {
         log.debug("Start buildRemoveFooterStructure");
         RemoveFooterStructureDto removeFooterStructure = new RemoveFooterStructureDto();
-        removeFooterStructure.setConverterType(ConverterTypeDto.REMOVE_HEADER);
+        removeFooterStructure.converterType(ConverterTypeDto.REMOVE_HEADER)
+                .threshold(settings.getThreshold())
+                .setBlackList(settings.getBlockList());
         log.debug("Finish buildRemoveFooterStructure");
         tableStructure.addStructuresItem(removeFooterStructure);
     }
@@ -69,10 +82,12 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure for removing trailing column.
      */
-    private void buildRemoveTrailingColumnStructure() {
+    private void buildRemoveTrailingColumnStructure(RemoveColumnsSettingsDto settings) {
         log.debug("Start buildRemoveTrailingColumnStructure");
         RemoveTrailingColumnStructureDto removeTrailingColumnStructure = new RemoveTrailingColumnStructureDto();
-        removeTrailingColumnStructure.setConverterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN);
+        removeTrailingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
+                .threshold(settings.getThreshold())
+                .blackList(settings.getBlockList());
         log.debug("Finish buildRemoveTrailingColumnStructure");
         tableStructure.addStructuresItem(removeTrailingColumnStructure);
     }
@@ -81,13 +96,13 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure for removing invalid rows.
      */
-    private void buildRemoveRowsStructure(TableStructureDto tableStructureDto, int threshold, List<String> blockList) {
-        log.debug("Start buildRemoveRowsStructure");
+    private void buildRemoveInvalidRowsStructure(RemoveInvalidRowsSettingsDto settings) {
+        log.debug("Start buildRemoveInvalidRowsStructure");
         RemoveInvalidRowsStructureDto removeInvalidRowStructure = new RemoveInvalidRowsStructureDto();
-        removeInvalidRowStructure.setConverterType(ConverterTypeDto.REMOVE_INVALID_ROWS);
-        removeInvalidRowStructure.threshold(threshold)
-                .blackList(blockList);
-        log.debug("Finish buildRemoveRowsStructure");
+        removeInvalidRowStructure.converterType(ConverterTypeDto.REMOVE_INVALID_ROWS)
+                .threshold(settings.getThreshold())
+                .blackList(settings.getBlockList());
+        log.debug("Finish buildRemoveInvalidRowsStructure");
         tableStructure.addStructuresItem(removeInvalidRowStructure);
     }
 
@@ -97,10 +112,11 @@ public class TableStructureBuilder {
     private void buildGroupHeaderStructure(GroupedHeaderReportDto reportDto) {
         log.debug("Start buildGroupHeaderStructure");
         RemoveGroupedHeaderStructureDto groupHeaderStructure = new RemoveGroupedHeaderStructureDto();
-        groupHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_GROUPED_HEADER);
-        groupHeaderStructure.setColumnIndex(reportDto.getColumnIndex());
-        groupHeaderStructure.setRowIndex(reportDto.getRowIndex());
-        groupHeaderStructure.setStartRow(Optional.of(reportDto.getStartRow()));
+        groupHeaderStructure.converterType(ConverterTypeDto.REMOVE_GROUPED_HEADER)
+                .columnIndex(reportDto.getColumnIndex())
+                .rowIndex(reportDto.getRowIndex())
+                .startRow(reportDto.getStartRow())
+                .startColumn(reportDto.getStartColumn());
         log.debug("Finish buildGroupHeaderStructure");
         tableStructure.addStructuresItem(groupHeaderStructure);
     }
@@ -111,8 +127,8 @@ public class TableStructureBuilder {
     private void buildHeaderNameStructure(List<String> headerNames) {
         log.debug("Start buildHeaderNameStructure");
         AddHeaderNameStructureDto addHeaderNamesStructure = new AddHeaderNameStructureDto();
-        addHeaderNamesStructure.setConverterType(ConverterTypeDto.ADD_HEADER_NAME);
-        addHeaderNamesStructure.setHeaderNames(headerNames);
+        addHeaderNamesStructure.converterType(ConverterTypeDto.ADD_HEADER_NAME)
+                .headerNames(headerNames);
         log.debug("Finish buildHeaderNameStructure");
         this.tableStructure.addStructuresItem(addHeaderNamesStructure);
     }
@@ -123,8 +139,8 @@ public class TableStructureBuilder {
     private void buildFillEmptyRowStructure(List<Integer> rowsToFill) {
         log.debug("Start buildFillEmptyRowStructure");
         FillEmptyRowStructureDto fillEmptyRowStructure = new FillEmptyRowStructureDto();
-        fillEmptyRowStructure.setConverterType(ConverterTypeDto.FILL_EMPTY_ROW);
-        fillEmptyRowStructure.setRowIndex(rowsToFill);
+        fillEmptyRowStructure.converterType(ConverterTypeDto.FILL_EMPTY_ROW)
+                .rowIndex(rowsToFill);
         log.debug("Finish buildFillEmptyRowStructure");
         tableStructure.addStructuresItem(fillEmptyRowStructure);
     }

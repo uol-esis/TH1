@@ -11,7 +11,15 @@ public class CellInfoService {
         return cellInfo.valueType() == ValueType.STRING;
     }
 
-    public boolean hasEntry(CellInfo cellInfo) {
+    public boolean isEmpty(CellInfo cellInfo) {
+        return cellInfo.valueType() == ValueType.EMPTY;
+    }
+
+    public boolean isNull(CellInfo cellInfo) {
         return cellInfo.valueType() == ValueType.NULL;
+    }
+
+    public boolean hasEntry(CellInfo cellInfo) {
+        return isNull(cellInfo) || isEmpty(cellInfo);
     }
 }
