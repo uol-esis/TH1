@@ -1,13 +1,33 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class RowInfoService {
 
+    private final CellInfoService cellInfoService;
+
+    /**
+     * Checks if this row is a valid Header.
+     *
+     * @param rowInfo .
+     * @return a boolean if the row is a headerRow.
+     */
+    public boolean isHeaderRow(RowInfo rowInfo) {
+        List<CellInfo> cellInfos = rowInfo.cellInfos();
+        for (CellInfo cellInfo : cellInfos) {
+            if (!cellInfoService.isString(cellInfo)) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     /**
      * Checks if this row is partially filled but not complete.
@@ -42,9 +62,10 @@ public class RowInfoService {
     /**
      * Counts how many cells in the row have entries.
      */
-    public int countEntries() {
+    public int countEntries(RowInfo rowInfo) {
+        List<CellInfo> cellInfos = rowInfo.cellInfos();
         return (int) cellInfos.stream()
-                .filter(CellInfo::hasEntry)
+                .filter(CellInfoService::)
                 .count();
     }
 

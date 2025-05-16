@@ -18,6 +18,31 @@ public class MatrixInfoService {
     /**
      * Calculates the maximum number of columns across all rows.
      */
+    public List<Integer> getHeaderRows(MatrixInfo matrixInfo) {
+        List<Integer> headerRows = new ArrayList<>();
+        List<RowInfo> rowInfos = matrixInfo.rowInfos();
+        for (int i = 0; i < rowInfos.size(); i++) {
+            RowInfo rowInfo = rowInfos.get(i);
+            if (rowInfoService.isHeaderRow(rowInfo)) {
+                headerRows.add(i);
+            } else if (!headerRows.isEmpty()) {
+                break;
+            }
+        }
+        return headerRows;
+    }
+
+    /**
+     * Checks whether the table header should be considered grouped.
+     */
+    public boolean hasGroupedHeader(MatrixInfo matrixInfo) {
+        List<Integer> rowHeader = getHeaderRows(matrixInfo);
+        return rowHeader.size() > 1;
+    }
+
+    /**
+     * Calculates the maximum number of columns across all rows.
+     */
     public int getMaxRowSize(MatrixInfo matrixInfo) {
         int maxRowSize = 0;
         List<RowInfo> rowInfos = matrixInfo.rowInfos();
@@ -38,8 +63,8 @@ public class MatrixInfoService {
         List<RowInfo> rowInfos = matrixInfo.rowInfos();
 
         for (RowInfo rowInfo : rowInfos) {
-            if (rowInfo.hasRowToFill(maxRowSize)) {
-                result.add(rowInfo.getRowId());
+            if (rowInfoService.hasRowToFill(maxRowSize, rowInfo.cellInfos())) {
+                result.add(rowInfo.rowId());
             }
         }
         return result;
@@ -48,19 +73,21 @@ public class MatrixInfoService {
     /**
      * Checks if there are any rows that are incomplete (partially filled).
      */
-    public boolean hasEmptyRow() {
-        return !getRowToFill().isEmpty();
+    public boolean hasEmptyRow(MatrixInfo matrixInfo) {
+        return !getRowToFill(matrixInfo).isEmpty();
     }
 
     /**
      * Identifies column indexes where only one row has an entry.
      * Note: currently simplified to always return 0.
      */
-    public List<Integer> getColumnIndexes() {
+    public List<Integer> getColumnIndexes(MatrixInfo matrixInfo) {
         List<Integer> rowIndexes = new ArrayList<>();
+        List<RowInfo> rowInfos = matrixInfo.rowInfos();
 
         for (RowInfo rowInfo : rowInfos) {
             /// TODO: überarbeiten wenn mehr als eine spalte in der column aufgelöst werden muss.
+            rowInfoService.countEntries(rowInfo);
             if (rowInfo.countEntries() == 1) {
                 rowIndexes.add(0);
             }
@@ -81,12 +108,5 @@ public class MatrixInfoService {
         }
         headerNames.add("Anzahl");
         return headerNames;
-    }
-
-    /**
-     * Checks whether the table header should be considered grouped.
-     */
-    public boolean hasGroupedHeader() {
-        return rowInfos.size() > 1 && rowInfos.size() <= 5;
     }
 }
