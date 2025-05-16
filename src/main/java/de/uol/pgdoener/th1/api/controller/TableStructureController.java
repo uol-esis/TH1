@@ -55,7 +55,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     @Override
     public ResponseEntity<TableStructureGenerationResponseDto> generateTableStructure(
             MultipartFile file,
-            Optional<TableStructureGenerationSettingsDto> settings
+            TableStructureGenerationSettingsDto settings
     ) {
         Pair<TableStructureDto, List<ReportDto>> result = tableStructureService.generateTableStructure(file, settings);
         log.debug("Table structure generated");
