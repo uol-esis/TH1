@@ -2,6 +2,7 @@ package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.TableStructuresApiDelegate;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.dto.TableStructureGenerationResponseDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
 import de.uol.pgdoener.th1.business.service.TableStructureService;
 import lombok.RequiredArgsConstructor;
@@ -52,9 +53,12 @@ public class TableStructureController implements TableStructuresApiDelegate {
     }
 
     @Override
-    public ResponseEntity<TableStructureDto> generateTableStructure(MultipartFile file) {
+    public ResponseEntity<TableStructureGenerationResponseDto> generateTableStructure(MultipartFile file) {
         TableStructureDto newTableStructureDto = tableStructureService.generateTableStructure(file);
-        return ResponseEntity.ok(newTableStructureDto);
+        log.debug("Table structure generated");
+        TableStructureGenerationResponseDto responseDto = new TableStructureGenerationResponseDto();
+        responseDto.setTableStructure(newTableStructureDto);
+        return ResponseEntity.ok(responseDto);
     }
 
 }
