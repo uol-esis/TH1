@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -88,11 +87,11 @@ public class TableStructureService {
 
     public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
             MultipartFile file,
-            Optional<TableStructureGenerationSettingsDto> optionalSettings
+            TableStructureGenerationSettingsDto optionalSettings
     ) {
         InputFile inputFile = new InputFile(file);
         //Mapper
-        TableStructureGenerationSettingsDto settings = optionalSettings.orElse(new TableStructureGenerationSettingsDto());
+        TableStructureGenerationSettingsDto settings = optionalSettings;
         try {
             return generateTableStructureService.generateTableStructure(inputFile, settings);
         } catch (IOException e) {
