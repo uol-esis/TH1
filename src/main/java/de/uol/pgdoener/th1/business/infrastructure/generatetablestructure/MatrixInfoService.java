@@ -1,17 +1,17 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MatrixInfoService {
 
-    final RowInfoService rowInfoService;
+    private final RowInfoService rowInfoService;
 
     /**
      * Calculates the maximum number of columns across all rows.
@@ -30,9 +30,10 @@ public class MatrixInfoService {
         return headerRows;
     }
 
+    @Deprecated
     public List<Integer> checkTypeMismatch(MatrixInfo matrixInfo) {
         List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
-        List<Integer> typeMismatches = getHeaderRows(matrixInfo);
+        List<Integer> typeMismatches = getHeaderRows(matrixInfo);  // FIXME ????
         for (ColumnInfo columnInfo : columnInfos) {
             if (columnInfo.cellInfos().size() < 2) continue;
 
@@ -46,6 +47,15 @@ public class MatrixInfoService {
             }
         }
         return typeMismatches;
+    }
+
+    public List<ColumnInfo> getMergePartners(MatrixInfo matrixInfo, ColumnInfo columnInfo, List<Integer> skipColumns) {
+        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
+        List<ColumnInfo> partners = new ArrayList<>();
+
+        for (int i = columnInfo.columnIndex(); i < columnInfos.size(); i++) {
+
+        }
     }
 
     /**

@@ -62,6 +62,7 @@ public class GenerateTableStructureService {
             List<ReportDto> previousReports = new ArrayList<>();
 
             int structureCount = 0;
+            // TODO get max iterations from settings
             for (int i = 0; i < 5; i++) {
                 MatrixInfo matrixInfo = matrixInfoFactory.create(convertedMatrix);
 
@@ -86,7 +87,7 @@ public class GenerateTableStructureService {
             throw e;
         } catch (Exception e) {
             log.warn("Unexpected error during table structure generation", e);
-            throw new RuntimeException("Tabellenstruktur konnte nicht erstellt werden", e);
+            throw new RuntimeException("Unexpected error during table structure generation", e);
         }
     }
 
