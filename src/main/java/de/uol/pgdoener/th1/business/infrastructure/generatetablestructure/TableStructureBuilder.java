@@ -1,11 +1,9 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.dto.*;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.ColumnTypeMismatchReport;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.GroupedHeaderReport;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.Report;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,30 +13,35 @@ import java.util.Optional;
 public class TableStructureBuilder {
 
     @Getter
-    private final TableStructureDto tableStructure = defaultTableStructure();
+    private final TableStructureDto tableStructure;
 
-    private TableStructureDto defaultTableStructure() {
-        TableStructureDto tableStructure = new TableStructureDto();
+    public TableStructureBuilder(TableStructureGenerationSettingsDto settings) {
+        tableStructure = new TableStructureDto();
         tableStructure.setName("");
-        buildRemoveHeaderStructure();
+        settings.getRemoveHeader().ifPresent(s -> {
+            if (s.isEnabled().orElse(false)) {
+                buildRemoveHeaderStructure(s.getThreshold().orElse(2), s.getBlockList());
+            }
+        });
         buildRemoveFooterStructure();
         buildRemoveTrailingColumnStructure();
-        return tableStructure;
     }
 
     /**
      * Constructs the full table structure with necessary converters applied.
      */
-    public TableStructureDto buildTableStructure(List<Report> reports) {
-        List<Report> unresolvedReports = new ArrayList<>();
-        for (Report report : reports) {
+    public Pair<TableStructureDto, List<ReportDto>> buildTableStructure(List<ReportDto> reports) {
+        List<ReportDto> unresolvedReports = new ArrayList<>();
+        for (ReportDto report : reports) {
             switch (report) {
-                case GroupedHeaderReport r -> buildGroupHeaderStructure(r);
-                case ColumnTypeMismatchReport r -> unresolvedReports.add(r);
+                case GroupedHeaderReportDto r -> buildGroupHeaderStructure(r);
+                case ColumnTypeMismatchReportDto r -> unresolvedReports.add(r);
+                // TODO remove default branch
+                default -> throw new IllegalStateException("Unexpected value: " + report);
             }
         }
 
-        return tableStructure;
+        return Pair.of(tableStructure, unresolvedReports);
     }
 
     /**
@@ -91,15 +94,13 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure for removing grouped header rows.
      */
-    private void buildGroupHeaderStructure(
-            List<Integer> colIndex, List<Integer> rowIndex, Integer startRow
-    ) {
+    private void buildGroupHeaderStructure(GroupedHeaderReportDto reportDto) {
         log.debug("Start buildGroupHeaderStructure");
         RemoveGroupedHeaderStructureDto groupHeaderStructure = new RemoveGroupedHeaderStructureDto();
         groupHeaderStructure.setConverterType(ConverterTypeDto.REMOVE_GROUPED_HEADER);
-        groupHeaderStructure.setColumnIndex(colIndex);
-        groupHeaderStructure.setRowIndex(rowIndex);
-        groupHeaderStructure.setStartRow(Optional.of(startRow));
+        groupHeaderStructure.setColumnIndex(reportDto.getColumnIndex());
+        groupHeaderStructure.setRowIndex(reportDto.getRowIndex());
+        groupHeaderStructure.setStartRow(Optional.of(reportDto.getStartRow()));
         log.debug("Finish buildGroupHeaderStructure");
         tableStructure.addStructuresItem(groupHeaderStructure);
     }
