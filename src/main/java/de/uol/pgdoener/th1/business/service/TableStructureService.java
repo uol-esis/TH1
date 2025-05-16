@@ -1,10 +1,7 @@
 package de.uol.pgdoener.th1.business.service;
 
-import de.uol.pgdoener.th1.business.dto.StructureDto;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.GenerateTableStructureService;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -13,6 +10,7 @@ import de.uol.pgdoener.th1.data.repository.StructureRepository;
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -24,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -34,6 +33,7 @@ public class TableStructureService {
     private final StructureRepository structureRepository;
     private final PlatformTransactionManager transactionManager;
     private final ValidationService validationService;
+    private final GenerateTableStructureService generateTableStructureService;
 
     public long create(TableStructureDto tableStructureDto) {
         List<StructureDto> structureDtoList = tableStructureDto.getStructures();
@@ -86,12 +86,17 @@ public class TableStructureService {
         return TableStructureMapper.toDto(tableStructure, structureList);
     }
 
-    public TableStructureDto generateTableStructure(MultipartFile file) {
+    public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
+            MultipartFile file,
+            Optional<TableStructureGenerationSettingsDto> optionalSettings
+    ) {
         InputFile inputFile = new InputFile(file);
-        GenerateTableStructureService generateTableStructureService = new GenerateTableStructureService(inputFile);
+        //Mapper
+        TableStructureGenerationSettingsDto settings = optionalSettings.orElse(new TableStructureGenerationSettingsDto());
         try {
-            return generateTableStructureService.generateTableStructure();
+            return generateTableStructureService.generateTableStructure(inputFile, settings);
         } catch (IOException e) {
+            log.warn("Could not read file");
             throw new RuntimeException(e);
         }
     }

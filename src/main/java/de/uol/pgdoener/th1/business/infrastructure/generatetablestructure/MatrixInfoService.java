@@ -1,8 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +28,24 @@ public class MatrixInfoService {
             }
         }
         return headerRows;
+    }
+
+    public List<Integer> checkTypeMismatch(MatrixInfo matrixInfo) {
+        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
+        List<Integer> typeMismatches = getHeaderRows(matrixInfo);
+        for (ColumnInfo columnInfo : columnInfos) {
+            if (columnInfo.cellInfos().size() < 2) continue;
+
+            List<CellInfo> cellInfos = columnInfo.cellInfos();
+            ValueType firstValueType = cellInfos.get(1).valueType();
+
+            for (int i = 2; i < cellInfos.size(); i++) {
+                if (cellInfos.get(i).valueType() != firstValueType) {
+                    typeMismatches.add(columnInfo.columnIndex());
+                }
+            }
+        }
+        return typeMismatches;
     }
 
     /**

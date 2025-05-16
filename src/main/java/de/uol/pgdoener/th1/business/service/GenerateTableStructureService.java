@@ -1,6 +1,8 @@
 package de.uol.pgdoener.th1.business.service;
 
+import de.uol.pgdoener.th1.business.dto.ReportDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.dto.TableStructureGenerationSettingsDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
@@ -8,12 +10,12 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.Analyz
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.Report;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -44,22 +46,27 @@ public class GenerateTableStructureService {
      * @return the generated table structure DTO.
      * @throws IOException if the file cannot be read.
      */
-    public TableStructureDto generateTableStructure(InputFile inputFile) throws IOException {
+    public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
+            InputFile inputFile, TableStructureGenerationSettingsDto settings
+    ) throws IOException {
         try {
             log.debug("Start generating table structure for file: {}", inputFile.getFileName());
             String[][] matrix = inputFile.asStringArray();
 
-            TableStructureBuilder tableStructureBuilder = new TableStructureBuilder();
+            TableStructureBuilder tableStructureBuilder = new TableStructureBuilder(settings);
             TableStructureDto tableStructure = tableStructureBuilder.getTableStructure();
+            Pair<TableStructureDto, List<ReportDto>> result = null;
             for (int i = 0; i < 5; i++) {
                 String[][] convertedMatrix = runConverter(matrix, tableStructure);
                 MatrixInfo matrixInfo = matrixInfoFactory.create(convertedMatrix);
-                List<Report> reports = analyzeMatrixInfoService.analyze(matrixInfo);
-                tableStructure = tableStructureBuilder.buildTableStructure(reports);
+                List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo);
+                log.debug("Generated {} reports", reports.size());
+                result = tableStructureBuilder.buildTableStructure(reports);
+                tableStructure = result.getFirst();
             }
 
             log.debug("Successfully generated table structure: {}", tableStructure.getName());
-            return tableStructure;
+            return result;
         } catch (IOException e) {
             log.warn("Failed to read input file: {}", inputFile.getFileName(), e);
             throw e;

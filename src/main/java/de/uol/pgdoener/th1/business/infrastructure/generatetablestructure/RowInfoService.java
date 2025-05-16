@@ -45,8 +45,7 @@ public class RowInfoService {
      */
     public int getFilledPositionsSize(List<CellInfo> cellInfos) {
         return (int) cellInfos.stream()
-                .filter(CellInfo::hasEntry)
-                .count();
+                .filter(cellInfoService::hasEntry).count();
     }
 
     /**
@@ -65,8 +64,7 @@ public class RowInfoService {
     public int countEntries(RowInfo rowInfo) {
         List<CellInfo> cellInfos = rowInfo.cellInfos();
         return (int) cellInfos.stream()
-                .filter(CellInfoService::)
-                .count();
+                .filter(cellInfoService::hasEntry).count();
     }
 
     /**
