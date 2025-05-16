@@ -4,7 +4,6 @@ import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.ColumnTypeMismatchReport;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.GroupedHeaderReport;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.Report;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -101,8 +100,8 @@ public class TableStructureBuilder {
         groupHeaderStructure.setColumnIndex(colIndex);
         groupHeaderStructure.setRowIndex(rowIndex);
         groupHeaderStructure.setStartRow(Optional.of(startRow));
-        this.tableStructure.addStructuresItem(groupHeaderStructure);
         log.debug("Finish buildGroupHeaderStructure");
+        tableStructure.addStructuresItem(groupHeaderStructure);
     }
 
     /**
@@ -114,19 +113,19 @@ public class TableStructureBuilder {
         addHeaderNamesStructure.setConverterType(ConverterTypeDto.ADD_HEADER_NAME);
         addHeaderNamesStructure.setHeaderNames(headerNames);
         log.debug("Finish buildHeaderNameStructure");
+        this.tableStructure.addStructuresItem(addHeaderNamesStructure);
     }
 
     /**
      * Builds converter structure to fill partially filled rows.
      */
-    private StructureDto buildFillEmptyRowStructure(MatrixInfo matrixInfo) {
+    private void buildFillEmptyRowStructure(List<Integer> rowsToFill) {
         log.debug("Start buildFillEmptyRowStructure");
         FillEmptyRowStructureDto fillEmptyRowStructure = new FillEmptyRowStructureDto();
         fillEmptyRowStructure.setConverterType(ConverterTypeDto.FILL_EMPTY_ROW);
-        fillEmptyRowStructure.setRowIndex(matrixInfo.getRowToFill());
+        fillEmptyRowStructure.setRowIndex(rowsToFill);
         log.debug("Finish buildFillEmptyRowStructure");
-
-        return fillEmptyRowStructure;
+        tableStructure.addStructuresItem(fillEmptyRowStructure);
     }
 
 }
