@@ -17,10 +17,11 @@ class MatrixInfoFactoryTest {
         String[][] input = new String[][]{
                 {"header1", "header2", "header3"},
                 {"1", "2", "3"},
-                {"4", "5", "6"}
+                {"4", "5", "6"},
+                {"7", "8", "9"},
         };
 
-        MatrixInfo matrixInfo = matrixInfoFactory.create(input);
+        MatrixInfo matrixInfo = matrixInfoFactory.createParallel(input);
 
         assertEquals(new MatrixInfo(
                 List.of(
@@ -44,6 +45,13 @@ class MatrixInfoFactoryTest {
                                         new CellInfo(2, 1, "5", ValueType.INTEGER),
                                         new CellInfo(2, 2, "6", ValueType.INTEGER)
                                 )
+                        ),
+                        new RowInfo(3,
+                                List.of(
+                                        new CellInfo(3, 0, "7", ValueType.INTEGER),
+                                        new CellInfo(3, 1, "8", ValueType.INTEGER),
+                                        new CellInfo(3, 2, "9", ValueType.INTEGER)
+                                )
                         )
                 ),
                 List.of(
@@ -51,21 +59,24 @@ class MatrixInfoFactoryTest {
                                 List.of(
                                         new CellInfo(0, 0, "header1", ValueType.STRING),
                                         new CellInfo(1, 0, "1", ValueType.INTEGER),
-                                        new CellInfo(2, 0, "4", ValueType.INTEGER)
+                                        new CellInfo(2, 0, "4", ValueType.INTEGER),
+                                        new CellInfo(3, 0, "7", ValueType.INTEGER)
                                 )
                         ),
                         new ColumnInfo(1,
                                 List.of(
                                         new CellInfo(0, 1, "header2", ValueType.STRING),
                                         new CellInfo(1, 1, "2", ValueType.INTEGER),
-                                        new CellInfo(2, 1, "5", ValueType.INTEGER)
+                                        new CellInfo(2, 1, "5", ValueType.INTEGER),
+                                        new CellInfo(3, 1, "8", ValueType.INTEGER)
                                 )
                         ),
                         new ColumnInfo(2,
                                 List.of(
                                         new CellInfo(0, 2, "header3", ValueType.STRING),
                                         new CellInfo(1, 2, "3", ValueType.INTEGER),
-                                        new CellInfo(2, 2, "6", ValueType.INTEGER)
+                                        new CellInfo(2, 2, "6", ValueType.INTEGER),
+                                        new CellInfo(3, 2, "9", ValueType.INTEGER)
                                 )
                         )
                 )
@@ -76,9 +87,9 @@ class MatrixInfoFactoryTest {
 
     @Test
     void testCreateWithLargeMatrix() {
-        for (int iteration = 0; iteration < 10; iteration++) {
+        for (int iteration = 0; iteration < 20; iteration++) {
 
-            String[][] input = new String[5000][5000];
+            String[][] input = new String[6000][5000];
             for (int i = 0; i < input.length; i++) {
                 for (int j = 0; j < input[0].length; j++) {
                     input[i][j] = String.valueOf(i * input.length + j * iteration);
@@ -86,7 +97,7 @@ class MatrixInfoFactoryTest {
             }
 
             long startTime = System.currentTimeMillis();
-            MatrixInfo matrixInfo = matrixInfoFactory.create(input);
+            MatrixInfo matrixInfo = matrixInfoFactory.createParallel(input);
             long endTime = System.currentTimeMillis();
             System.out.println("Time taken to create large matrix: " + (endTime - startTime) + " ms");
 

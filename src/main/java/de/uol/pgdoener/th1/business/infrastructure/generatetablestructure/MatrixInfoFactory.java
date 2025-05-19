@@ -5,11 +5,63 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Component
 public class MatrixInfoFactory {
+
+    public MatrixInfo createParallel(String[][] matrix) {
+        CellInfo[][] columnCellInfos = new CellInfo[matrix[0].length][matrix.length];
+
+        final List<RowInfo> rowInfos = IntStream.range(0, matrix.length)
+                .parallel()
+                .mapToObj(rowIndex -> {
+                    List<CellInfo> rowCells = new ArrayList<>(matrix[rowIndex].length);
+
+                    for (int columnIndex = 0; columnIndex < matrix[rowIndex].length; columnIndex++) {
+                        CellInfo cellInfo = createCell(rowIndex, columnIndex, matrix[rowIndex][columnIndex]);
+                        rowCells.add(cellInfo);
+                        columnCellInfos[columnIndex][rowIndex] = cellInfo;
+                    }
+
+                    return new RowInfo(rowIndex, rowCells);
+                })
+                .toList();
+
+        final List<ColumnInfo> columnInfos = new ArrayList<>(matrix[0].length);
+        for (int columnIndex = 0; columnIndex < matrix[0].length; columnIndex++) {
+            columnInfos.add(new ColumnInfo(columnIndex, Arrays.asList(columnCellInfos[columnIndex])));
+        }
+
+        return new MatrixInfo(rowInfos, columnInfos);
+    }
+
+    public MatrixInfo createFast(String[][] matrix) {
+        final List<RowInfo> rowInfos = new ArrayList<>(matrix.length);
+        CellInfo[][] columnCellInfos = new CellInfo[matrix[0].length][matrix.length];
+
+        for (int rowIndex = 0; rowIndex < matrix.length; rowIndex++) {
+            List<CellInfo> rowCells = new ArrayList<>(matrix[rowIndex].length);
+
+            for (int columnIndex = 0; columnIndex < matrix[rowIndex].length; columnIndex++) {
+                CellInfo cellInfo = createCell(rowIndex, columnIndex, matrix[rowIndex][columnIndex]);
+                rowCells.add(cellInfo);
+                columnCellInfos[columnIndex][rowIndex] = cellInfo;
+            }
+
+            rowInfos.add(new RowInfo(rowIndex, rowCells));
+        }
+
+        final List<ColumnInfo> columnInfos = new ArrayList<>(matrix[0].length);
+        for (int columnIndex = 0; columnIndex < matrix[0].length; columnIndex++) {
+            columnInfos.add(new ColumnInfo(columnIndex, Arrays.asList(columnCellInfos[columnIndex])));
+        }
+
+        return new MatrixInfo(rowInfos, columnInfos);
+    }
 
     /**
      * Extracts metadata from the top rows of the matrix until the data row begins.
@@ -31,22 +83,17 @@ public class MatrixInfoFactory {
     }
 
     private List<ColumnInfo> createColumnInfos(List<RowInfo> rowInfos) {
-        final int numColumns = rowInfos.getFirst().cellInfos().size();
-
-        List<List<CellInfo>> cellInfosList = new ArrayList<>(numColumns);
-        for (int i = 0; i < numColumns; i++) {
-            cellInfosList.add(new ArrayList<>(rowInfos.size()));
-        }
-
-        for (RowInfo rowInfo : rowInfos) {
-            for (int rowIndex = 0; rowIndex < rowInfo.cellInfos().size(); rowIndex++) {
-                cellInfosList.get(rowIndex).add(rowInfo.cellInfos().get(rowIndex));
-            }
-        }
-
         List<ColumnInfo> columnInfos = new ArrayList<>();
         for (int columnIndex = 0; columnIndex < rowInfos.getFirst().cellInfos().size(); columnIndex++) {
-            ColumnInfo columnInfo = new ColumnInfo(columnIndex, cellInfosList.get(columnIndex));
+            List<CellInfo> cellInfos = new ArrayList<>();
+
+            //noinspection ForLoopReplaceableByForEach
+            for (int rowIndex = 0; rowIndex < rowInfos.size(); rowIndex++) {
+                CellInfo cellInfo = rowInfos.get(rowIndex).cellInfos().get(columnIndex);
+                cellInfos.add(cellInfo);
+            }
+
+            ColumnInfo columnInfo = new ColumnInfo(columnIndex, cellInfos);
             columnInfos.add(columnInfo);
         }
         return columnInfos;
