@@ -5,9 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.EnumMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Component
@@ -33,24 +31,22 @@ public class MatrixInfoFactory {
     }
 
     private List<ColumnInfo> createColumnInfos(List<RowInfo> rowInfos) {
+        final int numColumns = rowInfos.getFirst().cellInfos().size();
+
+        List<List<CellInfo>> cellInfosList = new ArrayList<>(numColumns);
+        for (int i = 0; i < numColumns; i++) {
+            cellInfosList.add(new ArrayList<>(rowInfos.size()));
+        }
+
+        for (RowInfo rowInfo : rowInfos) {
+            for (int rowIndex = 0; rowIndex < rowInfo.cellInfos().size(); rowIndex++) {
+                cellInfosList.get(rowIndex).add(rowInfo.cellInfos().get(rowIndex));
+            }
+        }
+
         List<ColumnInfo> columnInfos = new ArrayList<>();
-        // TODO handle rows with different length
         for (int columnIndex = 0; columnIndex < rowInfos.getFirst().cellInfos().size(); columnIndex++) {
-            List<CellInfo> cellInfos = new ArrayList<>();
-            int[] typeCounts = new int[ValueType.values().length];
-
-            //noinspection ForLoopReplaceableByForEach
-            for (int rowIndex = 0; rowIndex < rowInfos.size(); rowIndex++) {
-                CellInfo cellInfo = rowInfos.get(rowIndex).cellInfos().get(columnIndex);
-                typeCounts[cellInfo.valueType().ordinal()] += 1;
-                cellInfos.add(cellInfo);
-            }
-
-            Map<ValueType, Integer> valueCounts = new EnumMap<>(ValueType.class);
-            for (int i = 0; i < ValueType.values().length; i++) {
-                valueCounts.put(ValueType.values()[i], typeCounts[i]);
-            }
-            ColumnInfo columnInfo = new ColumnInfo(columnIndex, cellInfos, valueCounts);
+            ColumnInfo columnInfo = new ColumnInfo(columnIndex, cellInfosList.get(columnIndex));
             columnInfos.add(columnInfo);
         }
         return columnInfos;

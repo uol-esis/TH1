@@ -1,13 +1,12 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ValueType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -23,25 +22,17 @@ public class ColumnInfoService {
      * @return true if there are more than one type, false otherwise
      */
     public boolean hasTypeMismatch(ColumnInfo columnInfo) {
-        Map<ValueType, Integer> typeCounts = columnInfo.typeCounts();
+        if (columnInfo.cellInfos().size() < 2) return false;
 
-        // find types present in column
-        List<ValueType> presentTypes = Arrays.stream(ValueType.values())
-                .filter(t -> typeCounts.containsKey(t) && typeCounts.get(t) > 0)
-                .toList();
+        List<CellInfo> cellInfos = columnInfo.cellInfos();
+        ValueType firstValueType = cellInfos.get(1).valueType();
 
-        // no mismatch if only one type present
-        if (presentTypes.size() == 1) {
-            return false;
+        for (int i = 2; i < cellInfos.size(); i++) {
+            if (cellInfos.get(i).valueType() != firstValueType) {
+                return true;
+            }
         }
-
-        // no mismatch if the only other type is string in the header
-        if (presentTypes.size() == 2 && presentTypes.contains(ValueType.STRING) && typeCounts.get(ValueType.STRING) == 1) {
-            return false;
-        }
-
-        // TODO handle compatible types like INTEGER and DOUBLE or STRING and CHARACTER
-        return true;
+        return false;
     }
 
     /**
@@ -57,7 +48,7 @@ public class ColumnInfoService {
             return false;
         }
 
-        for (int i = 0; i < columnInfos.get(i).cellInfos().size(); i++) {
+        for (int i = 1; i < columnInfos.getFirst().cellInfos().size(); i++) {
             if (!isRowMergeable(columnInfos, i)) return false;
         }
 

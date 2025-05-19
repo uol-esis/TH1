@@ -67,7 +67,7 @@ public class AnalyzeMatrixInfoService {
                     columnsToCheck.removeLast();
                 }
             }
-            // create report if more at least one column can be merged with the current one
+            // create report if at least one column can be merged with the current one
             if (columnsToCheck.size() > 1) {
                 reports.add(new MergeableColumnsReportDto()
                         .mergeables(columnsToCheck.stream()

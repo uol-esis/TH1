@@ -49,15 +49,6 @@ public class MatrixInfoService {
         return typeMismatches;
     }
 
-    public List<ColumnInfo> getMergePartners(MatrixInfo matrixInfo, ColumnInfo columnInfo, List<Integer> skipColumns) {
-        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
-        List<ColumnInfo> partners = new ArrayList<>();
-
-        for (int i = columnInfo.columnIndex(); i < columnInfos.size(); i++) {
-
-        }
-    }
-
     /**
      * Checks whether the table header should be considered grouped.
      */
@@ -102,36 +93,36 @@ public class MatrixInfoService {
         return !getRowToFill(matrixInfo).isEmpty();
     }
 
-    /**
-     * Identifies column indexes where only one row has an entry.
-     * Note: currently simplified to always return 0.
-     */
-    public List<Integer> getColumnIndexes(MatrixInfo matrixInfo) {
-        List<Integer> rowIndexes = new ArrayList<>();
-        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-
-        for (RowInfo rowInfo : rowInfos) {
-            /// TODO: überarbeiten wenn mehr als eine spalte in der column aufgelöst werden muss.
-            rowInfoService.countEntries(rowInfo);
-            if (rowInfo.countEntries() == 1) {
-                rowIndexes.add(0);
-            }
-        }
-        return rowIndexes;
-    }
-
-    /**
-     * Builds the header names for the table including a final "Anzahl" column.
-     * Rotates the last element to the beginning.
-     */
-    public List<String> getHeaderNames() {
-        List<String> headerNames = new ArrayList<>(rowInfos.stream().map(RowInfo::getHeaderName).toList());
-
-        if (!headerNames.isEmpty()) {
-            String lastElement = headerNames.removeLast();
-            headerNames.addFirst(lastElement); // An den Anfang setzen
-        }
-        headerNames.add("Anzahl");
-        return headerNames;
-    }
+//    /**
+//     * Identifies column indexes where only one row has an entry.
+//     * Note: currently simplified to always return 0.
+//     */
+//    public List<Integer> getColumnIndexes(MatrixInfo matrixInfo) {
+//        List<Integer> rowIndexes = new ArrayList<>();
+//        List<RowInfo> rowInfos = matrixInfo.rowInfos();
+//
+//        for (RowInfo rowInfo : rowInfos) {
+//            /// TODO: überarbeiten wenn mehr als eine spalte in der column aufgelöst werden muss.
+//            rowInfoService.countEntries(rowInfo);
+//            if (rowInfo.countEntries() == 1) {
+//                rowIndexes.add(0);
+//            }
+//        }
+//        return rowIndexes;
+//    }
+//
+//    /**
+//     * Builds the header names for the table including a final "Anzahl" column.
+//     * Rotates the last element to the beginning.
+//     */
+//    public List<String> getHeaderNames() {
+//        List<String> headerNames = new ArrayList<>(rowInfos.stream().map(RowInfo::getHeaderName).toList());
+//
+//        if (!headerNames.isEmpty()) {
+//            String lastElement = headerNames.removeLast();
+//            headerNames.addFirst(lastElement); // An den Anfang setzen
+//        }
+//        headerNames.add("Anzahl");
+//        return headerNames;
+//    }
 }
