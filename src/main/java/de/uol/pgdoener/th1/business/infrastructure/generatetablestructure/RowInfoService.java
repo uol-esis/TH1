@@ -73,21 +73,25 @@ public class RowInfoService {
 
     public List<Integer> getGroupHeaderIndex(List<RowInfo> rowInfos) {
         List<Integer> headerRowIndex = new ArrayList<>();
+        boolean hasOneFilledRow = false;
         for (RowInfo rowInfo : rowInfos) {
-            if (headerRowIndex.isEmpty()) {
-                headerRowIndex.add(rowInfo.rowId());
-                continue;
-            }
-
             int maxFilledPositions = rowInfo.cellInfos().size();
             int filledPositions = getFilledPositionsSize(rowInfo);
-            if (filledPositions == maxFilledPositions) {
+            boolean isFullyFilled = (filledPositions == maxFilledPositions);
+
+            if (!hasOneFilledRow) {
+                headerRowIndex.add(rowInfo.rowId());
+
+                if (isFullyFilled) {
+                    hasOneFilledRow = true;
+                }
+            } else {
+                if (!isFullyFilled) {
+                    break;
+                }
                 headerRowIndex.add(rowInfo.rowId());
             }
-
-            return headerRowIndex;
         }
-
         return headerRowIndex;
     }
 
