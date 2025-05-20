@@ -28,9 +28,13 @@ public class AnalyzeMatrixInfoService {
     public List<ReportDto> analyze(MatrixInfo matrixInfo) {
         List<ReportDto> reports = new ArrayList<>();
 
+        Optional<GroupedHeaderReportDto> optionalGroupedHeaderReport = findGroupedHeader(matrixInfo);
+        if (optionalGroupedHeaderReport.isPresent()) {
+            reports.add(optionalGroupedHeaderReport.get());
+            return reports;
+        }
         findColumnTypeMismatches(matrixInfo).ifPresent(reports::add);
         findMergeableColumns(matrixInfo).ifPresent(reports::addAll);
-        findGroupedHeader(matrixInfo).ifPresent(reports::add);
 
         return reports;
     }
@@ -85,20 +89,23 @@ public class AnalyzeMatrixInfoService {
         List<RowInfo> headerRows = matrixInfoService.getHeaderRowsInfo(matrixInfo);
         List<ColumnInfo> headerColumns = matrixInfoService.getHeaderColumns(matrixInfo);
 
-        if (headerRows.size() < 2 && headerColumns.size() < 2) {
+        if (headerRows.size() == 1 && headerColumns.size() == 1) {
             log.debug("No GroupedHeaderReportDto found");
             return Optional.empty();
         }
+
         GroupedHeaderReportDto headerReport = new GroupedHeaderReportDto();
         List<RowInfo> incompleteHeaderRows = rowInfoService.getRowsToFill(headerRows);
         List<ColumnInfo> incompleteHeaderColumns = rowInfoService.getColumnsToFill(headerColumns);
 
         if (!incompleteHeaderRows.isEmpty()) {
-            // add to Report
+            List<Integer> rowToFillIndices = incompleteHeaderRows.stream().map(RowInfo::rowId).toList();
+            headerReport.setRowsToFill(rowToFillIndices);
             log.debug("Unvollständige Headerzeilen erkannt: {}", incompleteHeaderRows);
         }
         if (!incompleteHeaderColumns.isEmpty()) {
-            // add to report
+            List<Integer> columnToFillIndices = incompleteHeaderColumns.stream().map(ColumnInfo::columnIndex).toList();
+            headerReport.setColumnsToFill(columnToFillIndices);
             log.debug("Unvollständige Headerspalten erkannt: {}", incompleteHeaderColumns);
         }
 
@@ -113,7 +120,8 @@ public class AnalyzeMatrixInfoService {
     }
 
     private void fillRowSection(MatrixInfo matrixInfo, GroupedHeaderReportDto report, List<RowInfo> headerRows) {
-        List<Integer> rowIndices = headerRows.stream().map(RowInfo::rowId).toList();
+        List<Integer> rowIndices = rowInfoService.getGroupHeaderIndex(headerRows);
+        //List<Integer> rowIndices = headerRows.stream().map(RowInfo::rowId).toList();
         int lastHeaderRowIndex = rowIndices.getLast();
         int dataStartRowIndex = matrixInfoService.getFirstDataRowIndex(matrixInfo, lastHeaderRowIndex + 1);
 

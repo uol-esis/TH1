@@ -33,7 +33,7 @@ public class RowInfoService {
                 strings++;
             }
         }
-        return strings > 1;
+        return strings >= 1;
     }
 
     public boolean isHeaderCol(ColumnInfo colInfo) {
@@ -61,14 +61,34 @@ public class RowInfoService {
         List<RowInfo> rowsToFill = new ArrayList<>();
         for (RowInfo rowInfo : rowInfos) {
 
-            if (hasRowToFill(rowInfo)) {
+            if (isRowToFill(rowInfo)) {
                 rowsToFill.add(rowInfo);
-            } else if (!rowsToFill.isEmpty()) {
+            } else {
                 break;
             }
         }
 
         return rowsToFill;
+    }
+
+    public List<Integer> getGroupHeaderIndex(List<RowInfo> rowInfos) {
+        List<Integer> headerRowIndex = new ArrayList<>();
+        for (RowInfo rowInfo : rowInfos) {
+            if (headerRowIndex.isEmpty()) {
+                headerRowIndex.add(rowInfo.rowId());
+                continue;
+            }
+
+            int maxFilledPositions = rowInfo.cellInfos().size();
+            int filledPositions = getFilledPositionsSize(rowInfo);
+            if (filledPositions == maxFilledPositions) {
+                headerRowIndex.add(rowInfo.rowId());
+            }
+
+            return headerRowIndex;
+        }
+
+        return headerRowIndex;
     }
 
     public List<ColumnInfo> getColumnsToFill(List<ColumnInfo> columnInfos) {
@@ -90,10 +110,10 @@ public class RowInfoService {
      *
      * @return true if the row is neither empty nor complete.
      */
-    public boolean hasRowToFill(RowInfo rowInfo) {
+    public boolean isRowToFill(RowInfo rowInfo) {
         int filledPositionsSize = getFilledPositionsSize(rowInfo);
 
-        return filledPositionsSize <= rowInfo.cellInfos().size();
+        return filledPositionsSize < rowInfo.cellInfos().size();
     }
 
     public boolean hasColumnToFill(ColumnInfo columnInfo) {

@@ -130,19 +130,19 @@ public class MatrixInfoService {
         return rowHeader.size() > 1;
     }
 
-    /**
-     * Calculates the maximum number of columns across all rows.
-     */
-    public int getMaxRowSize(MatrixInfo matrixInfo) {
-        int maxRowSize = 0;
-        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-        for (RowInfo rowInfo : rowInfos) {
-            List<CellInfo> cellInfos = rowInfo.cellInfos();
-            int rowSize = rowInfoService.getFilledPositionsSize(cellInfos);
-            maxRowSize = Math.max(maxRowSize, rowSize);
-        }
-        return maxRowSize;
-    }
+//    /**
+//     * Calculates the maximum number of columns across all rows.
+//     */
+//    public int getMaxRowSize(MatrixInfo matrixInfo) {
+//        int maxRowSize = 0;
+//        List<RowInfo> rowInfos = matrixInfo.rowInfos();
+//        for (RowInfo rowInfo : rowInfos) {
+//            List<CellInfo> cellInfos = rowInfo.cellInfos();
+//            int rowSize = rowInfoService.getFilledPositionsSize(cellInfos);
+//            maxRowSize = Math.max(maxRowSize, rowSize);
+//        }
+//        return maxRowSize;
+//    }
 
     /**
      * Returns a list of row IDs that are partially filled but not complete.
@@ -152,7 +152,7 @@ public class MatrixInfoService {
         List<RowInfo> rowInfos = matrixInfo.rowInfos();
 
         for (RowInfo rowInfo : rowInfos) {
-            if (rowInfoService.hasRowToFill(rowInfo)) {
+            if (rowInfoService.isRowToFill(rowInfo)) {
                 result.add(rowInfo.rowId());
             }
         }
