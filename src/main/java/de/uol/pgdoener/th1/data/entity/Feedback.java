@@ -1,9 +1,14 @@
 package de.uol.pgdoener.th1.data.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -13,8 +18,8 @@ import lombok.NoArgsConstructor;
 public class Feedback {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
-    private Long id;
+    @GeneratedValue
+    private UUID id;
     private String content;
 
 }
