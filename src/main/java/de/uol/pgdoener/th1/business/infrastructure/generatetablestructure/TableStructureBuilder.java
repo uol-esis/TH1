@@ -166,7 +166,7 @@ public class TableStructureBuilder {
         log.debug("Start buildFillEmptyRowStructure");
         FillEmptyRowStructureDto fillEmptyRowStructure = new FillEmptyRowStructureDto();
         fillEmptyRowStructure.converterType(ConverterTypeDto.FILL_EMPTY_ROW)
-                .rowIndex(reportDto.getRowIndex());
+                .rowIndex(reportDto.getRowsToFill());
         log.debug("Finish buildFillEmptyRowStructure");
         tableStructure.addStructuresItem(fillEmptyRowStructure);
     }

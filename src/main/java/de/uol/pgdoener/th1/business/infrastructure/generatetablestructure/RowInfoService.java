@@ -116,7 +116,6 @@ public class RowInfoService {
      */
     public boolean isRowToFill(RowInfo rowInfo) {
         int filledPositionsSize = getFilledPositionsSize(rowInfo);
-
         return filledPositionsSize < rowInfo.cellInfos().size();
     }
 
