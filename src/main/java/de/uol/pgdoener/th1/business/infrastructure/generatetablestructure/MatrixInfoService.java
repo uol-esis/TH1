@@ -69,7 +69,7 @@ public class MatrixInfoService {
      */
     public int getFirstDataRowIndex(MatrixInfo matrixInfo, int index) {
         List<RowInfo> rowInfos = matrixInfo.rowInfos();
-        int startIndex = 0;
+        int startIndex = index;
 
         for (int i = index; i < rowInfos.size(); i++) {
             RowInfo rowInfo = rowInfos.get(i);
@@ -87,7 +87,7 @@ public class MatrixInfoService {
 
     public int getFirstDataColumnIndex(MatrixInfo matrixInfo, int index) {
         List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
-        int startIndex = 0;
+        int startIndex = index;
 
         for (int i = index; i < columnInfos.size(); i++) {
             ColumnInfo columnInfo = columnInfos.get(i);

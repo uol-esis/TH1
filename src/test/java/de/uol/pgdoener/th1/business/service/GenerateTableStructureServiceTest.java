@@ -43,7 +43,7 @@ class GenerateTableStructureServiceTest {
 
         assertInstanceOf(RemoveHeaderStructureDto.class, tableStructure.getStructures().getFirst());
         assertInstanceOf(RemoveFooterStructureDto.class, tableStructure.getStructures().get(1));
-        assertInstanceOf(RemoveColumnByIndexStructureDto.class, tableStructure.getStructures().get(2));
+        assertInstanceOf(RemoveTrailingColumnStructureDto.class, tableStructure.getStructures().get(2));
         assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(3));
         assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(4));
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(5));
