@@ -6,10 +6,7 @@ import de.uol.pgdoener.th1.business.dto.TableStructureGenerationSettingsDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoFactory;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.*;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,13 +52,15 @@ public class GenerateTableStructureService {
             // setup defaults
             TableStructureBuilder tableStructureBuilder = new TableStructureBuilder(settings);
             TableStructureDto tableStructure = tableStructureBuilder.getTableStructure();
-            Pair<TableStructureDto, List<ReportDto>> result = null;
+            BuildResult result = null;
 
             // run converterChain if overhead converters were enabled
             String[][] convertedMatrix = runIfConvertersPresent(tableStructure, matrix);
-            List<ReportDto> previousReports = new ArrayList<>();
 
-            int structureCount = 0;
+            List<ReportDto> previousReports = new ArrayList<>();
+            int previousStructureCount = 0;
+
+            // TODO get max iterations from settings
             for (int i = 0; i < 5; i++) {
                 MatrixInfo matrixInfo = matrixInfoFactory.create(convertedMatrix);
 
@@ -69,24 +68,30 @@ public class GenerateTableStructureService {
                 log.debug("Generated {} reports", reports.size());
 
                 result = tableStructureBuilder.buildTableStructure(reports);
-                tableStructure = result.getFirst();
+                tableStructure = result.tableStructure();
 
-                previousReports = result.getSecond();
+                // continue, if an added structure requires reanalysis of the table
+                if (result.requiresReanalysis()) {
+                    convertedMatrix = runConverter(matrix, tableStructure);
+                    continue;
+                }
 
-                if (structureCount == tableStructure.getStructures().size()) break;
-                structureCount = tableStructure.getStructures().size();
+                // break if no structures have been added since the last iteration
+                if (previousStructureCount == tableStructure.getStructures().size()) break;
+                previousStructureCount = tableStructure.getStructures().size();
+                previousReports = result.unresolvedReports();
 
                 convertedMatrix = runConverter(matrix, tableStructure);
             }
 
             log.debug("Successfully generated table structure: {}", tableStructure.getName());
-            return result;
+            return Pair.of(result.tableStructure(), result.unresolvedReports());
         } catch (IOException e) {
             log.warn("Failed to read input file: {}", inputFile.getFileName(), e);
             throw e;
         } catch (Exception e) {
             log.warn("Unexpected error during table structure generation", e);
-            throw new RuntimeException("Tabellenstruktur konnte nicht erstellt werden", e);
+            throw new RuntimeException("Unexpected error during table structure generation", e);
         }
     }
 

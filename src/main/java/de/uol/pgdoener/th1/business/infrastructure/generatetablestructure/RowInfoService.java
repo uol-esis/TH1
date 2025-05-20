@@ -56,42 +56,42 @@ public class RowInfoService {
                 .count();
     }
 
-    /**
-     * Adds a cell to this row.
-     *
-     * @param cellInfo the CellInfo object to be added.
-     */
-    public void addColumnInfo(CellInfo cellInfo) {
-        cellInfos.add(cellInfo);
-        log.debug("Added cell with column ID {} to row {}", cellInfo.getColumnId(), rowId);
-    }
-
-    /**
-     * Counts how many cells in the row have entries.
-     */
-    public int countEntries(RowInfo rowInfo) {
-        List<CellInfo> cellInfos = rowInfo.cellInfos();
-        return (int) cellInfos.stream()
-                .filter(cellInfoService::hasEntry).count();
-    }
-
-    /**
-     * Returns a list of column indexes that are filled.
-     */
-    public List<Integer> getEmptyPositions() {
-        return cellInfos.stream()
-                .filter(c -> !c.hasEntry())
-                .map(CellInfo::getColumnId)
-                .toList();
-    }
-
-    /**
-     * Returns the total number of cells in this row.
-     */
-    public List<Integer> getFilledPositions() {
-        return cellInfos.stream()
-                .filter(CellInfo::hasEntry)
-                .map(CellInfo::getColumnId)
-                .toList();
-    }
+//    /**
+//     * Adds a cell to this row.
+//     *
+//     * @param cellInfo the CellInfo object to be added.
+//     */
+//    public void addColumnInfo(CellInfo cellInfo) {
+//        cellInfos.add(cellInfo);
+//        log.debug("Added cell with column ID {} to row {}", cellInfo.getColumnId(), rowId);
+//    }
+//
+//    /**
+//     * Counts how many cells in the row have entries.
+//     */
+//    public int countEntries(RowInfo rowInfo) {
+//        List<CellInfo> cellInfos = rowInfo.cellInfos();
+//        return (int) cellInfos.stream()
+//                .filter(cellInfoService::hasEntry).count();
+//    }
+//
+//    /**
+//     * Returns a list of column indexes that are filled.
+//     */
+//    public List<Integer> getEmptyPositions() {
+//        return cellInfos.stream()
+//                .filter(c -> !c.hasEntry())
+//                .map(CellInfo::getColumnId)
+//                .toList();
+//    }
+//
+//    /**
+//     * Returns the total number of cells in this row.
+//     */
+//    public List<Integer> getFilledPositions() {
+//        return cellInfos.stream()
+//                .filter(CellInfo::hasEntry)
+//                .map(CellInfo::getColumnId)
+//                .toList();
+//    }
 }

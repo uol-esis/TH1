@@ -1,17 +1,17 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class MatrixInfoService {
 
-    final RowInfoService rowInfoService;
+    private final RowInfoService rowInfoService;
 
     /**
      * Calculates the maximum number of columns across all rows.
@@ -30,9 +30,10 @@ public class MatrixInfoService {
         return headerRows;
     }
 
+    @Deprecated
     public List<Integer> checkTypeMismatch(MatrixInfo matrixInfo) {
         List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
-        List<Integer> typeMismatches = getHeaderRows(matrixInfo);
+        List<Integer> typeMismatches = getHeaderRows(matrixInfo);  // FIXME ????
         for (ColumnInfo columnInfo : columnInfos) {
             if (columnInfo.cellInfos().size() < 2) continue;
 
@@ -92,36 +93,36 @@ public class MatrixInfoService {
         return !getRowToFill(matrixInfo).isEmpty();
     }
 
-    /**
-     * Identifies column indexes where only one row has an entry.
-     * Note: currently simplified to always return 0.
-     */
-    public List<Integer> getColumnIndexes(MatrixInfo matrixInfo) {
-        List<Integer> rowIndexes = new ArrayList<>();
-        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-
-        for (RowInfo rowInfo : rowInfos) {
-            /// TODO: überarbeiten wenn mehr als eine spalte in der column aufgelöst werden muss.
-            rowInfoService.countEntries(rowInfo);
-            if (rowInfo.countEntries() == 1) {
-                rowIndexes.add(0);
-            }
-        }
-        return rowIndexes;
-    }
-
-    /**
-     * Builds the header names for the table including a final "Anzahl" column.
-     * Rotates the last element to the beginning.
-     */
-    public List<String> getHeaderNames() {
-        List<String> headerNames = new ArrayList<>(rowInfos.stream().map(RowInfo::getHeaderName).toList());
-
-        if (!headerNames.isEmpty()) {
-            String lastElement = headerNames.removeLast();
-            headerNames.addFirst(lastElement); // An den Anfang setzen
-        }
-        headerNames.add("Anzahl");
-        return headerNames;
-    }
+//    /**
+//     * Identifies column indexes where only one row has an entry.
+//     * Note: currently simplified to always return 0.
+//     */
+//    public List<Integer> getColumnIndexes(MatrixInfo matrixInfo) {
+//        List<Integer> rowIndexes = new ArrayList<>();
+//        List<RowInfo> rowInfos = matrixInfo.rowInfos();
+//
+//        for (RowInfo rowInfo : rowInfos) {
+//            /// TODO: überarbeiten wenn mehr als eine spalte in der column aufgelöst werden muss.
+//            rowInfoService.countEntries(rowInfo);
+//            if (rowInfo.countEntries() == 1) {
+//                rowIndexes.add(0);
+//            }
+//        }
+//        return rowIndexes;
+//    }
+//
+//    /**
+//     * Builds the header names for the table including a final "Anzahl" column.
+//     * Rotates the last element to the beginning.
+//     */
+//    public List<String> getHeaderNames() {
+//        List<String> headerNames = new ArrayList<>(rowInfos.stream().map(RowInfo::getHeaderName).toList());
+//
+//        if (!headerNames.isEmpty()) {
+//            String lastElement = headerNames.removeLast();
+//            headerNames.addFirst(lastElement); // An den Anfang setzen
+//        }
+//        headerNames.add("Anzahl");
+//        return headerNames;
+//    }
 }

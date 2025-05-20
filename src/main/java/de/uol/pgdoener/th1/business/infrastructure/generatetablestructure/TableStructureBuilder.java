@@ -3,7 +3,6 @@ package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 import de.uol.pgdoener.th1.business.dto.*;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +13,12 @@ public class TableStructureBuilder {
 
     private final TableStructureDto tableStructure;
 
+    /**
+     * This creates a new builder for table structures.
+     * This constructor adds converters enabled by default in the generation settings.
+     *
+     * @param settings settings for generating a table structure
+     */
     public TableStructureBuilder(TableStructureGenerationSettingsDto settings) {
         tableStructure = new TableStructureDto();
         tableStructure.setName("");
@@ -37,20 +42,40 @@ public class TableStructureBuilder {
     }
 
     /**
-     * Constructs the full table structure with necessary converters applied.
+     * This method iterates over the provided reports and adds structures to the table structure
      */
-    public Pair<TableStructureDto, List<ReportDto>> buildTableStructure(List<ReportDto> reports) {
+    public BuildResult buildTableStructure(List<ReportDto> reports) {
         List<ReportDto> unresolvedReports = new ArrayList<>();
+        boolean earlyBreak = false;
+        ReportTypeDto reanalysisCause = null;
+
+        reportsLoop:
         for (ReportDto report : reports) {
             switch (report) {
-                case GroupedHeaderReportDto r -> buildGroupHeaderStructure(r);
+                case GroupedHeaderReportDto r -> {
+                    buildGroupHeaderStructure(r);
+                    // break since no other reports should be acted upon after the removal of the grouped header
+                    earlyBreak = true;
+                    reanalysisCause = ReportTypeDto.GROUPED_HEADER;
+                    break reportsLoop;
+                }
                 case ColumnTypeMismatchReportDto r -> unresolvedReports.add(r);
-                // TODO remove default branch
-                default -> throw new IllegalStateException("Unexpected value: " + report);
+                case EmptyColumnReportDto r -> unresolvedReports.add(r);
+                case EmptyRowReportDto r -> unresolvedReports.add(r);
+                case EmptyHeaderReportDto r -> unresolvedReports.add(r);
+                case MergeableColumnsReportDto r -> unresolvedReports.add(r);
+                case SameAsHeaderReportDto r -> unresolvedReports.add(r);
+                case MissingEntryReportDto r -> unresolvedReports.add(r);
+                case SplitRowReportDto r -> unresolvedReports.add(r);
             }
         }
 
-        return Pair.of(tableStructure, unresolvedReports);
+        return new BuildResult(
+                tableStructure,
+                unresolvedReports,
+                earlyBreak,
+                reanalysisCause
+        );
     }
 
     /**
