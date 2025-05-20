@@ -53,6 +53,7 @@ public class TableStructureBuilder {
         for (ReportDto report : reports) {
             switch (report) {
                 case GroupedHeaderReportDto r -> {
+                    buildFillEmptyRowStructure(r);
                     buildGroupHeaderStructure(r);
                     // break since no other reports should be acted upon after the removal of the grouped header
                     earlyBreak = true;
@@ -161,11 +162,11 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure to fill partially filled rows.
      */
-    private void buildFillEmptyRowStructure(List<Integer> rowsToFill) {
+    private void buildFillEmptyRowStructure(GroupedHeaderReportDto reportDto) {
         log.debug("Start buildFillEmptyRowStructure");
         FillEmptyRowStructureDto fillEmptyRowStructure = new FillEmptyRowStructureDto();
         fillEmptyRowStructure.converterType(ConverterTypeDto.FILL_EMPTY_ROW)
-                .rowIndex(rowsToFill);
+                .rowIndex(reportDto.getRowIndex());
         log.debug("Finish buildFillEmptyRowStructure");
         tableStructure.addStructuresItem(fillEmptyRowStructure);
     }

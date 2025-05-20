@@ -6,8 +6,8 @@ import de.uol.pgdoener.th1.business.dto.TableStructureGenerationSettingsDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.*;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.BuildResult;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
@@ -66,13 +66,15 @@ public class GenerateTableStructureService {
 
             // TODO get max iterations from settings
             for (int i = 0; i < 5; i++) {
-                MatrixInfo matrixInfo = matrixInfoFactory.create(convertedMatrix);
+                MatrixInfo matrixInfo = matrixInfoFactory.createParallel(convertedMatrix);
 
                 List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo);
                 log.debug("Generated {} reports", reports.size());
 
                 result = tableStructureBuilder.buildTableStructure(reports);
                 tableStructure = result.tableStructure();
+                System.out.println(tableStructure.toString());
+                System.out.println(reports.toString());
 
                 // continue, if an added structure requires reanalysis of the table
                 if (result.requiresReanalysis()) {

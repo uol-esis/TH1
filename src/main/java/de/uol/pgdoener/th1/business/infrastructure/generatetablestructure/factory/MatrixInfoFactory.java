@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
 
-
 @Slf4j
 @Component
 public class MatrixInfoFactory {
@@ -113,31 +112,18 @@ public class MatrixInfoFactory {
 
     private CellInfo createCell(int rowIndex, int colIndex, String entry) {
         ValueType valueType = detectType(entry);
-        return new CellInfo(rowIndex, colIndex, entry, valueType);
+        return new CellInfo(rowIndex, colIndex, valueType);
     }
 
     private ValueType detectType(String entry) {
-
-        if (entry == null) return ValueType.NULL;
         if (entry.isBlank()) return ValueType.EMPTY;
-        if (isInteger(entry)) return ValueType.INTEGER;
-        if (isDouble(entry)) return ValueType.DOUBLE;
+        if (isNumber(entry)) return ValueType.NUMBER;
         if (isBoolean(entry)) return ValueType.BOOLEAN;
-        if (isCharacter(entry)) return ValueType.CHARACTER;
 
         return ValueType.STRING;
     }
 
-    private boolean isInteger(String s) {
-        try {
-            Integer.parseInt(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean isDouble(String s) {
+    private boolean isNumber(String s) {
         try {
             Double.parseDouble(s);
             return true;
@@ -148,10 +134,6 @@ public class MatrixInfoFactory {
 
     private boolean isBoolean(String s) {
         return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false");
-    }
-
-    private boolean isCharacter(String s) {
-        return s.length() == 1;
     }
 
 }
