@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 public class CellInfoService {
 
     public boolean isString(CellInfo cellInfo) {
-        return cellInfo.valueType() == ValueType.STRING;
+        return cellInfo.valueType() == ValueType.STRING || cellInfo.valueType() == ValueType.CHARACTER;
     }
 
     public boolean isEmpty(CellInfo cellInfo) {

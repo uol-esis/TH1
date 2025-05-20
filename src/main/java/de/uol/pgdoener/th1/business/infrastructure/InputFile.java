@@ -22,7 +22,7 @@ import java.util.*;
 import java.util.stream.StreamSupport;
 
 /**
- * This class takes a {@link MultipartFile} and a {@link TableStructureDto} and provides the file as a 2D-String Array.
+ * This class takes a {@link MultipartFile} and provides the file as a 2D-String Array.
  */
 @Slf4j
 public class InputFile {
@@ -51,9 +51,10 @@ public class InputFile {
      * Each entry is a cell in the CSV or Excel File.
      *
      * @return the contents of the file
-     * @throws IOException if the file cannot be read
+     * @throws IOException if the file cannot be read TODO throw new InputFileException for better feedback
      */
     public String[][] asStringArray() throws IOException {
+        // TODO maybe fill rows with different lengths will empty strings
         return mapNulls(switch (fileType) {
             case CSV -> readCsvToMatrix();
             case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
