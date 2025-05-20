@@ -30,6 +30,79 @@ public class MatrixInfoService {
         return headerRows;
     }
 
+    /**
+     * Calculates the maximum number of columns across all rows.
+     */
+    public List<RowInfo> getHeaderRowsInfo(MatrixInfo matrixInfo) {
+        List<RowInfo> headerRows = new ArrayList<>();
+        List<RowInfo> rowInfos = matrixInfo.rowInfos();
+
+        for (RowInfo rowInfo : rowInfos) {
+            if (rowInfoService.isHeaderRow(rowInfo)) {
+                headerRows.add(rowInfo);
+            } else if (!headerRows.isEmpty()) {
+                break;
+            }
+        }
+        return headerRows;
+    }
+
+    /**
+     * Calculates the maximum number of columns across all rows.
+     */
+    public List<ColumnInfo> getHeaderColumns(MatrixInfo matrixInfo) {
+        List<ColumnInfo> headerColumns = new ArrayList<>();
+        List<ColumnInfo> colInfos = matrixInfo.columnInfos();
+
+        for (ColumnInfo colInfo : colInfos) {
+            if (rowInfoService.isHeaderCol(colInfo)) {
+                headerColumns.add(colInfo);
+            } else if (!headerColumns.isEmpty()) {
+                break;
+            }
+        }
+        return headerColumns;
+    }
+
+    /**
+     * Calculates the maximum number of columns across all rows.
+     */
+    public int getFirstDataRowIndex(MatrixInfo matrixInfo, int index) {
+        List<RowInfo> rowInfos = matrixInfo.rowInfos();
+        int startIndex = 0;
+
+        for (int i = index; i < rowInfos.size(); i++) {
+            RowInfo rowInfo = rowInfos.get(i);
+            int filledPositions = rowInfoService.getFilledPositionsSize(rowInfo);
+
+            // check if data Row ?
+            if (filledPositions > 0) {
+                return i;
+            }
+
+            startIndex = i;
+        }
+        return startIndex;
+    }
+
+    public int getFirstDataColumnIndex(MatrixInfo matrixInfo, int index) {
+        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
+        int startIndex = 0;
+
+        for (int i = index; i < columnInfos.size(); i++) {
+            ColumnInfo columnInfo = columnInfos.get(i);
+            int filledPositions = rowInfoService.getFilledPositionsSize(columnInfo);
+
+            // check if data Row ?
+            if (filledPositions > 0) {
+                break;
+            }
+
+            startIndex = i;
+        }
+        return startIndex;
+    }
+
     @Deprecated
     public List<Integer> checkTypeMismatch(MatrixInfo matrixInfo) {
         List<ColumnInfo> columnInfos = matrixInfo.columnInfos();

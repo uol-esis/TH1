@@ -20,6 +20,6 @@ public class CellInfoService {
     }
 
     public boolean hasEntry(CellInfo cellInfo) {
-        return isNull(cellInfo) || isEmpty(cellInfo);
+        return !isNull(cellInfo) && !isEmpty(cellInfo);
     }
 }
