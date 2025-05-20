@@ -122,7 +122,7 @@ public class AnalyzeMatrixInfoService {
     private void fillRowSection(MatrixInfo matrixInfo, GroupedHeaderReportDto report, List<RowInfo> headerRows) {
         List<Integer> rowIndices = rowInfoService.getGroupHeaderIndex(headerRows);
         //List<Integer> rowIndices = headerRows.stream().map(RowInfo::rowId).toList();
-        int lastHeaderRowIndex = rowIndices.getLast();
+        int lastHeaderRowIndex = headerRows.getLast().rowId();
         int dataStartRowIndex = matrixInfoService.getFirstDataRowIndex(matrixInfo, lastHeaderRowIndex + 1);
 
         report.setRowIndex(rowIndices);
