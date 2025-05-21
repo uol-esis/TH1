@@ -1,7 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,8 +18,8 @@ public class RowInfoService {
      * Checks if this row is a valid Header.
      * A valid header is either a string or is empty.
      *
-     * @param rowInfo .
-     * @return a boolean if the row is a headerRow.
+     * @param rowInfo the RowInfo object to be checked
+     * @return a boolean if the row is a headerRow
      */
     public boolean isHeaderRow(RowInfo rowInfo) {
         List<CellInfo> cellInfos = rowInfo.cellInfos();
@@ -36,32 +35,19 @@ public class RowInfoService {
         return strings >= 1;
     }
 
-    public boolean isHeaderCol(ColumnInfo colInfo) {
-        List<CellInfo> cellInfos = colInfo.cellInfos();
-        int strings = 0;
-        for (CellInfo cellInfo : cellInfos) {
-            if (!cellInfoService.isEmpty(cellInfo) && !cellInfoService.isString(cellInfo)) {
-                return false;
-            }
-            if (cellInfoService.isString(cellInfo)) {
-                strings++;
-            }
-        }
-        return strings > 1;
-    }
-
     /**
      * Checks if this row has a row to Fill.
-     * A row to fill is a roe with only one valid entry.
+     * A row to fill is a row with only one valid entry.
      *
-     * @param rowInfos .
-     * @return a list of RowInfo.
+     * @param rowInfos    the list of RowInfo objects to be checked
+     * @param startColumn the column index to start checking from
+     * @return a list of RowInfos that have empty cells
      */
-    public List<RowInfo> getRowsToFill(List<RowInfo> rowInfos) {
+    public List<RowInfo> getRowsToFill(List<RowInfo> rowInfos, int startColumn) {
         List<RowInfo> rowsToFill = new ArrayList<>();
-        for (RowInfo rowInfo : rowInfos) {
 
-            if (isRowToFill(rowInfo)) {
+        for (RowInfo rowInfo : rowInfos) {
+            if (hasEmptyCellsStartingFrom(rowInfo, startColumn)) {
                 rowsToFill.add(rowInfo);
             } else {
                 break;
@@ -80,7 +66,7 @@ public class RowInfoService {
             boolean isFullyFilled = (filledPositions == maxFilledPositions);
 
             if (!hasOneFilledRow) {
-                headerRowIndex.add(rowInfo.rowId());
+                headerRowIndex.add(rowInfo.rowIndex());
 
                 if (isFullyFilled) {
                     hasOneFilledRow = true;
@@ -89,24 +75,10 @@ public class RowInfoService {
                 if (!isFullyFilled) {
                     break;
                 }
-                headerRowIndex.add(rowInfo.rowId());
+                headerRowIndex.add(rowInfo.rowIndex());
             }
         }
         return headerRowIndex;
-    }
-
-    public List<ColumnInfo> getColumnsToFill(List<ColumnInfo> columnInfos) {
-        List<ColumnInfo> columnsToFill = new ArrayList<>();
-        for (ColumnInfo columnInfo : columnInfos) {
-
-            if (hasColumnToFill(columnInfo)) {
-                columnsToFill.add(columnInfo);
-            } else if (!columnsToFill.isEmpty()) {
-                break;
-            }
-        }
-
-        return columnsToFill;
     }
 
     /**
@@ -114,15 +86,17 @@ public class RowInfoService {
      *
      * @return true if the row is neither empty nor complete.
      */
-    public boolean isRowToFill(RowInfo rowInfo) {
-        int filledPositionsSize = getFilledPositionsSize(rowInfo);
-        return filledPositionsSize < rowInfo.cellInfos().size();
-    }
+    public boolean hasEmptyCellsStartingFrom(RowInfo rowInfo, int startColumn) {
+        List<CellInfo> cellInfos = rowInfo.cellInfos();
 
-    public boolean hasColumnToFill(ColumnInfo columnInfo) {
-        int filledPositionsSize = getFilledPositionsSize(columnInfo);
+        for (int i = startColumn; i < cellInfos.size(); i++) {
+            CellInfo cellInfo = cellInfos.get(i);
+            if (!cellInfoService.hasEntry(cellInfo)) {
+                return true;
+            }
+        }
 
-        return filledPositionsSize <= columnInfo.cellInfos().size();
+        return false;
     }
 
     /**
@@ -135,14 +109,6 @@ public class RowInfoService {
                 .count();
     }
 
-    public int getFilledPositionsSize(ColumnInfo columnInfo) {
-        List<CellInfo> cellInfos = columnInfo.cellInfos();
-        return (int) cellInfos.stream()
-                .filter(cellInfoService::hasEntry)
-                .count();
-    }
-
-
     ///**
     // * Adds a cell to this row.
     // *
@@ -150,7 +116,7 @@ public class RowInfoService {
     // */
     //public void addColumnInfo(CellInfo cellInfo) {
     //    cellInfos.add(cellInfo);
-    //    log.debug("Added cell with column ID {} to row {}", cellInfo.getColumnId(), rowId);
+    //    log.debug("Added cell with column ID {} to row {}", cellInfo.getColumnId(), rowIndex);
     //}
 
     /**

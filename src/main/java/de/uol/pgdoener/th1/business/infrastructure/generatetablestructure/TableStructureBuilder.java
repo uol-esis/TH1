@@ -55,6 +55,7 @@ public class TableStructureBuilder {
                 case GroupedHeaderReportDto r -> {
                     buildFillEmptyRowStructure(r);
                     buildGroupHeaderStructure(r);
+                    buildHeaderNameStructure(r.getHeaderNames());
                     // break since no other reports should be acted upon after the removal of the grouped header
                     earlyBreak = true;
                     reanalysisCause = ReportTypeDto.GROUPED_HEADER;
@@ -98,7 +99,7 @@ public class TableStructureBuilder {
     private void buildRemoveFooterStructure(RemoveFooterSettingsDto settings) {
         log.debug("Start buildRemoveFooterStructure");
         RemoveFooterStructureDto removeFooterStructure = new RemoveFooterStructureDto();
-        removeFooterStructure.converterType(ConverterTypeDto.REMOVE_HEADER)
+        removeFooterStructure.converterType(ConverterTypeDto.REMOVE_FOOTER)
                 .threshold(settings.getThreshold())
                 .setBlackList(settings.getBlockList());
         log.debug("Finish buildRemoveFooterStructure");

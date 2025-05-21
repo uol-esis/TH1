@@ -62,13 +62,12 @@ public class GenerateTableStructureService {
             String[][] convertedMatrix = runIfConvertersPresent(tableStructure, matrix);
 
             List<ReportDto> previousReports = new ArrayList<>();
-            int previousStructureCount = 0;
+            int previousStructureCount = tableStructure.getStructures().size();
 
-            // TODO get max iterations from settings
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < settings.getMaxIterations().orElse(5); i++) {
                 MatrixInfo matrixInfo = matrixInfoFactory.createParallel(convertedMatrix);
 
-                List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo);
+                List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo, convertedMatrix);
                 log.debug("Generated {} reports", reports.size());
 
                 result = tableStructureBuilder.buildTableStructure(reports);

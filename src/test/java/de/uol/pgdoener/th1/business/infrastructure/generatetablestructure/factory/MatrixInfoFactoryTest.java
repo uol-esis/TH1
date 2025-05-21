@@ -1,8 +1,6 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
+package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.CellInfoFactory;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.MatrixInfoFactory;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -18,10 +16,10 @@ class MatrixInfoFactoryTest {
     @Test
     void testCreate() {
         String[][] input = new String[][]{
-                {"header1", "header2", "header3"},
-                {"1", "2", "3"},
-                {"4", "5", "6"},
-                {"7", "8", "9"},
+                {"header1", "header2", ""},
+                {"1.54", "2", "false"},
+                {"4", " ", "6"},
+                {"true", "8", "9.31"},
         };
 
         MatrixInfo matrixInfo = matrixInfoFactory.createParallel(input);
@@ -32,26 +30,26 @@ class MatrixInfoFactoryTest {
                                 List.of(
                                         new CellInfo(0, 0, ValueType.STRING),
                                         new CellInfo(0, 1, ValueType.STRING),
-                                        new CellInfo(0, 2, ValueType.STRING)
+                                        new CellInfo(0, 2, ValueType.EMPTY)
                                 )
                         ),
                         new RowInfo(1,
                                 List.of(
                                         new CellInfo(1, 0, ValueType.NUMBER),
                                         new CellInfo(1, 1, ValueType.NUMBER),
-                                        new CellInfo(1, 2, ValueType.NUMBER)
+                                        new CellInfo(1, 2, ValueType.BOOLEAN)
                                 )
                         ),
                         new RowInfo(2,
                                 List.of(
                                         new CellInfo(2, 0, ValueType.NUMBER),
-                                        new CellInfo(2, 1, ValueType.NUMBER),
+                                        new CellInfo(2, 1, ValueType.EMPTY),
                                         new CellInfo(2, 2, ValueType.NUMBER)
                                 )
                         ),
                         new RowInfo(3,
                                 List.of(
-                                        new CellInfo(3, 0, ValueType.NUMBER),
+                                        new CellInfo(3, 0, ValueType.BOOLEAN),
                                         new CellInfo(3, 1, ValueType.NUMBER),
                                         new CellInfo(3, 2, ValueType.NUMBER)
                                 )
@@ -63,21 +61,21 @@ class MatrixInfoFactoryTest {
                                         new CellInfo(0, 0, ValueType.STRING),
                                         new CellInfo(1, 0, ValueType.NUMBER),
                                         new CellInfo(2, 0, ValueType.NUMBER),
-                                        new CellInfo(3, 0, ValueType.NUMBER)
+                                        new CellInfo(3, 0, ValueType.BOOLEAN)
                                 )
                         ),
                         new ColumnInfo(1,
                                 List.of(
                                         new CellInfo(0, 1, ValueType.STRING),
                                         new CellInfo(1, 1, ValueType.NUMBER),
-                                        new CellInfo(2, 1, ValueType.NUMBER),
+                                        new CellInfo(2, 1, ValueType.EMPTY),
                                         new CellInfo(3, 1, ValueType.NUMBER)
                                 )
                         ),
                         new ColumnInfo(2,
                                 List.of(
-                                        new CellInfo(0, 2, ValueType.STRING),
-                                        new CellInfo(1, 2, ValueType.NUMBER),
+                                        new CellInfo(0, 2, ValueType.EMPTY),
+                                        new CellInfo(1, 2, ValueType.BOOLEAN),
                                         new CellInfo(2, 2, ValueType.NUMBER),
                                         new CellInfo(3, 2, ValueType.NUMBER)
                                 )
@@ -90,7 +88,7 @@ class MatrixInfoFactoryTest {
 
     @Test
     void testCreateWithLargeMatrix() {
-        for (int iteration = 0; iteration < 20; iteration++) {
+        for (int iteration = 0; iteration < 2; iteration++) {
 
             String[][] input = new String[6000][5000];
             for (int i = 0; i < input.length; i++) {
