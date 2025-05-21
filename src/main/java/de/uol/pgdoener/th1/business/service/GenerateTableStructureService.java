@@ -92,9 +92,6 @@ public class GenerateTableStructureService {
 
             log.debug("Successfully generated table structure: {}", tableStructure.getName());
             return Pair.of(result.tableStructure(), result.unresolvedReports());
-        } catch (IOException e) {
-            log.warn("Failed to read input file: {}", inputFile.getFileName(), e);
-            throw e;
         } catch (Exception e) {
             log.warn("Unexpected error during table structure generation", e);
             throw new RuntimeException("Unexpected error during table structure generation", e);

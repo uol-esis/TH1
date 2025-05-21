@@ -3,6 +3,7 @@ package de.uol.pgdoener.th1.business.service;
 import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.*;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.CellInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.MatrixInfoFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.data.util.Pair;
@@ -22,7 +23,8 @@ class GenerateTableStructureServiceTest {
     RowInfoService rowInfoService = new RowInfoService(cellInfoService);
     MatrixInfoService matrixInfoService = new MatrixInfoService(rowInfoService);
 
-    MatrixInfoFactory matrixInfoFactory = new MatrixInfoFactory();
+    CellInfoFactory cellInfoFactory = new CellInfoFactory();
+    MatrixInfoFactory matrixInfoFactory = new MatrixInfoFactory(cellInfoFactory);
 
     AnalyzeMatrixInfoService analyzeMatrixInfoService = new AnalyzeMatrixInfoService(matrixInfoService, rowInfoService, columnInfoService, cellInfoService);
 

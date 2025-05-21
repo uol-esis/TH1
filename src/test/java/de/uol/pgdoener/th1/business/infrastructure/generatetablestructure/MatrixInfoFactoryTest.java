@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.CellInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.MatrixInfoFactory;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +12,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 
 class MatrixInfoFactoryTest {
 
-    MatrixInfoFactory matrixInfoFactory = new MatrixInfoFactory();
+    CellInfoFactory cellInfoFactory = new CellInfoFactory();
+    MatrixInfoFactory matrixInfoFactory = new MatrixInfoFactory(cellInfoFactory);
 
     @Test
     void testCreate() {
