@@ -27,6 +27,12 @@ public abstract class StructureMapper {
             )
                     .name(structure.getName())
                     .description(structure.getDescription());
+            case FillEmptyColumnStructure structure -> new FillEmptyColumnStructureDto(
+                    ConverterTypeDto.FILL_EMPTY_COLUMN,
+                    List.of(structure.getColumns())
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription());
             case RemoveColumnByIndexStructure structure -> new RemoveColumnByIndexStructureDto(
                     ConverterTypeDto.REMOVE_COLUMN_BY_INDEX,
                     List.of(structure.getColumns())
@@ -122,6 +128,14 @@ public abstract class StructureMapper {
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
                     structure.getRowIndex().toArray(new Integer[0])
+            );
+            case FillEmptyColumnStructureDto structure -> new FillEmptyColumnStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getColumnIndex().toArray(new Integer[0])
             );
             case RemoveColumnByIndexStructureDto structure -> new RemoveColumnByIndexStructure(
                     null, // ID wird von der Datenbank generiert
