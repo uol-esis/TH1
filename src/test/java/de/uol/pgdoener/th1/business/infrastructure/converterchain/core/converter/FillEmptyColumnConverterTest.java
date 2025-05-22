@@ -75,6 +75,27 @@ class FillEmptyColumnConverterTest {
     }
 
     @Test
+    void testHandleRequestFirstEmpty() {
+        FillEmptyColumnStructureDto structure = new FillEmptyColumnStructureDto(null, List.of(0));
+        FillEmptyColumnConverter converter = new FillEmptyColumnConverter(structure);
+        String[][] matrix = new String[][]{
+                {"", "e"},
+                {"", ""},
+                {"w", "r"},
+                {"", "d"}
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                {"", "e"},
+                {"", ""},
+                {"w", "r"},
+                {"w", "d"}
+        }, result);
+    }
+
+    @Test
     void testHandleRequestWithEmptyColumn() {
         FillEmptyColumnStructureDto structure = new FillEmptyColumnStructureDto(null, List.of(0));
         FillEmptyColumnConverter converter = new FillEmptyColumnConverter(structure);

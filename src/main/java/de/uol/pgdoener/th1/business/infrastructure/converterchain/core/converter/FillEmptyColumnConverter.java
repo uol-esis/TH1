@@ -23,15 +23,15 @@ public class FillEmptyColumnConverter extends Converter {
 
         for (int columnIndex : columnsToFill) {
             String lastNonEmptyValue = "";
-            for (int i = 0; i < matrix.length; i++) {
-                if (!matrix[i][columnIndex].isBlank()) {
-                    lastNonEmptyValue = matrix[i][columnIndex];
+            for (String[] row : matrix) {
+                if (!row[columnIndex].isBlank()) {
+                    lastNonEmptyValue = row[columnIndex];
                 } else {
-                    if (lastNonEmptyValue.isBlank()) {
-                        throwConverterException("No non-empty value found in the column to fill empty cells");
-                    }
-                    matrix[i][columnIndex] = lastNonEmptyValue;
+                    row[columnIndex] = lastNonEmptyValue;
                 }
+            }
+            if (lastNonEmptyValue.isBlank()) {
+                throwConverterException("No non-empty value found in the column to fill empty cells");
             }
         }
         return super.handleRequest(matrix);
