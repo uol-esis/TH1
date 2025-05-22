@@ -28,56 +28,56 @@ class MatrixInfoFactoryTest {
                 List.of(
                         new RowInfo(0,
                                 List.of(
-                                        new CellInfo(0, 0, ValueType.STRING),
-                                        new CellInfo(0, 1, ValueType.STRING),
-                                        new CellInfo(0, 2, ValueType.STRING)
+                                        new CellInfo(0, 0, "header1", ValueType.STRING),
+                                        new CellInfo(0, 1, "header2", ValueType.STRING),
+                                        new CellInfo(0, 2, "header3", ValueType.STRING)
                                 )
                         ),
                         new RowInfo(1,
                                 List.of(
-                                        new CellInfo(1, 0, ValueType.NUMBER),
-                                        new CellInfo(1, 1, ValueType.NUMBER),
-                                        new CellInfo(1, 2, ValueType.NUMBER)
+                                        new CellInfo(1, 0, "1", ValueType.NUMBER),
+                                        new CellInfo(1, 1, "2", ValueType.NUMBER),
+                                        new CellInfo(1, 2, "3", ValueType.NUMBER)
                                 )
                         ),
                         new RowInfo(2,
                                 List.of(
-                                        new CellInfo(2, 0, ValueType.NUMBER),
-                                        new CellInfo(2, 1, ValueType.NUMBER),
-                                        new CellInfo(2, 2, ValueType.NUMBER)
+                                        new CellInfo(2, 0, "4", ValueType.NUMBER),
+                                        new CellInfo(2, 1, "5", ValueType.NUMBER),
+                                        new CellInfo(2, 2, "6", ValueType.NUMBER)
                                 )
                         ),
                         new RowInfo(3,
                                 List.of(
-                                        new CellInfo(3, 0, ValueType.NUMBER),
-                                        new CellInfo(3, 1, ValueType.NUMBER),
-                                        new CellInfo(3, 2, ValueType.NUMBER)
+                                        new CellInfo(3, 0, "7", ValueType.NUMBER),
+                                        new CellInfo(3, 1, "8", ValueType.NUMBER),
+                                        new CellInfo(3, 2, "9", ValueType.NUMBER)
                                 )
                         )
                 ),
                 List.of(
                         new ColumnInfo(0,
                                 List.of(
-                                        new CellInfo(0, 0, ValueType.STRING),
-                                        new CellInfo(1, 0, ValueType.NUMBER),
-                                        new CellInfo(2, 0, ValueType.NUMBER),
-                                        new CellInfo(3, 0, ValueType.NUMBER)
+                                        new CellInfo(0, 0, "header1", ValueType.STRING),
+                                        new CellInfo(1, 0, "1", ValueType.NUMBER),
+                                        new CellInfo(2, 0, "4", ValueType.NUMBER),
+                                        new CellInfo(3, 0, "7", ValueType.NUMBER)
                                 )
                         ),
                         new ColumnInfo(1,
                                 List.of(
-                                        new CellInfo(0, 1, ValueType.STRING),
-                                        new CellInfo(1, 1, ValueType.NUMBER),
-                                        new CellInfo(2, 1, ValueType.NUMBER),
-                                        new CellInfo(3, 1, ValueType.NUMBER)
+                                        new CellInfo(0, 1, "header2", ValueType.STRING),
+                                        new CellInfo(1, 1, "2", ValueType.NUMBER),
+                                        new CellInfo(2, 1, "5", ValueType.NUMBER),
+                                        new CellInfo(3, 1, "8", ValueType.NUMBER)
                                 )
                         ),
                         new ColumnInfo(2,
                                 List.of(
-                                        new CellInfo(0, 2, ValueType.STRING),
-                                        new CellInfo(1, 2, ValueType.NUMBER),
-                                        new CellInfo(2, 2, ValueType.NUMBER),
-                                        new CellInfo(3, 2, ValueType.NUMBER)
+                                        new CellInfo(0, 2, "header3", ValueType.STRING),
+                                        new CellInfo(1, 2, "3", ValueType.NUMBER),
+                                        new CellInfo(2, 2, "6", ValueType.NUMBER),
+                                        new CellInfo(3, 2, "9", ValueType.NUMBER)
                                 )
                         )
                 )
