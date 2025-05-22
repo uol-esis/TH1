@@ -85,13 +85,13 @@ public class RowInfoService {
     public List<String> getHeaderNames(List<RowInfo> headerRows, List<ColumnInfo> headerColumns) {
         List<String> headerNames = new ArrayList<>();
 
-        for (ColumnInfo columnInfo : headerColumns) {
-            headerNames.add(columnInfo.cellInfos().getFirst().entry());
-        }
-
-        for (RowInfo rowInfo : headerRows) {
-            headerNames.add(rowInfo.cellInfos().getFirst().entry());
-        }
+//        for (ColumnInfo columnInfo : headerColumns) {
+//            headerNames.add(columnInfo.cellInfos().getFirst().entry());
+//        }
+//
+//        for (RowInfo rowInfo : headerRows) {
+//            headerNames.add(rowInfo.cellInfos().getFirst().entry());
+//        }
 
         return headerNames;
     }

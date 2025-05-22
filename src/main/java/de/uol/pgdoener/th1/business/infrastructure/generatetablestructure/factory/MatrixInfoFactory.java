@@ -1,6 +1,9 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -107,37 +110,11 @@ public class MatrixInfoFactory {
         List<CellInfo> cellInfos = new ArrayList<>(row.length);
 
         for (int i = 0; i < row.length; i++) {
-            CellInfo cellInfo = createCell(rowIndex, i, row[i]);
+            CellInfo cellInfo = cellInfoFactory.create(rowIndex, i, row[i]);
             cellInfos.add(cellInfo);
         }
 
         return new RowInfo(rowIndex, cellInfos);
-    }
-
-    private CellInfo createCell(int rowIndex, int colIndex, String entry) {
-        ValueType valueType = detectType(entry);
-        return new CellInfo(rowIndex, colIndex, entry, valueType);
-    }
-
-    private ValueType detectType(String entry) {
-        if (entry.isBlank()) return ValueType.EMPTY;
-        if (isNumber(entry)) return ValueType.NUMBER;
-        if (isBoolean(entry)) return ValueType.BOOLEAN;
-
-        return ValueType.STRING;
-    }
-
-    private boolean isNumber(String s) {
-        try {
-            Double.parseDouble(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean isBoolean(String s) {
-        return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false");
     }
 
 }

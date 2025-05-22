@@ -128,8 +128,8 @@ public class AnalyzeMatrixInfoService {
         }
         headerReport.setHeaderNames(headerNames);
 
-        List<String> headerNames = rowInfoService.getHeaderNames(headerRows, headerColumns);
-        System.out.println(headerNames);
+        //List<String> headerNames = rowInfoService.getHeaderNames(headerRows, headerColumns);
+        //System.out.println(headerNames);
 
         return Optional.of(headerReport);
     }
