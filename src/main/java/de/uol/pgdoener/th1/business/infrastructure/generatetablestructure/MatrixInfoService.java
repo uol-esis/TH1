@@ -5,12 +5,10 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.C
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -145,92 +143,77 @@ public class MatrixInfoService {
         return !getRowToFill(matrixInfo).isEmpty();
     }
 
-    /**
-     * This method detects the rectangle of a grouped header in the top left corner of the matrix.
-     * <p>
-     * A grouped header rectangle has entries in the first column.
-     * To the right there are empty cells until the data starts.
-     * So each row in the rectangle has exactly one filled cell in the first column.
-     * Below the rectangle there are the headers for the grouped header columns.
-     * To the right of those there are only empty cells.
-     *
-     * @param matrixInfo the matrix to analyze
-     * @return the rectangle of the grouped header
-     */
-    public Optional<Pair<Integer, Integer>> detectGroupedHeaderCorner(MatrixInfo matrixInfo) {
-        if (!cellInfoService.hasEntry(matrixInfo.rowInfos().getFirst().cellInfos().getFirst())) {
-            // no entry in cell 0,0 => no grouped header
-            return Optional.empty();
-        }
-
-        // find width of rectangle
+    public int detectRectangleWidth(MatrixInfo matrixInfo) {
         int width = 1;
         List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
         for (int i = 1; i < columnInfos.size(); i++) {
             ColumnInfo columnInfo = columnInfos.get(i);
-            CellInfo cellInfo = columnInfo.cellInfos().getFirst();
-            if (!cellInfoService.hasEntry(cellInfo)) {
+            CellInfo firstCellOfColumn = columnInfo.cellInfos().getFirst();
+            if (!cellInfoService.hasEntry(firstCellOfColumn)) {
                 width++;
             } else {
                 break;
             }
         }
+        return width;
+    }
 
-        // find height of rectangle
+    public int detectRectangleHeight(MatrixInfo matrixInfo, int width) {
         int height = 1;
         List<RowInfo> rowInfos = matrixInfo.rowInfos();
         for (int i = 1; i < rowInfos.size(); i++) {
             RowInfo rowInfo = rowInfos.get(i);
-            CellInfo leftCell = rowInfo.cellInfos().getFirst();
+            CellInfo firstCellInRow = rowInfo.cellInfos().getFirst();
             CellInfo firstHeaderCell = rowInfo.cellInfos().get(width);
-            if (cellInfoService.hasEntry(leftCell) && cellInfoService.hasEntry(firstHeaderCell)) {
+            if (cellInfoService.hasEntry(firstCellInRow) && cellInfoService.hasEntry(firstHeaderCell)) {
                 height++;
             } else {
                 break;
             }
         }
-        if (height > rowInfos.size() / 2) {
-            // unrealistic height
-            return Optional.empty();
-        }
+        return height;
+    }
 
-        // check if the rectangle is valid
+    public boolean isRectangleValid(MatrixInfo matrixInfo, int width, int height) {
         for (int i = 0; i < height; i++) {
             if (cellInfoService.isEmpty(matrixInfo.rowInfos().get(i).cellInfos().getFirst())) {
-                return Optional.empty();
+                return false;
             }
             for (int j = 1; j < width; j++) {
                 if (cellInfoService.hasEntry(matrixInfo.rowInfos().get(i).cellInfos().get(j))) {
-                    return Optional.empty();
+                    return false;
                 }
             }
         }
+        return true;
+    }
 
-        // check if there is a column header row
+    public boolean isValidGroupedHeaderColumnHeader(MatrixInfo matrixInfo, int width, int height) {
         RowInfo columnHeaderRow = matrixInfo.rowInfos().get(height);
         for (int i = 0; i < width; i++)
             if (cellInfoService.isEmpty(columnHeaderRow.cellInfos().get(i)))
-                return Optional.empty();
+                return false;
+
         for (int i = width; i < columnHeaderRow.cellInfos().size(); i++)
             if (cellInfoService.hasEntry(columnHeaderRow.cellInfos().get(i)))
-                return Optional.empty();
+                return false;
+        return true;
+    }
 
-        // if there is more than 1 row in the rectangle, check if the top rows have empty cells
-        if (height >= 2) {
-            boolean hasEmptyCells = false;
-            for (int i = 0; i < height - 1; i++) {
-                if (rowInfoService.hasEmptyCellsStartingFrom(matrixInfo.rowInfos().get(i), width)) {
-                    hasEmptyCells = true;
-                    break;
-                }
-            }
-            if (!hasEmptyCells) {
-                return Optional.empty();
+   /* private int detectRectangleWidthOld(MatrixInfo matrixInfo) {
+        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
+
+        for (int i = 1; i < columnInfos.size(); i++) {
+            ColumnInfo columnInfo = columnInfos.get(i);
+            CellInfo firstCellOfColumn = columnInfo.cellInfos().getFirst();
+            if (!cellInfoService.hasEntry(firstCellOfColumn)) {
+                width++;
+            } else {
+                break;
             }
         }
-
-        return Optional.of(Pair.of(width, height));
-    }
+        return width;
+    }*/
 
 //    /**
 //     * Identifies column indexes where only one row has an entry.
