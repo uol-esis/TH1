@@ -1,6 +1,10 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +15,10 @@ import java.util.stream.IntStream;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class MatrixInfoFactory {
+
+    private final CellInfoFactory cellInfoFactory;
 
     public MatrixInfo createParallel(String[][] matrix) {
         CellInfo[][] columnCellInfos = new CellInfo[matrix[0].length][matrix.length];
@@ -22,7 +29,7 @@ public class MatrixInfoFactory {
                     List<CellInfo> rowCells = new ArrayList<>(matrix[rowIndex].length);
 
                     for (int columnIndex = 0; columnIndex < matrix[rowIndex].length; columnIndex++) {
-                        CellInfo cellInfo = createCell(rowIndex, columnIndex, matrix[rowIndex][columnIndex]);
+                        CellInfo cellInfo = cellInfoFactory.create(rowIndex, columnIndex, matrix[rowIndex][columnIndex]);
                         rowCells.add(cellInfo);
                         columnCellInfos[columnIndex][rowIndex] = cellInfo;
                     }
@@ -39,7 +46,7 @@ public class MatrixInfoFactory {
         return new MatrixInfo(rowInfos, columnInfos);
     }
 
-    public MatrixInfo createFast(String[][] matrix) {
+    public MatrixInfo create(String[][] matrix) {
         final List<RowInfo> rowInfos = new ArrayList<>(matrix.length);
         CellInfo[][] columnCellInfos = new CellInfo[matrix[0].length][matrix.length];
 
@@ -47,7 +54,7 @@ public class MatrixInfoFactory {
             List<CellInfo> rowCells = new ArrayList<>(matrix[rowIndex].length);
 
             for (int columnIndex = 0; columnIndex < matrix[rowIndex].length; columnIndex++) {
-                CellInfo cellInfo = createCell(rowIndex, columnIndex, matrix[rowIndex][columnIndex]);
+                CellInfo cellInfo = cellInfoFactory.create(rowIndex, columnIndex, matrix[rowIndex][columnIndex]);
                 rowCells.add(cellInfo);
                 columnCellInfos[columnIndex][rowIndex] = cellInfo;
             }
@@ -69,7 +76,7 @@ public class MatrixInfoFactory {
      * @param matrix the raw matrix read from the file
      * @return MatrixInfo object with structure metadata
      */
-    public MatrixInfo create(String[][] matrix) {
+    public MatrixInfo createSlow(String[][] matrix) {
         List<RowInfo> rowInfos = new ArrayList<>(matrix.length);
 
         for (int i = 0; i < matrix.length; i++) {
@@ -103,37 +110,11 @@ public class MatrixInfoFactory {
         List<CellInfo> cellInfos = new ArrayList<>(row.length);
 
         for (int i = 0; i < row.length; i++) {
-            CellInfo cellInfo = createCell(rowIndex, i, row[i]);
+            CellInfo cellInfo = cellInfoFactory.create(rowIndex, i, row[i]);
             cellInfos.add(cellInfo);
         }
 
         return new RowInfo(rowIndex, cellInfos);
-    }
-
-    private CellInfo createCell(int rowIndex, int colIndex, String entry) {
-        ValueType valueType = detectType(entry);
-        return new CellInfo(rowIndex, colIndex, entry, valueType);
-    }
-
-    private ValueType detectType(String entry) {
-        if (entry.isBlank()) return ValueType.EMPTY;
-        if (isNumber(entry)) return ValueType.NUMBER;
-        if (isBoolean(entry)) return ValueType.BOOLEAN;
-
-        return ValueType.STRING;
-    }
-
-    private boolean isNumber(String s) {
-        try {
-            Double.parseDouble(s);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    private boolean isBoolean(String s) {
-        return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false");
     }
 
 }

@@ -10,7 +10,6 @@ import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -31,13 +30,8 @@ public class ConverterChainService {
     }
 
     public ConverterResult performTransformation(@NonNull InputFile inputFile) throws TransformationException {
-        try {
-            String[][] inputMatrix = inputFile.asStringArray();
-            return performTransformation(inputMatrix);
-        } catch (IOException e) {
-            log.error("Error processing file: Could not read input file content", e);
-            throw new TransformationException("Error processing file: Could not read input file content", e);
-        }
+        String[][] inputMatrix = inputFile.asStringArray();
+        return performTransformation(inputMatrix);
     }
 
     /**

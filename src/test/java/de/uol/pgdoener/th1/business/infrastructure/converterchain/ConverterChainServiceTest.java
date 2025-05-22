@@ -5,13 +5,13 @@ import de.uol.pgdoener.th1.business.dto.RemoveRowByIndexStructureDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.InputFileException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.IOException;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -45,7 +45,7 @@ class ConverterChainServiceTest {
     }
 
     @Test
-    void testPerformTransformationNoStructures() throws IOException {
+    void testPerformTransformationNoStructures() {
         String[][] inputMatrix = {{"A", "B"}, {"C", "D"}};
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
@@ -59,7 +59,7 @@ class ConverterChainServiceTest {
     }
 
     @Test
-    void testPerformTransformationNoStructuresEmpty() throws IOException {
+    void testPerformTransformationNoStructuresEmpty() {
         String[][] inputMatrix = {};
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
@@ -73,7 +73,7 @@ class ConverterChainServiceTest {
     }
 
     @Test
-    void testPerformTransformationNoStructuresEmpty2() throws IOException {
+    void testPerformTransformationNoStructuresEmpty2() {
         String[][] inputMatrix = {{}};
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
@@ -87,7 +87,7 @@ class ConverterChainServiceTest {
     }
 
     @Test
-    void testPerformTransformationStructures() throws IOException {
+    void testPerformTransformationStructures() {
         String[][] inputMatrix = {{"A", "B"}, {"C", "D"}};
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
@@ -103,17 +103,17 @@ class ConverterChainServiceTest {
     }
 
     @Test
-    void testPerformTransformationIOException() throws IOException {
-        when(inputFile.asStringArray()).thenThrow(new IOException("Test exception"));
+    void testPerformTransformationIOException() {
+        when(inputFile.asStringArray()).thenThrow(new InputFileException("Test exception"));
 
         TableStructureDto tableStructure = new TableStructureDto();
         ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        assertThrows(TransformationException.class, () -> converterChainService.performTransformation(inputFile));
+        assertThrows(InputFileException.class, () -> converterChainService.performTransformation(inputFile));
     }
 
     @Test
-    void testPerformTransformationException() throws IOException {
+    void testPerformTransformationException() {
         String[][] inputMatrix = {{"A", "B"}, {"C", "D"}};
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 

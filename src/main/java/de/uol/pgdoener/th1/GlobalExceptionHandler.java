@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1;
 
+import de.uol.pgdoener.th1.business.infrastructure.InputFileException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.TransformationException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureGenerationException;
@@ -27,6 +28,13 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InputFileException.class)
+    public ResponseEntity<Object> handleMetabaseException(InputFileException ex) {
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.debug("InputFileException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse.getBody());
+    }
 
     // Add request Id and code ?
     @ExceptionHandler(ServiceException.class)
