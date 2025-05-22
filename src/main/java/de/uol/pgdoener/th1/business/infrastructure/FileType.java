@@ -35,7 +35,7 @@ enum FileType {
                 return fileType;
             }
         }
-        throw new IllegalArgumentException("Unsupported file type");
+        throw new InputFileException("Unsupported file type");
     }
 
 }

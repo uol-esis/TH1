@@ -6,14 +6,16 @@ import de.uol.pgdoener.th1.business.dto.MergeableColumnsReportDto;
 import de.uol.pgdoener.th1.business.dto.ReportDto;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @Slf4j
 @Service
@@ -25,10 +27,10 @@ public class AnalyzeMatrixInfoService {
     private final ColumnInfoService columnInfoService;
     private final CellInfoService cellInfoService;
 
-    public List<ReportDto> analyze(MatrixInfo matrixInfo) {
+    public List<ReportDto> analyze(MatrixInfo matrixInfo, String[][] matrix) {
         List<ReportDto> reports = new ArrayList<>();
 
-        Optional<GroupedHeaderReportDto> optionalGroupedHeaderReport = findGroupedHeader(matrixInfo);
+        Optional<GroupedHeaderReportDto> optionalGroupedHeaderReport = findGroupedHeader(matrixInfo, matrix);
         if (optionalGroupedHeaderReport.isPresent()) {
             reports.add(optionalGroupedHeaderReport.get());
             return reports;
@@ -85,59 +87,51 @@ public class AnalyzeMatrixInfoService {
         return Optional.of(reports);
     }
 
-    private Optional<GroupedHeaderReportDto> findGroupedHeader(MatrixInfo matrixInfo) {
-        List<RowInfo> headerRows = matrixInfoService.getHeaderRowsInfo(matrixInfo);
-        List<ColumnInfo> headerColumns = matrixInfoService.getHeaderColumns(matrixInfo);
-
-        if (headerRows.size() == 1 && headerColumns.size() == 1) {
-            log.debug("No GroupedHeaderReportDto found");
+    private Optional<GroupedHeaderReportDto> findGroupedHeader(MatrixInfo matrixInfo, String[][] matrix) {
+        Optional<Pair<Integer, Integer>> rectangle = matrixInfoService.detectGroupedHeaderCorner(matrixInfo);
+        if (rectangle.isEmpty()) {
+            log.debug("No grouped header detected");
             return Optional.empty();
         }
+        int width = rectangle.get().getFirst();
+        int height = rectangle.get().getSecond();
+
+        log.debug("Grouped header detected with width {} and height {}", width, height);
 
         GroupedHeaderReportDto headerReport = new GroupedHeaderReportDto();
-        List<RowInfo> incompleteHeaderRows = rowInfoService.getRowsToFill(headerRows);
-        List<ColumnInfo> incompleteHeaderColumns = rowInfoService.getColumnsToFill(headerColumns);
+        List<Integer> rowsToFill = IntStream.range(0, height - 1)
+                .boxed()
+                .toList();
+        headerReport.setRowsToFill(rowsToFill);
+        List<Integer> columnsToFill = IntStream.range(0, width - 1)
+                .boxed()
+                .toList();
+        headerReport.setColumnsToFill(columnsToFill);
 
-        if (!incompleteHeaderRows.isEmpty()) {
-            List<Integer> rowToFillIndices = incompleteHeaderRows.stream().map(RowInfo::rowId).toList();
-            headerReport.setRowsToFill(rowToFillIndices);
-            log.debug("Unvollständige Headerzeilen erkannt: {}", incompleteHeaderRows);
-        }
-        if (!incompleteHeaderColumns.isEmpty()) {
-            List<Integer> columnToFillIndices = incompleteHeaderColumns.stream().map(ColumnInfo::columnIndex).toList();
-            headerReport.setColumnsToFill(columnToFillIndices);
-            log.debug("Unvollständige Headerspalten erkannt: {}", incompleteHeaderColumns);
-        }
+        headerReport.setStartRow(height + 1);
+        headerReport.setStartColumn(width);
 
-        if (!headerRows.isEmpty()) {
-            fillRowSection(matrixInfo, headerReport, headerRows);
-        }
-        if (!headerColumns.isEmpty()) {
-            fillColumnSection(matrixInfo, headerReport, headerColumns);
-        }
+        List<Integer> rowIndices = IntStream.range(0, height)
+                .boxed()
+                .toList();
+        headerReport.setRowIndex(rowIndices);
+        List<Integer> columnIndices = IntStream.range(0, width)
+                .boxed()
+                .toList();
+        headerReport.setColumnIndex(columnIndices);
 
-        List<String> headerNames = rowInfoService.getHeaderNames(headerRows, headerColumns);
-        System.out.println(headerNames);
+        List<String> columnHeaderNames = Arrays.asList(matrix[height]).subList(0, width);
+        List<String> headerNames = new ArrayList<>(columnHeaderNames);
+        for (int i = 0; i < height; i++) {
+            String rowHeaderName = matrix[i][0];
+            headerNames.add(rowHeaderName);
+        }
+        headerReport.setHeaderNames(headerNames);
+
+        //List<String> headerNames = rowInfoService.getHeaderNames(headerRows, headerColumns);
+        //System.out.println(headerNames);
 
         return Optional.of(headerReport);
     }
 
-    private void fillRowSection(MatrixInfo matrixInfo, GroupedHeaderReportDto report, List<RowInfo> headerRows) {
-        List<Integer> rowIndices = rowInfoService.getGroupHeaderIndex(headerRows);
-        //List<Integer> rowIndices = headerRows.stream().map(RowInfo::rowId).toList();
-        int lastHeaderRowIndex = headerRows.getLast().rowId();
-        int dataStartRowIndex = matrixInfoService.getFirstDataRowIndex(matrixInfo, lastHeaderRowIndex + 1);
-
-        report.setRowIndex(rowIndices);
-        report.setStartRow(dataStartRowIndex);
-    }
-
-    private void fillColumnSection(MatrixInfo matrixInfo, GroupedHeaderReportDto report, List<ColumnInfo> headerColumns) {
-        List<Integer> columnIndices = headerColumns.stream().map(ColumnInfo::columnIndex).toList();
-        int lastHeaderColumnIndex = columnIndices.getLast();
-        int dataStartColumnIndex = matrixInfoService.getFirstDataColumnIndex(matrixInfo, lastHeaderColumnIndex + 1);
-
-        report.setColumnIndex(columnIndices);
-        report.setStartColumn(dataStartColumnIndex);
-    }
 }

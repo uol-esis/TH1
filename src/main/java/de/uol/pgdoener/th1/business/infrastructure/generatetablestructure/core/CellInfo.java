@@ -5,8 +5,7 @@ package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core;
  */
 public record CellInfo(
         int rowIndex,
-        int columnId,
-        String entry,
+        int columnIndex,
         ValueType valueType
 ) {
 }
