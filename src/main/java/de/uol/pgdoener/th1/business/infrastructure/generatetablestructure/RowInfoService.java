@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -79,6 +80,20 @@ public class RowInfoService {
             }
         }
         return headerRowIndex;
+    }
+
+    public List<String> getHeaderNames(List<RowInfo> headerRows, List<ColumnInfo> headerColumns) {
+        List<String> headerNames = new ArrayList<>();
+
+        for (ColumnInfo columnInfo : headerColumns) {
+            headerNames.add(columnInfo.cellInfos().getFirst().entry());
+        }
+
+        for (RowInfo rowInfo : headerRows) {
+            headerNames.add(rowInfo.cellInfos().getFirst().entry());
+        }
+
+        return headerNames;
     }
 
     /**

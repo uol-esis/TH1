@@ -1,9 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -68,6 +65,79 @@ public class MatrixInfoFactory {
         }
 
         return new MatrixInfo(rowInfos, columnInfos);
+    }
+
+    /**
+     * Extracts metadata from the top rows of the matrix until the data row begins.
+     *
+     * @param matrix the raw matrix read from the file
+     * @return MatrixInfo object with structure metadata
+     */
+    public MatrixInfo createSlow(String[][] matrix) {
+        List<RowInfo> rowInfos = new ArrayList<>(matrix.length);
+
+        for (int i = 0; i < matrix.length; i++) {
+            RowInfo rowInfo = createRow(i, matrix[i]);
+            rowInfos.add(rowInfo);
+        }
+
+        List<ColumnInfo> columnInfos = createColumnInfos(rowInfos);
+
+        return new MatrixInfo(rowInfos, columnInfos);
+    }
+
+    private List<ColumnInfo> createColumnInfos(List<RowInfo> rowInfos) {
+        List<ColumnInfo> columnInfos = new ArrayList<>();
+        for (int columnIndex = 0; columnIndex < rowInfos.getFirst().cellInfos().size(); columnIndex++) {
+            List<CellInfo> cellInfos = new ArrayList<>();
+
+            //noinspection ForLoopReplaceableByForEach
+            for (int rowIndex = 0; rowIndex < rowInfos.size(); rowIndex++) {
+                CellInfo cellInfo = rowInfos.get(rowIndex).cellInfos().get(columnIndex);
+                cellInfos.add(cellInfo);
+            }
+
+            ColumnInfo columnInfo = new ColumnInfo(columnIndex, cellInfos);
+            columnInfos.add(columnInfo);
+        }
+        return columnInfos;
+    }
+
+    private RowInfo createRow(int rowIndex, String[] row) {
+        List<CellInfo> cellInfos = new ArrayList<>(row.length);
+
+        for (int i = 0; i < row.length; i++) {
+            CellInfo cellInfo = createCell(rowIndex, i, row[i]);
+            cellInfos.add(cellInfo);
+        }
+
+        return new RowInfo(rowIndex, cellInfos);
+    }
+
+    private CellInfo createCell(int rowIndex, int colIndex, String entry) {
+        ValueType valueType = detectType(entry);
+        return new CellInfo(rowIndex, colIndex, entry, valueType);
+    }
+
+    private ValueType detectType(String entry) {
+        if (entry.isBlank()) return ValueType.EMPTY;
+        if (isNumber(entry)) return ValueType.NUMBER;
+        if (isBoolean(entry)) return ValueType.BOOLEAN;
+
+        return ValueType.STRING;
+    }
+
+    private boolean isNumber(String s) {
+        try {
+            Double.parseDouble(s);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+
+    private boolean isBoolean(String s) {
+        return s.equalsIgnoreCase("true") || s.equalsIgnoreCase("false");
     }
 
 }
