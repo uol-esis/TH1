@@ -4,6 +4,10 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.C
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ValueType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,10 +15,15 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        RowInfoService.class,
+        CellInfoService.class,
+})
 class RowInfoServiceTest {
 
-    CellInfoService cellInfoService = new CellInfoService();
-    RowInfoService rowInfoService = new RowInfoService(cellInfoService);
+    @Autowired
+    RowInfoService rowInfoService;
 
     @Test
     void testIsHeaderRow() {

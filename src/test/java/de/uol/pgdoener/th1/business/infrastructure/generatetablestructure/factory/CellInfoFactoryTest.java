@@ -3,12 +3,21 @@ package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.facto
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ValueType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        CellInfoFactory.class,
+})
 class CellInfoFactoryTest {
 
-    CellInfoFactory factory = new CellInfoFactory();
+    @Autowired
+    CellInfoFactory factory;
 
     @Test
     void testCreateString() {

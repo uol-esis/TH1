@@ -105,7 +105,7 @@ public class FindGroupedHeaderService {
         }
 
         // check if there is a column header row
-        return !matrixInfoService.isValidGroupedHeaderColumnHeader(matrixInfo, width, height);
+        return matrixInfoService.isValidGroupedHeaderColumnHeader(matrixInfo, width, height);
     }
 
 }

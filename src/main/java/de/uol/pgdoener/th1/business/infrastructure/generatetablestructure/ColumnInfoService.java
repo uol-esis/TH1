@@ -111,4 +111,10 @@ public class ColumnInfoService {
                 .count();
     }
 
+    public boolean isEmpty(ColumnInfo columnInfo) {
+        List<CellInfo> cellInfos = columnInfo.cellInfos();
+        return cellInfos.stream()
+                .allMatch(cellInfoService::isEmpty);
+    }
+
 }
