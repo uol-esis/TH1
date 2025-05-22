@@ -116,6 +116,9 @@ public class AnalyzeMatrixInfoService {
             fillColumnSection(matrixInfo, headerReport, headerColumns);
         }
 
+        List<String> headerNames = rowInfoService.getHeaderNames(headerRows, headerColumns);
+        System.out.println(headerNames);
+
         return Optional.of(headerReport);
     }
 

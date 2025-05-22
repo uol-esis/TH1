@@ -112,7 +112,7 @@ public class MatrixInfoFactory {
 
     private CellInfo createCell(int rowIndex, int colIndex, String entry) {
         ValueType valueType = detectType(entry);
-        return new CellInfo(rowIndex, colIndex, valueType);
+        return new CellInfo(rowIndex, colIndex, entry, valueType);
     }
 
     private ValueType detectType(String entry) {
