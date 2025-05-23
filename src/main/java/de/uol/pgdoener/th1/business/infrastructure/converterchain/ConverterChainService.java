@@ -7,10 +7,10 @@ import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.TransformationException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.util.List;
 
 @Slf4j
@@ -30,6 +30,11 @@ public class ConverterChainService {
         }
     }
 
+    public ConverterResult performTransformation(@NonNull InputFile inputFile) throws TransformationException {
+        String[][] inputMatrix = inputFile.asStringArray();
+        return performTransformation(inputMatrix);
+    }
+
     /**
      * Performs the transformation on the input file.
      * <p>
@@ -39,29 +44,23 @@ public class ConverterChainService {
      * If an error occurs during the transformation, it throws a TransformationException.
      * To get more information about the error, check the cause of the exception.
      *
-     * @param inputFile the input file to be transformed
+     * @param rawMatrix the input files matrix to be transformed
      * @return the result of the transformation
      * @throws TransformationException if an error occurs during the transformation
      */
-    public ConverterResult performTransformation(@NonNull InputFile inputFile) throws TransformationException {
+    public ConverterResult performTransformation(@NonNull String[][] rawMatrix) throws TransformationException {
         String[][] transformedMatrix;
-        try {
-            String[][] rawMatrix = inputFile.asStringArray();
-            String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
-            if (matrix.length == 0 || matrix[0].length == 0) {
-                log.debug("No data found in the input file");
-                return new ConverterResult(tableStructure, matrix);
-            }
-            Converter first = converterChain.getFirst();
-            if (first == null) {
-                log.debug("No converter found");
-                return new ConverterResult(tableStructure, rawMatrix);
-            }
-            transformedMatrix = first.handleRequest(matrix);
-        } catch (IOException e) {
-            log.error("Error processing file: Could not read input file content", e);
-            throw new TransformationException("Error processing file: Could not read input file content", e);
+        String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
+        if (matrix.length == 0 || matrix[0].length == 0) {
+            log.debug("No data found in the input file");
+            return new ConverterResult(tableStructure, matrix);
         }
+        Converter first = converterChain.getFirst();
+        if (first == null) {
+            log.debug("No converter found");
+            return new ConverterResult(tableStructure, rawMatrix);
+        }
+        transformedMatrix = first.handleRequest(matrix);
         return new ConverterResult(tableStructure, transformedMatrix);
     }
 

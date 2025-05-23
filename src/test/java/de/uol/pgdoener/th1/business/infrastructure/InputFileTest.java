@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure;
 
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.InputFileException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -18,6 +19,19 @@ class InputFileTest {
     @SuppressWarnings("DataFlowIssue")
     void testConstructor() {
         assertThrows(NullPointerException.class, () -> new InputFile(null));
+        MockMultipartFile file = new MockMultipartFile("file", "test.pdf", "", new byte[0]);
+        assertThrows(InputFileException.class, () -> new InputFile(file));
+    }
+
+    @Test
+    void testDifferentLengths() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/differentLengths.csv"));
+        InputFile inputFile = new InputFile(file);
+
+        String[][] result = inputFile.asStringArray();
+        System.out.println(Arrays.deepToString(result));
+
+        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "", ""}}, result);
     }
 
     @ParameterizedTest
@@ -48,3 +62,4 @@ class InputFileTest {
     }
 
 }
+

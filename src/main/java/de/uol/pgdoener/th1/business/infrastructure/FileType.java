@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure;
 
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.InputFileException;
 import lombok.NonNull;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -35,7 +36,7 @@ enum FileType {
                 return fileType;
             }
         }
-        throw new IllegalArgumentException("Unsupported file type");
+        throw new InputFileException("Unsupported file type");
     }
 
 }

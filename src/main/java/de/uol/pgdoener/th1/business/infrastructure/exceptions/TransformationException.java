@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.converterchain;
+package de.uol.pgdoener.th1.business.infrastructure.exceptions;
 
 public class TransformationException extends RuntimeException {
 

@@ -1,11 +1,11 @@
 package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.TableStructuresApiDelegate;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.dto.TableStructureSummaryDto;
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.service.TableStructureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,9 +52,17 @@ public class TableStructureController implements TableStructuresApiDelegate {
     }
 
     @Override
-    public ResponseEntity<TableStructureDto> generateTableStructure(MultipartFile file) {
-        TableStructureDto newTableStructureDto = tableStructureService.generateTableStructure(file);
-        return ResponseEntity.ok(newTableStructureDto);
+    public ResponseEntity<TableStructureGenerationResponseDto> generateTableStructure(
+            MultipartFile file,
+            TableStructureGenerationSettingsDto settings
+    ) {
+        log.debug("Generating Table structure for file {} with settings {}", file.getOriginalFilename(), settings);
+        Pair<TableStructureDto, List<ReportDto>> result = tableStructureService.generateTableStructure(file, settings);
+        log.debug("Table structure generated");
+        TableStructureGenerationResponseDto responseDto = new TableStructureGenerationResponseDto();
+        responseDto.setTableStructure(result.getFirst());
+        responseDto.setReports(result.getSecond());
+        return ResponseEntity.ok(responseDto);
     }
 
 }

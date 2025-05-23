@@ -1,7 +1,9 @@
 package de.uol.pgdoener.th1;
 
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.TransformationException;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.InputFileException;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.TableStructureGenerationException;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.TransformationException;
 import de.uol.pgdoener.th1.business.service.ServiceException;
 import de.uol.pgdoener.th1.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
@@ -26,6 +28,13 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
+
+    @ExceptionHandler(InputFileException.class)
+    public ResponseEntity<Object> handleMetabaseException(InputFileException ex) {
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
+        log.debug("InputFileException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse.getBody());
+    }
 
     // Add request Id and code ?
     @ExceptionHandler(ServiceException.class)
@@ -118,6 +127,14 @@ public class GlobalExceptionHandler {
         log.debug("MethodArgumentNotValidException: {}", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
     }
+
+    @ExceptionHandler(TableStructureGenerationException.class)
+    public ResponseEntity<Object> handleTableStructureGenerationException(TableStructureGenerationException ex) {
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        log.debug("TableStructureGenerationException: {}", ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse.getBody());
+    }
+
 }
 
 

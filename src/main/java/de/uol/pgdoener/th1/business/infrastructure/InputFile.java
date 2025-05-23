@@ -2,9 +2,11 @@ package de.uol.pgdoener.th1.business.infrastructure;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.InputFileException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -17,9 +19,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.StreamSupport;
 
 /**
- * This class takes a {@link MultipartFile} and a {@link TableStructureDto} and provides the file as a 2D-String Array.
+ * This class takes a {@link MultipartFile} and provides the file as a 2D-String Array.
  */
 @Slf4j
 public class InputFile {
@@ -37,31 +40,47 @@ public class InputFile {
      * Constructor for InputFile
      *
      * @param file the file to be read
-     * @throws IllegalArgumentException if the file type is not supported
+     * @throws InputFileException if the file type is not supported
      */
-    public InputFile(@NonNull MultipartFile file) {
+    public InputFile(@NonNull MultipartFile file) throws InputFileException {
         this(file, FileType.getType(file));
     }
 
     /**
      * Returns the content of the file to a 2D-String Array.
      * Each entry is a cell in the CSV or Excel File.
+     * Entries cannot be null, but can be empty.
+     * All rows have the same length.
      *
      * @return the contents of the file
-     * @throws IOException if the file cannot be read
+     * @throws InputFileException if the file cannot be read
      */
-    public String[][] asStringArray() throws IOException {
-        return mapNulls(cutOff(switch (fileType) {
-            case CSV -> readCsvToMatrix();
-            case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
-            case EXCEL_OOXML -> readExcelOOXMLToMatrix();
-        }));
+    public String[][] asStringArray() throws InputFileException {
+        try {
+            String[][] contentWithNulls = switch (fileType) {
+                case CSV -> readCsvToMatrix();
+                case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
+                case EXCEL_OOXML -> readExcelOOXMLToMatrix();
+            };
+            String[][] content = mapNulls(contentWithNulls);
+            return ensureSameLengths(content);
+        } catch (IOException e) {
+            throw new InputFileException("Could not read file", e);
+        }
     }
 
     public String getFileName() {
         String originalFilename = Objects.requireNonNull(this.file.getOriginalFilename());
         int dotIndex = originalFilename.lastIndexOf('.');
-        return (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
+        String filenameWithoutExtension = (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
+
+        // Alle Zahlen entfernen (inkl. mögliche Datumsmuster)
+        String cleaned = filenameWithoutExtension.replaceAll("\\d+", "");
+
+        // Optional: Leerzeichen trimmen und evtl. doppelte Unterstriche oder Bindestriche bereinigen
+        cleaned = cleaned.replaceAll("[_\\-]{2,}", "_").replaceAll("^[_\\-]+|[_\\-]+$", "").trim();
+        return cleaned;
+
     }
 
     // #################
@@ -84,10 +103,20 @@ public class InputFile {
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
             String delimiter = getDelimiter();
             log.debug("Detected delimiter: {}", delimiter);
-            List<String[]> rows = reader.lines()
-                    .map(String::trim)
-                    .map(line -> line.split(delimiter, -1))
-                    .toList();
+
+            CSVFormat format = CSVFormat.DEFAULT
+                    .withDelimiter(delimiter.charAt(0))
+                    .withQuote('"')
+                    .withIgnoreEmptyLines(true)
+                    .withTrim();
+
+            List<String[]> rows = new ArrayList<>();
+
+            for (CSVRecord record : format.parse(reader)) {
+                String[] row = StreamSupport.stream(record.spliterator(), false)
+                        .toArray(String[]::new);
+                rows.add(row);
+            }
 
             if (rows.isEmpty()) {
                 return new String[0][0];
@@ -146,63 +175,8 @@ public class InputFile {
     }
 
     // ################
-    // Cut Off Methods
+    // Post Processing
     // ################
-
-    private String[][] cutOff(String[][] raw) {
-        // cut off rows before the first non-empty row
-        int firstRelevantRow = -1;
-        for (int i = 0; i < raw.length; i++) {
-            if (isFilterRow(raw[i])) {
-                firstRelevantRow = i;
-            } else {
-                break;
-            }
-        }
-        List<String[]> rows = new ArrayList<>(Arrays.asList(raw));
-        if (firstRelevantRow != -1) {
-            rows = new ArrayList<>(Arrays.asList(raw).subList(firstRelevantRow + 1, raw.length));
-            log.debug("Cut off {} rows from the beginning", firstRelevantRow + 1);
-        }
-        final int rowCountAfterCutOff = rows.size();
-
-        // cut off rows after the last non-empty row
-        Iterator<String[]> rowIterator = rows.reversed().iterator();
-        while (rowIterator.hasNext()) {
-            String[] row = rowIterator.next();
-            if (isFilterRow(row)) {
-                rowIterator.remove();
-            } else {
-                break;
-            }
-        }
-        log.debug("Cut off {} rows from the end", rowCountAfterCutOff - rows.size());
-
-        return rows.toArray(new String[rows.size()][]);
-    }
-
-    private boolean isFilterRow(String[] row) {
-        // filter out empty rows
-        if (row.length == 0)
-            return true;
-
-        int blankCells = 0;
-        int nonBlankCells = 0;
-        for (String cell : row) {
-            if (cell == null || cell.isBlank()) {
-                blankCells++;
-            } else {
-                nonBlankCells++;
-            }
-        }
-
-        // filter out rows with only blank cells
-        if (blankCells == row.length)
-            return true;
-
-        // filter out rows with only one non-blank cell
-        return nonBlankCells == 1;
-    }
 
     private String[][] mapNulls(String[][] raw) {
         for (int i = 0; i < raw.length; i++) {
@@ -213,6 +187,22 @@ public class InputFile {
             }
         }
         return raw;
+    }
+
+    private String[][] ensureSameLengths(String[][] raw) {
+        int maxLength = Arrays.stream(raw)
+                .mapToInt(row -> row.length)
+                .max()
+                .orElse(0);
+
+        String[][] result = new String[raw.length][maxLength];
+        for (int i = 0; i < raw.length; i++) {
+            System.arraycopy(raw[i], 0, result[i], 0, raw[i].length);
+            for (int j = raw[i].length; j < maxLength; j++) {
+                result[i][j] = "";
+            }
+        }
+        return result;
     }
 
 }

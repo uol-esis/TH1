@@ -1,18 +1,15 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core;
 
-import lombok.Getter;
+import java.util.List;
 
-@Getter
-public class ColumnInfo {
-    private final int columnId;
-    private final boolean hasEntry;
-
-    public ColumnInfo(int columnId, boolean hasEntry) {
-        this.columnId = columnId;
-        this.hasEntry = hasEntry;
-    }
-
-    public boolean hasEntry() {
-        return hasEntry;
-    }
+/**
+ * This summarizes a column of a table.
+ *
+ * @param columnIndex the index of the column
+ * @param cellInfos   the cells of the table
+ */
+public record ColumnInfo(
+        int columnIndex,
+        List<CellInfo> cellInfos
+) {
 }

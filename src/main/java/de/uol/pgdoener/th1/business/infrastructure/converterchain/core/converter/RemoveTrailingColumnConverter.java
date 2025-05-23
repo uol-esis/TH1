@@ -91,7 +91,7 @@ public class RemoveTrailingColumnConverter extends Converter {
                 break;
             }
         }
-        log.info("Max valid element count in the matrix: {}", maxValidRowLength);
+        log.debug("Max valid element count in the matrix: {}", maxValidRowLength);
         return maxValidRowLength;
     }
 
