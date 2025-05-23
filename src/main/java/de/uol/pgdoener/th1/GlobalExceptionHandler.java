@@ -58,9 +58,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MetabaseException.class)
     public ResponseEntity<Object> handleMetabaseException(MetabaseException ex) {
-        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.ACCEPTED, ex.getMessage());
         log.debug("MetabaseException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse.getBody());
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(errorResponse.getBody());
     }
 
     @ExceptionHandler(ArrayIndexOutOfBoundsException.class)
