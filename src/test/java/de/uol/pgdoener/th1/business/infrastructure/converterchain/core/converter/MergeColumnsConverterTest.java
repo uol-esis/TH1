@@ -229,4 +229,28 @@ class MergeColumnsConverterTest {
         assertArrayEquals(expected, result);
     }
 
+    @Test
+    void testHandleRequestWithEmptyRow() {
+        MergeColumnsStructureDto structure = new MergeColumnsStructureDto(
+                null,
+                List.of(0, 1),
+                "merged"
+        );
+        MergeColumnsConverter converter = new MergeColumnsConverter(structure);
+        String[][] matrix = new String[][]{
+                {"h1", "h2", "h3", "h4"},
+                {"", "", "", ""},
+                {" ", "o", "r", "d"}
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        String[][] expected = new String[][]{
+                {"merged", "h3", "h4"},
+                {"", "", ""},
+                {"o", "r", "d"}
+        };
+        assertArrayEquals(expected, result);
+    }
+
 }
