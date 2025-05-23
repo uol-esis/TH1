@@ -35,14 +35,16 @@ public class FindSameAsHeaderService {
     }
 
     // move to columnInfoService although it needs the matrix?
-    public List<PositionDto> findSameAsHeader(ColumnInfo columnInfo, String[][] matrix) {
+    private List<PositionDto> findSameAsHeader(ColumnInfo columnInfo, String[][] matrix) {
         String header = matrix[0][columnInfo.columnIndex()];
+        int maxRowToLookAt = Math.min(columnInfo.cellInfos().size(), 10);
 
         List<PositionDto> positionsSameAsHeader = new ArrayList<>();
         List<CellInfo> cellInfos = columnInfo.cellInfos();
-        for (int i = 1; i < cellInfos.size(); i++) {
-            if (matrix[i][columnInfo.columnIndex()].equals(header)) {
-                CellInfo cellInfo = cellInfos.get(i);
+        for (int rowIndex = 1; rowIndex < maxRowToLookAt; rowIndex++) {
+            String cellEntry = matrix[rowIndex][columnInfo.columnIndex()];
+            if (cellEntry.equals(header)) {
+                CellInfo cellInfo = cellInfos.get(rowIndex);
                 positionsSameAsHeader.add(new PositionDto(cellInfo.rowIndex(), cellInfo.columnIndex()));
             }
         }
