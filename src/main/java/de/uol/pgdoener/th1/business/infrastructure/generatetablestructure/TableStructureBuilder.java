@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
 import de.uol.pgdoener.th1.business.dto.*;
+import de.uol.pgdoener.th1.business.infrastructure.BuildResult;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 

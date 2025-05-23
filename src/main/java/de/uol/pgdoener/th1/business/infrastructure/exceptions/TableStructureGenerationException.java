@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
+package de.uol.pgdoener.th1.business.infrastructure.exceptions;
 
 /**
  * This exception might be thrown at any point while generating a Table Structure

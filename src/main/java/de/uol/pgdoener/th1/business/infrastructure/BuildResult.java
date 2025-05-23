@@ -1,8 +1,9 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
+package de.uol.pgdoener.th1.business.infrastructure;
 
 import de.uol.pgdoener.th1.business.dto.ReportDto;
 import de.uol.pgdoener.th1.business.dto.ReportTypeDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ import java.util.List;
  * @param tableStructure     the table structure built by this call
  * @param unresolvedReports  reports, which were not resolved by this call
  * @param requiresReanalysis true if processing was ended early, false otherwise
- * @param reanalysisCause the cause of the reanalysis
+ * @param reanalysisCause    the cause of the reanalysis
  */
 public record BuildResult(
         TableStructureDto tableStructure,

@@ -1,8 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ValueType;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

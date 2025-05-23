@@ -1,9 +1,9 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze;
 
 import de.uol.pgdoener.th1.business.dto.EmptyRowReportDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.RowInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

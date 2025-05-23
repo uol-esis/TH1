@@ -2,6 +2,7 @@ package de.uol.pgdoener.th1.business.infrastructure;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.InputFileException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;

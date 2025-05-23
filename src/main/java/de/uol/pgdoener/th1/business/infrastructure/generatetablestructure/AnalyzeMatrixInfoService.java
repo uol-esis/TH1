@@ -18,7 +18,6 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class AnalyzeMatrixInfoService {
-    private final ColumnInfoService columnInfoService;
 
     private final FindGroupedHeaderService findGroupedHeaderService;
     private final FindEmptyRowService findEmptyRowService;

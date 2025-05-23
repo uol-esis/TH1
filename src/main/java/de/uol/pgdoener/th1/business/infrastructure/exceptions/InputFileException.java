@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure;
+package de.uol.pgdoener.th1.business.infrastructure.exceptions;
 
 import java.io.IOException;
 

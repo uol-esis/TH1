@@ -1,8 +1,8 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze;
 
 import de.uol.pgdoener.th1.business.dto.GroupedHeaderReportDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

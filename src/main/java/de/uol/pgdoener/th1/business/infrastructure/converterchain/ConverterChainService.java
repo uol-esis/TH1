@@ -7,6 +7,7 @@ import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.TransformationException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 

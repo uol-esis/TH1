@@ -1,9 +1,5 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
+package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

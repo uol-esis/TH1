@@ -1,8 +1,8 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze;
 
 import de.uol.pgdoener.th1.business.dto.EmptyColumnReportDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.ColumnInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

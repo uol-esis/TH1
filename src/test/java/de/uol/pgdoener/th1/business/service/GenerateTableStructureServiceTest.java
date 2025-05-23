@@ -2,8 +2,12 @@ package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.*;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.*;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfoService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfoService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfoService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.CellInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.MatrixInfoFactory;
 import org.junit.jupiter.api.Test;

@@ -2,7 +2,7 @@ package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureGenerationException;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.TableStructureGenerationException;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
