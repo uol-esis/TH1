@@ -4,7 +4,7 @@ import de.uol.pgdoener.th1.business.dto.ColumnTypeMismatchReportDto;
 import de.uol.pgdoener.th1.business.dto.GroupedHeaderReportDto;
 import de.uol.pgdoener.th1.business.dto.MergeableColumnsReportDto;
 import de.uol.pgdoener.th1.business.dto.ReportDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.FindGroupedHeaderService;
+import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.*;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +26,10 @@ public class AnalyzeMatrixInfoService {
     private final CellInfoService cellInfoService;
 
     private final FindGroupedHeaderService findGroupedHeaderService;
+    private final FindEmptyRowService findEmptyRowService;
+    private final FindEmptyColumnService findEmptyColumnService;
+    private final FindEmptyHeaderService findEmptyHeaderService;
+    private final FindSameAsHeaderService findSameAsHeaderService;
 
     public List<ReportDto> analyze(MatrixInfo matrixInfo, String[][] matrix) {
         List<ReportDto> reports = new ArrayList<>();
@@ -37,6 +41,10 @@ public class AnalyzeMatrixInfoService {
         }
         findColumnTypeMismatches(matrixInfo).ifPresent(reports::add);
         findMergeableColumns(matrixInfo).ifPresent(reports::addAll);
+        findEmptyRowService.find(matrixInfo).ifPresent(reports::add);
+        findEmptyColumnService.find(matrixInfo).ifPresent(reports::add);
+        findEmptyHeaderService.find(matrixInfo).ifPresent(reports::add);
+        findSameAsHeaderService.find(matrixInfo, matrix).ifPresent(reports::add);
 
         return reports;
     }
@@ -85,62 +93,6 @@ public class AnalyzeMatrixInfoService {
 
         if (reports.isEmpty()) return Optional.empty();
         return Optional.of(reports);
-    }
-
-    private Optional<GroupedHeaderReportDto> findGroupedHeaderOld(MatrixInfo matrixInfo) {
-        List<RowInfo> headerRows = matrixInfoService.getHeaderRowInfos(matrixInfo);
-        List<ColumnInfo> headerColumns = matrixInfoService.getHeaderColumns(matrixInfo);
-
-        if (headerRows.size() == 1 && headerColumns.size() == 1) {
-            log.debug("No GroupedHeaderReportDto found");
-            return Optional.empty();
-        }
-
-        GroupedHeaderReportDto headerReport = new GroupedHeaderReportDto();
-        List<RowInfo> incompleteHeaderRows = rowInfoService.getRowsToFill(headerRows);
-        List<ColumnInfo> incompleteHeaderColumns = rowInfoService.getColumnsToFill(headerColumns);
-
-        if (!incompleteHeaderRows.isEmpty()) {
-            List<Integer> rowToFillIndices = incompleteHeaderRows.stream().map(RowInfo::rowId).toList();
-            headerReport.setRowsToFill(rowToFillIndices);
-            log.debug("Unvollständige Headerzeilen erkannt: {}", incompleteHeaderRows);
-        }
-        if (!incompleteHeaderColumns.isEmpty()) {
-            List<Integer> columnToFillIndices = incompleteHeaderColumns.stream().map(ColumnInfo::columnIndex).toList();
-            headerReport.setColumnsToFill(columnToFillIndices);
-            log.debug("Unvollständige Headerspalten erkannt: {}", incompleteHeaderColumns);
-        }
-
-        if (!headerRows.isEmpty()) {
-            fillRowSection(matrixInfo, headerReport, headerRows);
-        }
-        if (!headerColumns.isEmpty()) {
-            fillColumnSection(matrixInfo, headerReport, headerColumns);
-        }
-
-        List<String> headerNames = rowInfoService.getHeaderNames(headerRows, headerColumns);
-        System.out.println(headerNames);
-
-        return Optional.of(headerReport);
-    }
-
-    private void fillRowSection(MatrixInfo matrixInfo, GroupedHeaderReportDto report, List<RowInfo> headerRows) {
-        List<Integer> rowIndices = rowInfoService.getGroupHeaderIndex(headerRows);
-        //List<Integer> rowIndices = headerRows.stream().map(RowInfo::rowId).toList();
-        int lastHeaderRowIndex = headerRows.getLast().rowId();
-        int dataStartRowIndex = matrixInfoService.getFirstDataRowIndex(matrixInfo, lastHeaderRowIndex + 1);
-
-        report.setRowIndex(rowIndices);
-        report.setStartRow(dataStartRowIndex);
-    }
-
-    private void fillColumnSection(MatrixInfo matrixInfo, GroupedHeaderReportDto report, List<ColumnInfo> headerColumns) {
-        List<Integer> columnIndices = headerColumns.stream().map(ColumnInfo::columnIndex).toList();
-        int lastHeaderColumnIndex = columnIndices.getLast();
-        int dataStartColumnIndex = matrixInfoService.getFirstDataColumnIndex(matrixInfo, lastHeaderColumnIndex + 1);
-
-        report.setColumnIndex(columnIndices);
-        report.setStartColumn(dataStartColumnIndex);
     }
 
 }

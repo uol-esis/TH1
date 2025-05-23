@@ -2,16 +2,25 @@ package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.facto
 
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(classes = {
+        MatrixInfoFactory.class,
+        CellInfoFactory.class,
+})
 class MatrixInfoFactoryTest {
 
-    CellInfoFactory cellInfoFactory = new CellInfoFactory();
-    MatrixInfoFactory matrixInfoFactory = new MatrixInfoFactory(cellInfoFactory);
+    @Autowired
+    MatrixInfoFactory matrixInfoFactory;
 
     @Test
     void testCreate() {
@@ -89,8 +98,7 @@ class MatrixInfoFactoryTest {
     @Test
     void testCreateWithLargeMatrix() {
         for (int iteration = 0; iteration < 2; iteration++) {
-
-            String[][] input = new String[6000][5000];
+            String[][] input = new String[100_000][300];
             for (int i = 0; i < input.length; i++) {
                 for (int j = 0; j < input[0].length; j++) {
                     input[i][j] = String.valueOf(i * input.length + j * iteration);
@@ -105,6 +113,32 @@ class MatrixInfoFactoryTest {
             assertEquals(input.length, matrixInfo.rowInfos().size());
             assertEquals(input[0].length, matrixInfo.columnInfos().size());
         }
+    }
+
+    @Test
+    void testOneCell() {
+        String[][] input = new String[][]{
+                {"entry"}
+        };
+
+        MatrixInfo matrixInfo = matrixInfoFactory.createParallel(input);
+
+        assertEquals(new MatrixInfo(
+                List.of(
+                        new RowInfo(0,
+                                List.of(
+                                        new CellInfo(0, 0, ValueType.STRING)
+                                )
+                        )
+                ),
+                List.of(
+                        new ColumnInfo(0,
+                                List.of(
+                                        new CellInfo(0, 0, ValueType.STRING)
+                                )
+                        )
+                )
+        ), matrixInfo);
     }
 
 }

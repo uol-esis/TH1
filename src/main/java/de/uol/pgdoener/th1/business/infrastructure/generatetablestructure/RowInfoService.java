@@ -143,6 +143,20 @@ public class RowInfoService {
                 .filter(cellInfoService::hasEntry).count();
     }
 
+    public boolean isEmpty(RowInfo rowInfo) {
+        List<CellInfo> cellInfos = rowInfo.cellInfos();
+        return cellInfos.stream()
+                .allMatch(cellInfoService::isEmpty);
+    }
+
+    public List<Integer> getEmptyPositions(RowInfo firstRow) {
+        List<CellInfo> cellInfos = firstRow.cellInfos();
+        return cellInfos.stream()
+                .filter(cellInfoService::isEmpty)
+                .map(CellInfo::columnIndex)
+                .toList();
+    }
+
     /**
      * Returns a list of column indexes that are filled.
      */

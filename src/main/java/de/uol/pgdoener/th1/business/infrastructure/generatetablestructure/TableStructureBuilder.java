@@ -53,7 +53,12 @@ public class TableStructureBuilder {
         for (ReportDto report : reports) {
             switch (report) {
                 case GroupedHeaderReportDto r -> {
-                    buildFillEmptyRowStructure(r);
+                    if (!r.getRowsToFill().isEmpty()) {
+                        buildFillEmptyRowStructure(r);
+                    }
+                    if (!r.getColumnsToFill().isEmpty()) {
+                        // buildFillEmptyColumnStructure(r);
+                    }
                     buildGroupHeaderStructure(r);
                     buildHeaderNameStructure(r.getHeaderNames());
                     // break since no other reports should be acted upon after the removal of the grouped header
