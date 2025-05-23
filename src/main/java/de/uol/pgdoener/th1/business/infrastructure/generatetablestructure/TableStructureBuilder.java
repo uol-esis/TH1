@@ -57,7 +57,7 @@ public class TableStructureBuilder {
                         buildFillEmptyRowStructure(r);
                     }
                     if (!r.getColumnsToFill().isEmpty()) {
-                        // buildFillEmptyColumnStructure(r);
+                        buildFillEmptyColumnStructure(r);
                     }
                     buildGroupHeaderStructure(r);
                     buildHeaderNameStructure(r.getHeaderNames());
@@ -175,6 +175,18 @@ public class TableStructureBuilder {
                 .rowIndex(reportDto.getRowsToFill());
         log.debug("Finish buildFillEmptyRowStructure");
         tableStructure.addStructuresItem(fillEmptyRowStructure);
+    }
+
+    /**
+     * Builds converter structure to fill partially filled rows.
+     */
+    private void buildFillEmptyColumnStructure(GroupedHeaderReportDto reportDto) {
+        log.debug("Start buildFillEmptyColumnStructure");
+        FillEmptyColumnStructureDto fillEmptyColumnStructure = new FillEmptyColumnStructureDto();
+        fillEmptyColumnStructure.converterType(ConverterTypeDto.FILL_EMPTY_COLUMN)
+                .columnIndex(reportDto.getColumnsToFill());
+        log.debug("Finish buildFillEmptyColumnStructure");
+        tableStructure.addStructuresItem(fillEmptyColumnStructure);
     }
 
 }
