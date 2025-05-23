@@ -12,6 +12,7 @@ public abstract class ConverterFactory {
         return switch (structure) {
             case RemoveGroupedHeaderStructureDto s -> new RemoveGroupedHeaderConverter(s);
             case FillEmptyRowStructureDto s -> new FillEmptyRowConverter(s);
+            case FillEmptyColumnStructureDto s -> new FillEmptyColumnConverter(s);
             case RemoveColumnByIndexStructureDto s -> new RemoveColumnByIndexConverter(s);
             case RemoveRowByIndexStructureDto s -> new RemoveRowByIndexConverter(s);
             case AddHeaderNameStructureDto s -> new AddHeaderRowConverter(s);
