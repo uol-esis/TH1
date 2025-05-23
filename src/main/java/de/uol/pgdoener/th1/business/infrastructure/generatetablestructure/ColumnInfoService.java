@@ -6,7 +6,6 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.V
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -61,54 +60,6 @@ public class ColumnInfoService {
         return columnInfos.stream()
                 .filter(c -> !cellInfoService.isEmpty(c.cellInfos().get(rowIndex)))
                 .count() == 1;
-    }
-
-    public boolean isHeaderCol(ColumnInfo colInfo) {
-        List<CellInfo> cellInfos = colInfo.cellInfos();
-        int strings = 0;
-        for (CellInfo cellInfo : cellInfos) {
-            if (!cellInfoService.isEmpty(cellInfo) && !cellInfoService.isString(cellInfo)) {
-                return false;
-            }
-            if (cellInfoService.isString(cellInfo)) {
-                strings++;
-            }
-        }
-        return strings > 1;
-    }
-
-    public boolean hasEmptyCellsStartingFrom(ColumnInfo columnInfo, int startRow) {
-        List<CellInfo> cellInfos = columnInfo.cellInfos();
-
-        for (int i = startRow; i < cellInfos.size(); i++) {
-            CellInfo cellInfo = cellInfos.get(i);
-            if (!cellInfoService.hasEntry(cellInfo)) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    public List<ColumnInfo> getColumnsToFill(List<ColumnInfo> columnInfos, int startRow) {
-        List<ColumnInfo> columnsToFill = new ArrayList<>();
-
-        for (ColumnInfo columnInfo : columnInfos) {
-            if (hasEmptyCellsStartingFrom(columnInfo, startRow)) {
-                columnsToFill.add(columnInfo);
-            } else {
-                break;
-            }
-        }
-
-        return columnsToFill;
-    }
-
-    public int getFilledPositionsSize(ColumnInfo columnInfo) {
-        List<CellInfo> cellInfos = columnInfo.cellInfos();
-        return (int) cellInfos.stream()
-                .filter(cellInfoService::hasEntry)
-                .count();
     }
 
     public boolean isEmpty(ColumnInfo columnInfo) {

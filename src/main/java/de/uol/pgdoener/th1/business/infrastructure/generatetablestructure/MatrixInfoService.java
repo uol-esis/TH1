@@ -7,141 +7,13 @@ import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.R
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class MatrixInfoService {
 
-    private final RowInfoService rowInfoService;
-    private final ColumnInfoService columnInfoService;
     private final CellInfoService cellInfoService;
-
-    /**
-     * Returns a list of indices for header rows.
-     * A header row is defined as a row that does not contain any data, but describes the data in the rows below it.
-     *
-     * @param matrixInfo The matrix information
-     * @return A list of indices for header rows
-     */
-    public List<Integer> getHeaderRowIndices(MatrixInfo matrixInfo) {
-        return getHeaderRowInfos(matrixInfo).stream()
-                .map(RowInfo::rowIndex)
-                .toList();
-    }
-
-    /**
-     * Returns a list of header rows.
-     * A header row is defined as a row that does not contain any data, but describes the data in the rows below it.
-     *
-     * @param matrixInfo The matrix information
-     * @return A list of header rows
-     */
-    public List<RowInfo> getHeaderRowInfos(MatrixInfo matrixInfo) {
-        List<RowInfo> headerRows = new ArrayList<>();
-        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-
-        for (RowInfo rowInfo : rowInfos) {
-            if (rowInfoService.isHeaderRow(rowInfo)) {
-                headerRows.add(rowInfo);
-            } else if (!headerRows.isEmpty()) {
-                break;
-            }
-        }
-        return headerRows;
-    }
-
-    /**
-     * Returns a list of header columns.
-     * A header column is defined as a column that does not contain any data, but describes the data in the columns to
-     * the right of it.
-     *
-     * @param matrixInfo The matrix information
-     * @return A list of header columns
-     */
-    public List<ColumnInfo> getHeaderColumnInfos(MatrixInfo matrixInfo) {
-        List<ColumnInfo> headerColumns = new ArrayList<>();
-        List<ColumnInfo> colInfos = matrixInfo.columnInfos();
-
-        for (ColumnInfo colInfo : colInfos) {
-            if (columnInfoService.isHeaderCol(colInfo)) {
-                headerColumns.add(colInfo);
-            } else if (!headerColumns.isEmpty()) {
-                break;
-            }
-        }
-        return headerColumns;
-    }
-
-    /**
-     * Calculates the maximum number of columns across all rows.
-     */
-    public int getFirstDataRowIndex(MatrixInfo matrixInfo, int index) {
-        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-        int startIndex = index;
-
-        for (int i = index; i < rowInfos.size(); i++) {
-            RowInfo rowInfo = rowInfos.get(i);
-            int filledPositions = rowInfoService.getFilledPositionsSize(rowInfo);
-
-            // check if data Row ?
-            if (filledPositions > 0) {
-                return i;
-            }
-
-            startIndex = i;
-        }
-        return startIndex;
-    }
-
-    public int getFirstDataColumnIndex(MatrixInfo matrixInfo, int index) {
-        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
-        int startIndex = index;
-
-        for (int i = index; i < columnInfos.size(); i++) {
-            ColumnInfo columnInfo = columnInfos.get(i);
-            int filledPositions = columnInfoService.getFilledPositionsSize(columnInfo);
-
-            // check if data Row ?
-            if (filledPositions > 0) {
-                break;
-            }
-
-            startIndex = i;
-        }
-        return startIndex;
-    }
-
-    /**
-     * Checks whether the table header should be considered grouped.
-     */
-    public boolean hasGroupedHeader(MatrixInfo matrixInfo) {
-        List<Integer> rowHeader = getHeaderRowIndices(matrixInfo);
-        return rowHeader.size() > 1;
-    }
-
-    /**
-     * Returns a list of row IDs that are partially filled but not complete.
-     */
-    public List<Integer> getRowToFill(MatrixInfo matrixInfo) {
-        List<Integer> result = new ArrayList<>();
-        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-
-        for (RowInfo rowInfo : rowInfos) {
-            if (rowInfoService.hasEmptyCellsStartingFrom(rowInfo, 0)) {
-                result.add(rowInfo.rowIndex());
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Checks if there are any rows that are incomplete (partially filled).
-     */
-    public boolean hasEmptyRow(MatrixInfo matrixInfo) {
-        return !getRowToFill(matrixInfo).isEmpty();
-    }
 
     public int detectRectangleWidth(MatrixInfo matrixInfo) {
         int width = 1;
@@ -233,42 +105,9 @@ public class MatrixInfoService {
             if (!cellInfoService.isString(cell)) {
                 return rowIndex - 1;
             }
-
         }
 
         return rows.size();
     }
 
-//    /**
-//     * Identifies column indexes where only one row has an entry.
-//     * Note: currently simplified to always return 0.
-//     */
-//    public List<Integer> getColumnIndexes(MatrixInfo matrixInfo) {
-//        List<Integer> rowIndexes = new ArrayList<>();
-//        List<RowInfo> rowInfos = matrixInfo.rowInfos();
-//
-//        for (RowInfo rowInfo : rowInfos) {
-//            /// TODO: überarbeiten wenn mehr als eine spalte in der column aufgelöst werden muss.
-//            rowInfoService.countEntries(rowInfo);
-//            if (rowInfo.countEntries() == 1) {
-//                rowIndexes.add(0);
-//            }
-//        }
-//        return rowIndexes;
-//    }
-//
-//    /**
-//     * Builds the header names for the table including a final "Anzahl" column.
-//     * Rotates the last element to the beginning.
-//     */
-//    public List<String> getHeaderNames() {
-//        List<String> headerNames = new ArrayList<>(rowInfos.stream().map(RowInfo::getHeaderName).toList());
-//
-//        if (!headerNames.isEmpty()) {
-//            String lastElement = headerNames.removeLast();
-//            headerNames.addFirst(lastElement); // An den Anfang setzen
-//        }
-//        headerNames.add("Anzahl");
-//        return headerNames;
-//    }
 }

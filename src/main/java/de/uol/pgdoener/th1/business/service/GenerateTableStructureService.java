@@ -8,7 +8,6 @@ import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.BuildResult;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.MatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.MatrixInfoFactory;
@@ -18,14 +17,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-
-// Remove empty cells at the end in the row
-// mehrer Einträge in einer Zeile -> Converter Schreiben der eine column index braucht und dann nach abstätzrn /n die eintrage entschachtelt.
-// Wie gehen wir mit leeren Werten um ? // wichtig für die Datenbank kann mit * und anderen Symbolen nicht umgehen :(
-// Bulk import fix Postgres
-// Code schön machen
 
 /**
  * Service for generating table structure from a given input file.
@@ -35,7 +27,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenerateTableStructureService {
 
-    private final MatrixInfoService matrixInfoService;
     private final MatrixInfoFactory matrixInfoFactory;
     private final AnalyzeMatrixInfoService analyzeMatrixInfoService;
 
@@ -61,10 +52,9 @@ public class GenerateTableStructureService {
             // run converterChain if overhead converters were enabled
             String[][] convertedMatrix = runIfConvertersPresent(tableStructure, matrix);
 
-            List<ReportDto> previousReports = new ArrayList<>();
             int previousStructureCount = tableStructure.getStructures().size();
-
-            for (int i = 0; i < settings.getMaxIterations().orElse(5); i++) {
+            int maxIterations = Math.max(settings.getMaxIterations().orElse(5), 1);
+            for (int i = 0; i < maxIterations; i++) {
                 MatrixInfo matrixInfo = matrixInfoFactory.createParallel(convertedMatrix);
 
                 List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo, convertedMatrix, settings);
@@ -72,8 +62,8 @@ public class GenerateTableStructureService {
 
                 result = tableStructureBuilder.buildTableStructure(reports);
                 tableStructure = result.tableStructure();
-                System.out.println(tableStructure.toString());
-                System.out.println(reports.toString());
+                log.debug(tableStructure.toString());
+                log.debug(reports.toString());
 
                 // continue, if an added structure requires reanalysis of the table
                 if (result.requiresReanalysis()) {
@@ -84,7 +74,6 @@ public class GenerateTableStructureService {
                 // break if no structures have been added since the last iteration
                 if (previousStructureCount == tableStructure.getStructures().size()) break;
                 previousStructureCount = tableStructure.getStructures().size();
-                previousReports = result.unresolvedReports();
 
                 convertedMatrix = runConverter(matrix, tableStructure);
             }
