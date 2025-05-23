@@ -1,9 +1,9 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory;
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.factory;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ColumnInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.ColumnInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.RowInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;

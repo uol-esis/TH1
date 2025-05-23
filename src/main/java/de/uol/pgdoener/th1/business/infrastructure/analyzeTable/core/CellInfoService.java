@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core;
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core;
 
 import org.springframework.stereotype.Service;
 

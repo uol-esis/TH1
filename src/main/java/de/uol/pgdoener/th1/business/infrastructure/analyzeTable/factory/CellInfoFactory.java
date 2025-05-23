@@ -1,7 +1,7 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory;
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.factory;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.ValueType;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.ValueType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

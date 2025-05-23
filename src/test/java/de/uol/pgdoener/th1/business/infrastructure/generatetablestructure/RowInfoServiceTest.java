@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
 
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.*;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
