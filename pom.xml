@@ -10,7 +10,7 @@
     </parent>
     <groupId>de.uol.pg-doener</groupId>
     <artifactId>TH1</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
     <name>TH1</name>
     <description>TH1</description>
 
@@ -213,7 +213,7 @@
                         </goals>
                         <configuration>
                             <inputSpec>
-                                https://raw.githubusercontent.com/uol-esis/TH1-OpenAPI/1ab15553604c4a89e58d3d82c26b4cd75b11ba05/openapi.yaml
+                                https://raw.githubusercontent.com/uol-esis/TH1-OpenAPI/v1.15.0/openapi.yaml
                             </inputSpec>
                             <generatorName>spring</generatorName>
                             <apiPackage>de.uol.pgdoener.th1.api</apiPackage>
