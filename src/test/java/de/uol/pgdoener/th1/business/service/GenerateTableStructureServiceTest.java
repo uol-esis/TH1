@@ -38,6 +38,9 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         FindEmptyColumnService.class,
         FindEmptyHeaderService.class,
         FindSameAsHeaderService.class,
+        FindSumService.class,
+        FindColumnMismatchService.class,
+        FindMergableColumnsService.class,
         AnalyzeMatrixInfoService.class,
         GenerateTableStructureService.class,
 })
@@ -64,13 +67,14 @@ class GenerateTableStructureServiceTest {
         assertInstanceOf(RemoveTrailingColumnStructureDto.class, tableStructure.getStructures().get(2));
         assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(3));
         assertEquals(List.of(0), ((FillEmptyRowStructureDto) tableStructure.getStructures().get(3)).getRowIndex());
-        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(4));
-        assertEquals(List.of(0, 1), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getRowIndex());
-        assertEquals(List.of(0, 1, 2), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getColumnIndex());
-        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getStartColumn().orElseThrow());
-        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getStartRow().orElseThrow());
-        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(5));
-        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(5)).getHeaderNames());
+        assertInstanceOf(FillEmptyColumnStructureDto.class, tableStructure.getStructures().get(4));
+        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(5));
+        assertEquals(List.of(0, 1), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getRowIndex());
+        assertEquals(List.of(0, 1, 2), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getColumnIndex());
+        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartColumn().orElseThrow());
+        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
+        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
     }
 
     @Test
