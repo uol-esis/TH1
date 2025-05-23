@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -16,9 +18,9 @@ public class FeedbackController implements FeedbackApiDelegate {
     private final FeedbackService feedbackService;
 
     @Override
-    public ResponseEntity<Long> submitFeedback(FeedbackDto request) {
+    public ResponseEntity<UUID> submitFeedback(FeedbackDto request) {
         log.debug("Received Feedback {}", request);
-        long id = feedbackService.create(request);
+        UUID id = feedbackService.create(request);
         log.debug("Feedback saved with id {}", id);
         return ResponseEntity.status(201).body(id);
     }
