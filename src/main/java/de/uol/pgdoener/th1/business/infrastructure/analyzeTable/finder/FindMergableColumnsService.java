@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.analyze;
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.finder;
 
 import de.uol.pgdoener.th1.business.dto.MergeableColumnsReportDto;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.ColumnInfo;
