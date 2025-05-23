@@ -6,12 +6,10 @@ import de.uol.pgdoener.th1.business.dto.TableStructureGenerationSettingsDto;
 import de.uol.pgdoener.th1.business.infrastructure.BuildResult;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
 import de.uol.pgdoener.th1.business.infrastructure.exceptions.TableStructureGenerationException;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.factory.MatrixInfoFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -27,7 +25,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class GenerateTableStructureService {
 
-    private final MatrixInfoFactory matrixInfoFactory;
     private final AnalyzeMatrixInfoService analyzeMatrixInfoService;
 
     /**
@@ -54,9 +51,7 @@ public class GenerateTableStructureService {
             int previousStructureCount = tableStructure.getStructures().size();
             int maxIterations = Math.max(settings.getMaxIterations().orElse(5), 1);
             for (int i = 0; i < maxIterations; i++) {
-                MatrixInfo matrixInfo = matrixInfoFactory.createParallel(convertedMatrix);
-
-                List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo, convertedMatrix, settings);
+                List<ReportDto> reports = analyzeMatrixInfoService.analyze(convertedMatrix, settings);
                 log.debug("Generated {} reports", reports.size());
 
                 result = tableStructureBuilder.buildTableStructure(reports);

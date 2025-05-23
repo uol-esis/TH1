@@ -1,9 +1,9 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze;
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.finder;
 
 import de.uol.pgdoener.th1.business.dto.EmptyHeaderReportDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.RowInfoService;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.RowInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.RowInfoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

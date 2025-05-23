@@ -1,11 +1,12 @@
-package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure;
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable;
 
 import de.uol.pgdoener.th1.business.dto.GroupedHeaderReportDto;
 import de.uol.pgdoener.th1.business.dto.ReportDto;
 import de.uol.pgdoener.th1.business.dto.SumReportDto;
 import de.uol.pgdoener.th1.business.dto.TableStructureGenerationSettingsDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze.*;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.factory.MatrixInfoFactory;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.finder.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AnalyzeMatrixInfoService {
 
+    private final MatrixInfoFactory matrixInfoFactory;
     private final FindGroupedHeaderService findGroupedHeaderService;
     private final FindEmptyRowService findEmptyRowService;
     private final FindEmptyColumnService findEmptyColumnService;
@@ -28,7 +30,9 @@ public class AnalyzeMatrixInfoService {
     private final FindMergableColumnsService findMergableColumnsService;
     private final FindSumService findSumReportService;
 
-    public List<ReportDto> analyze(MatrixInfo matrixInfo, String[][] matrix, TableStructureGenerationSettingsDto settings) {
+    public List<ReportDto> analyze(String[][] matrix, TableStructureGenerationSettingsDto settings) {
+        MatrixInfo matrixInfo = matrixInfoFactory.createParallel(matrix);
+
         List<ReportDto> reports = new ArrayList<>();
 
         Optional<GroupedHeaderReportDto> optionalGroupedHeaderReport = findGroupedHeaderService.find(matrixInfo, matrix);
