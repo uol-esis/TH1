@@ -66,6 +66,16 @@ public class TableStructureBuilder {
                     reanalysisCause = ReportTypeDto.GROUPED_HEADER;
                     break reportsLoop;
                 }
+                case SumReportDto r -> {
+                    if (!r.getRowIndex().isEmpty())
+                        buildRemoveRowByIndexStructure(r.getRowIndex());
+                    if (!r.getColumnIndex().isEmpty())
+                        buildRemoveColumnByIndexStructure(r.getColumnIndex());
+                    // break since indices have shifted after those converters
+                    earlyBreak = true;
+                    reanalysisCause = ReportTypeDto.SUM;
+                    break reportsLoop;
+                }
                 case ColumnTypeMismatchReportDto r -> unresolvedReports.add(r);
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
@@ -187,6 +197,24 @@ public class TableStructureBuilder {
                 .columnIndex(reportDto.getColumnsToFill());
         log.debug("Finish buildFillEmptyColumnStructure");
         tableStructure.addStructuresItem(fillEmptyColumnStructure);
+    }
+
+    private void buildRemoveRowByIndexStructure(List<Integer> rowIndex) {
+        log.debug("Start buildRemoveRowByIndexStructureDto");
+        RemoveRowByIndexStructureDto removeRowByIndexStructure = new RemoveRowByIndexStructureDto();
+        removeRowByIndexStructure.converterType(ConverterTypeDto.REMOVE_ROW_BY_INDEX)
+                .rowIndex(rowIndex);
+        log.debug("Finish buildRemoveRowByIndexStructureDto");
+        tableStructure.addStructuresItem(removeRowByIndexStructure);
+    }
+
+    private void buildRemoveColumnByIndexStructure(List<Integer> columnIndex) {
+        log.debug("Start buildRemoveColumnByIndexStructureDto");
+        RemoveColumnByIndexStructureDto removeColumnByIndexStructure = new RemoveColumnByIndexStructureDto();
+        removeColumnByIndexStructure.converterType(ConverterTypeDto.REMOVE_COLUMN_BY_INDEX)
+                .columnIndex(columnIndex);
+        log.debug("Finish buildRemoveColumnByIndexStructureDto");
+        tableStructure.addStructuresItem(removeColumnByIndexStructure);
     }
 
 }

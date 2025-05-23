@@ -67,7 +67,7 @@ public class GenerateTableStructureService {
             for (int i = 0; i < settings.getMaxIterations().orElse(5); i++) {
                 MatrixInfo matrixInfo = matrixInfoFactory.createParallel(convertedMatrix);
 
-                List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo, convertedMatrix);
+                List<ReportDto> reports = analyzeMatrixInfoService.analyze(matrixInfo, convertedMatrix, settings);
                 log.debug("Generated {} reports", reports.size());
 
                 result = tableStructureBuilder.buildTableStructure(reports);
