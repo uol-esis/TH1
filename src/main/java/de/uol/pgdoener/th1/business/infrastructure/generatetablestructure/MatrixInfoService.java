@@ -174,6 +174,7 @@ public class MatrixInfoService {
         return height;
     }
 
+
     public boolean isRectangleValid(MatrixInfo matrixInfo, int width, int height) {
         for (int i = 0; i < height; i++) {
             if (cellInfoService.isEmpty(matrixInfo.rowInfos().get(i).cellInfos().getFirst())) {
@@ -200,20 +201,43 @@ public class MatrixInfoService {
         return true;
     }
 
-   /* private int detectRectangleWidthOld(MatrixInfo matrixInfo) {
-        List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
+    public int detectColumnHeaderEndIndex(MatrixInfo matrixInfo) {
+        List<ColumnInfo> columns = matrixInfo.columnInfos();
 
-        for (int i = 1; i < columnInfos.size(); i++) {
-            ColumnInfo columnInfo = columnInfos.get(i);
-            CellInfo firstCellOfColumn = columnInfo.cellInfos().getFirst();
-            if (!cellInfoService.hasEntry(firstCellOfColumn)) {
-                width++;
-            } else {
-                break;
+        for (int i = 1; i < columns.size(); i++) {
+            CellInfo firstCell = columns.get(i).cellInfos().getFirst();
+
+            if (cellInfoService.hasEntry(firstCell)) {
+                return i - 1;
             }
         }
-        return width;
-    }*/
+
+        return columns.size();
+    }
+
+    public boolean hasFirstEntry(MatrixInfo matrixInfo) {
+        CellInfo topLeft = matrixInfo.rowInfos().getFirst().cellInfos().getFirst();
+        return cellInfoService.hasEntry(topLeft);
+    }
+
+    public int detectRowHeaderEndIndex(MatrixInfo matrixInfo, int width) {
+        List<RowInfo> rows = matrixInfo.rowInfos();
+
+        for (int rowIndex = 0; rowIndex < rows.size(); rowIndex++) {
+            CellInfo cell = rows.get(rowIndex).cellInfos().get(width + 1);
+
+            if (!cellInfoService.hasEntry(cell)) {
+                return rowIndex;
+            }
+
+            if (!cellInfoService.isString(cell)) {
+                return rowIndex - 1;
+            }
+
+        }
+
+        return rows.size();
+    }
 
 //    /**
 //     * Identifies column indexes where only one row has an entry.
