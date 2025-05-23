@@ -1,8 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.analyze;
 
 import de.uol.pgdoener.th1.business.dto.GroupedHeaderReportDto;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfo;
-import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.CellInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfoService;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +19,6 @@ import java.util.stream.IntStream;
 public class FindGroupedHeaderService {
 
     private final MatrixInfoService matrixInfoService;
-    private final CellInfoService cellInfoService;
 
     /**
      * This method detects the rectangle of a grouped header in the top left corner of the matrix.
@@ -36,55 +33,53 @@ public class FindGroupedHeaderService {
      * @return the rectangle of the grouped header
      */
     public Optional<GroupedHeaderReportDto> find(MatrixInfo matrixInfo, String[][] matrix) {
-        CellInfo firstCell = matrixInfo.rowInfos().getFirst().cellInfos().getFirst();
-        if (!cellInfoService.hasEntry(firstCell)) {
-            // no entry in cell 0,0 => no grouped header
+        if (!matrixInfoService.hasFirstEntry(matrixInfo)) {
             return Optional.empty();
         }
 
-        // find width of rectangle
-        int width = matrixInfoService.detectRectangleWidth(matrixInfo);
-        // find height of rectangle
-        int height = matrixInfoService.detectRectangleHeight(matrixInfo, width);
+        HeaderRectangle rectangle = findHeaderRectangle(matrixInfo);
 
-        if (!validateRectangle(matrixInfo, width, height)) {
+        if (!validateRectangle(matrixInfo, rectangle)) {
             return Optional.empty();
         }
 
-        log.debug("Grouped header detected with width {} and height {}", width, height);
+        log.debug("Grouped header detected with {}", rectangle);
 
-        GroupedHeaderReportDto headerReport = buildGroupHeaderReport(width, height, matrix);
+        GroupedHeaderReportDto headerReport = buildGroupHeaderReport(rectangle, matrix);
 
         return Optional.of(headerReport);
     }
 
-    private GroupedHeaderReportDto buildGroupHeaderReport(int width, int height, String[][] matrix) {
-        GroupedHeaderReportDto headerReport = new GroupedHeaderReportDto();
+    private HeaderRectangle findHeaderRectangle(MatrixInfo matrixInfo) {
+        int width = matrixInfoService.detectRectangleWidth(matrixInfo);
+        int height = matrixInfoService.detectRectangleHeight(matrixInfo, width);
+        return new HeaderRectangle(width, height);
+    }
 
-        List<Integer> rowsToFill = rangeFromZero(height - 1);
-        headerReport.setRowsToFill(rowsToFill);
+    private GroupedHeaderReportDto buildGroupHeaderReport(HeaderRectangle rectangle, String[][] matrix) {
+        int width = rectangle.width();
+        int height = rectangle.height();
 
-        List<Integer> columnsToFill = rangeFromZero(width - 1);
-        headerReport.setColumnsToFill(columnsToFill);
+        GroupedHeaderReportDto report = new GroupedHeaderReportDto();
+        report.setRowsToFill(rangeFromZero(height - 1));
+        report.setColumnsToFill(rangeFromZero(width - 1));
+        report.setStartRow(height + 1);
+        report.setStartColumn(width);
+        report.setRowIndex(rangeFromZero(height));
+        report.setColumnIndex(rangeFromZero(width));
+        report.setHeaderNames(extractHeaderNames(matrix, width, height));
 
-        headerReport.setStartRow(height + 1);
-        headerReport.setStartColumn(width);
+        return report;
+    }
 
-        List<Integer> rowIndices = rangeFromZero(height);
-        headerReport.setRowIndex(rowIndices);
-
-        List<Integer> columnIndices = rangeFromZero(width);
-        headerReport.setColumnIndex(columnIndices);
-
+    private List<String> extractHeaderNames(String[][] matrix, int width, int height) {
         List<String> columnHeaderNames = Arrays.asList(matrix[height]).subList(0, width);
         List<String> headerNames = new ArrayList<>(columnHeaderNames);
         for (int i = 0; i < height; i++) {
             String rowHeaderName = matrix[i][0];
             headerNames.add(rowHeaderName);
         }
-        headerReport.setHeaderNames(headerNames);
-
-        return headerReport;
+        return headerNames;
     }
 
     private List<Integer> rangeFromZero(int endExclusive) {
@@ -93,19 +88,28 @@ public class FindGroupedHeaderService {
                 .toList();
     }
 
-    private boolean validateRectangle(MatrixInfo matrixInfo, int width, int height) {
-        if (height > matrixInfo.rowInfos().size() / 2) {
+    private boolean validateRectangle(MatrixInfo matrixInfo, HeaderRectangle rectangle) {
+        if (rectangle.height() > matrixInfo.rowInfos().size() / 2) {
             // unrealistic height
             return false;
         }
 
         // check if the rectangle is valid
-        if (!matrixInfoService.isRectangleValid(matrixInfo, width, height)) {
+        if (!matrixInfoService.isRectangleValid(matrixInfo, rectangle.width(), rectangle.height())) {
             return false;
         }
 
         // check if there is a column header row
-        return matrixInfoService.isValidGroupedHeaderColumnHeader(matrixInfo, width, height);
+        return matrixInfoService.isValidGroupedHeaderColumnHeader(matrixInfo, rectangle.width(), rectangle.height());
+    }
+
+    /**
+     * Internal record for clarity when handling both dimensions together.
+     */
+    private record HeaderRectangle(
+            int width,
+            int height
+    ) {
     }
 
 }

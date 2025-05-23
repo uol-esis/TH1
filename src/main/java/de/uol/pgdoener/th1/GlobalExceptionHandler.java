@@ -130,9 +130,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(TableStructureGenerationException.class)
     public ResponseEntity<Object> handleTableStructureGenerationException(TableStructureGenerationException ex) {
-        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.BAD_REQUEST, ex.getMessage());
+        ErrorResponse errorResponse = ErrorResponse.create(ex, HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
         log.debug("TableStructureGenerationException: {}", ex.getMessage());
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse.getBody());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse.getBody());
     }
 
 }

@@ -69,7 +69,12 @@ public class MatrixInfoService {
         return true;
     }
 
-    public int detectColumnHeaderEndIndex(MatrixInfo matrixInfo) {
+    public boolean hasFirstEntry(MatrixInfo matrixInfo) {
+        CellInfo topLeft = matrixInfo.rowInfos().getFirst().cellInfos().getFirst();
+        return cellInfoService.hasEntry(topLeft);
+    }
+
+  /*  public int detectColumnHeaderEndIndex(MatrixInfo matrixInfo) {
         List<ColumnInfo> columns = matrixInfo.columnInfos();
 
         for (int i = 1; i < columns.size(); i++) {
@@ -81,11 +86,6 @@ public class MatrixInfoService {
         }
 
         return columns.size();
-    }
-
-    public boolean hasFirstEntry(MatrixInfo matrixInfo) {
-        CellInfo topLeft = matrixInfo.rowInfos().getFirst().cellInfos().getFirst();
-        return cellInfoService.hasEntry(topLeft);
     }
 
     public int detectRowHeaderEndIndex(MatrixInfo matrixInfo, int width) {
@@ -104,6 +104,6 @@ public class MatrixInfoService {
         }
 
         return rows.size();
-    }
+    }*/
 
 }

@@ -2,7 +2,6 @@ package de.uol.pgdoener.th1.business.service;
 
 import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
-import de.uol.pgdoener.th1.business.infrastructure.exceptions.TableStructureGenerationException;
 import de.uol.pgdoener.th1.business.mapper.StructureMapper;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -20,7 +19,6 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,13 +98,7 @@ public class TableStructureService {
             TableStructureGenerationSettingsDto optionalSettings
     ) {
         InputFile inputFile = new InputFile(file);
-        //Mapper ??? settings
-        try {
-            return generateTableStructureService.generateTableStructure(inputFile, optionalSettings);
-        } catch (IOException e) {
-            log.warn("Could not read file");
-            throw new TableStructureGenerationException("Could not read file", e);
-        }
+        return generateTableStructureService.generateTableStructure(inputFile, optionalSettings);
     }
 
     @Transactional

@@ -7,6 +7,7 @@ import de.uol.pgdoener.th1.business.infrastructure.BuildResult;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.exceptions.TableStructureGenerationException;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.TableStructureBuilder;
 import de.uol.pgdoener.th1.business.infrastructure.generatetablestructure.core.MatrixInfo;
@@ -16,7 +17,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -34,11 +34,10 @@ public class GenerateTableStructureService {
      * Main entry point to generate a table structure from the input file.
      *
      * @return the generated table structure DTO.
-     * @throws IOException if the file cannot be read.
      */
     public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
             InputFile inputFile, TableStructureGenerationSettingsDto settings
-    ) throws IOException {
+    ) {
         try {
             log.debug("Start generating table structure for file: {}", inputFile.getFileName());
             // read file
@@ -81,8 +80,8 @@ public class GenerateTableStructureService {
             log.debug("Successfully generated table structure: {}", tableStructure.getName());
             return Pair.of(result.tableStructure(), result.unresolvedReports());
         } catch (Exception e) {
-            log.warn("Unexpected error during table structure generation", e);
-            throw new RuntimeException("Unexpected error during table structure generation", e);
+            log.error("Unexpected error during table structure generation", e);
+            throw new TableStructureGenerationException("Unexpected error during table structure generation", e);
         }
     }
 
