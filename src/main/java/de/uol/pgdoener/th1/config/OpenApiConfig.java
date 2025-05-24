@@ -39,8 +39,6 @@ public class OpenApiConfig {
         flow.authorizationUrl(authorizationUrl);
         flow.refreshUrl(tokenUrl);
         flow.tokenUrl(tokenUrl);
-        flow.scopes(new Scopes().addString("user", ""));
-
 
         OAuthFlows flows = new OAuthFlows();
         flows.authorizationCode(flow);

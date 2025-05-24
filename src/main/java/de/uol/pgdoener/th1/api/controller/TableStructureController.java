@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,6 +21,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     private final TableStructureService tableStructureService;
 
     @Override
+    @PreAuthorize("hasAuthority('write:tablestructure')")
     public ResponseEntity<Long> createTableStructure(TableStructureDto request) {
         log.debug("Creating table structure {}", request);
         long id = tableStructureService.create(request);
@@ -28,6 +30,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('read:tablestructure')")
     public ResponseEntity<TableStructureDto> getTableStructure(Long id) {
         log.debug("Getting table structure with id {}", id);
         TableStructureDto tableStructureDto = tableStructureService.getById(id);
