@@ -118,7 +118,7 @@ public class TableStructureBuilder {
                 .endColumn(mismatch.getColumnIndex() + 1)
                 .startRow(1)
                 .search(mismatch.getReplacementSearch().orElseThrow())
-                .replacement(mismatch.getReplacementSearch().orElseThrow());
+                .replacement(mismatch.getReplacementValue().orElseThrow());
         log.debug("Finish buildReplaceEntriesStructure for column index {}", mismatch.getColumnIndex());
         tableStructure.addStructuresItem(structure);
     }

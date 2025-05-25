@@ -29,9 +29,9 @@ public class FindColumnMismatchService {
         for (ColumnTypeMismatchDto mismatch : mismatches) {
             ColumnInfo columnInfo = matrixInfo.columnInfos().get(mismatch.getColumnIndex());
             Optional<String> noDataString = getNoDataStringIfNumbersColumn(columnInfo, matrix);
-            if (noDataString.isPresent()) {
+            if (noDataString.isPresent() && !noDataString.get().equals(NO_DATA_STRING)) {
                 mismatch.replacementSearch(noDataString.get());
-                mismatch.replacementSearch(NO_DATA_STRING);
+                mismatch.replacementValue(NO_DATA_STRING);
             }
         }
 
