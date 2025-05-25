@@ -63,7 +63,7 @@ public class RemoveFooterConverter extends Converter {
             return false;
         }
 
-        List<String> validElements = removeFooterStructure.getBlackList();
+        List<String> validElements = removeFooterStructure.getBlockList();
         if (validElements.isEmpty()) {
             return true;
         }

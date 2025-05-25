@@ -45,7 +45,7 @@ public class AnalyzeMatrixInfoService {
             reports.add(optionalSumReport.get());
             return reports;
         }
-        findColumnMismatchService.find(matrixInfo).ifPresent(reports::add);
+        findColumnMismatchService.find(matrixInfo, matrix).ifPresent(reports::add);
         findMergableColumnsService.find(matrixInfo).ifPresent(reports::addAll);
         findEmptyRowService.find(matrixInfo).ifPresent(reports::add);
         findEmptyColumnService.find(matrixInfo).ifPresent(reports::add);

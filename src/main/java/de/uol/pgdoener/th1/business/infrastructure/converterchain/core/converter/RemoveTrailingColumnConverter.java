@@ -133,7 +133,7 @@ public class RemoveTrailingColumnConverter extends Converter {
             return false;
         }
 
-        List<String> validElements = structure.getBlackList();
+        List<String> validElements = structure.getBlockList();
         if (validElements.isEmpty()) {
             log.debug("No blacklist defined, entry '{}' is valid.", entry);
             return true;

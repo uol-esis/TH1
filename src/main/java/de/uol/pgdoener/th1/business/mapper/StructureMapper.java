@@ -57,14 +57,14 @@ public abstract class StructureMapper {
                     .name(structure.getName())
                     .description(structure.getDescription())
                     .threshold(structure.getThreshold())
-                    .blackList(List.of(structure.getBlackList()));
+                    .blockList(List.of(structure.getBlackList()));
             case RemoveFooterStructure structure -> new RemoveFooterStructureDto(
                     ConverterTypeDto.REMOVE_FOOTER
             )
                     .name(structure.getName())
                     .description(structure.getDescription())
                     .threshold(structure.getThreshold())
-                    .blackList(List.of(structure.getBlackList()));
+                    .blockList(List.of(structure.getBlackList()));
             case RemoveInvalidRowStructure structure -> new RemoveInvalidRowsStructureDto(
                     ConverterTypeDto.REMOVE_INVALID_ROWS
             )
@@ -74,7 +74,7 @@ public abstract class StructureMapper {
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
                     .threshold(structure.getThreshold())
-                    .blackList(List.of(structure.getBlackList()));
+                    .blockList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
                     structure.getReplacement()
@@ -168,7 +168,7 @@ public abstract class StructureMapper {
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
                     structure.getThreshold().orElse(null),
-                    structure.getBlackList().toArray(new String[0])
+                    structure.getBlockList().toArray(new String[0])
             );
             case RemoveFooterStructureDto structure -> new RemoveFooterStructure(
                     null, // ID wird von der Datenbank generiert
@@ -177,7 +177,7 @@ public abstract class StructureMapper {
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
                     structure.getThreshold().orElse(null),
-                    structure.getBlackList().toArray(new String[0])
+                    structure.getBlockList().toArray(new String[0])
             );
             case RemoveTrailingColumnStructureDto structure -> new RemoveTrailingColumnStructure(
                     null, // ID wird von der Datenbank generiert
@@ -186,7 +186,7 @@ public abstract class StructureMapper {
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
                     structure.getThreshold().orElse(null),
-                    structure.getBlackList().toArray(new String[0])
+                    structure.getBlockList().toArray(new String[0])
             );
             case ReplaceEntriesStructureDto structure -> new ReplaceEntriesStructure(
                     null, // ID wird von der Datenbank generiert
