@@ -129,6 +129,49 @@ class GenerateTableStructureServiceTest {
         assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(5)).getHeaderNames());
     }
 
+    @Test
+    void testLargeFile() {
+        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", generateLargeCSV().getBytes());
+        InputFile inputFile = new InputFile(file);
+        TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
+
+        for (int i = 0; i < 1; i++) {
+            Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
+
+            TableStructureDto tableStructure = result.getFirst();
+            List<ReportDto> unresolvedReports = result.getSecond();
+            System.out.println(tableStructure);
+            System.out.println(unresolvedReports);
+
+            assertInstanceOf(RemoveHeaderStructureDto.class, tableStructure.getStructures().getFirst());
+        }
+
+    }
+
+    private String generateLargeCSV() {
+        final int lines = 50000;
+        final int columns = 200;
+
+        StringBuilder builder = new StringBuilder();
+        builder.append("invalid row;;;;;;;\n");
+        builder.append(";;;;;;;;;;\n");
+        builder.append(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;\n");
+        builder.append("invalid row;;;;;;;\n");
+        // header line
+        for (int i = 0; i < columns; i++) {
+            builder.append("header").append(i).append(";");
+        }
+        builder.append("\n");
+
+        for (int i = 0; i < lines; i++) {
+            for (int j = 0; j < columns; j++) {
+                builder.append("entry").append(i * j).append(";");
+            }
+            builder.append("\n");
+        }
+        return builder.toString();
+    }
+
     InputStream getInputStream(String path) {
         return getClass().getResourceAsStream(path);
     }
