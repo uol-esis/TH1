@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.text.Normalizer;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Component
 public class SqlHeaderBuilder {
@@ -14,19 +15,13 @@ public class SqlHeaderBuilder {
      */
     public Map<String, String> build(String[][] matrix) {
         String[] headers = matrix[0];
-        String[] firstDataRow = matrix[1];
-
-        if (headers.length != firstDataRow.length) {
-            throw new IllegalArgumentException("Header and data row length mismatch.");
-        }
 
         Map<String, String> columnHeaders = new LinkedHashMap<>();
         columnHeaders.put("id", "SERIAL PRIMARY KEY");
-        //columnHeaders.put("id", "UUID PRIMARY KEY DEFAULT uuid_generate_v4()");
 
         for (int i = 0; i < headers.length; i++) {
             String header = prepareForSQLColumnName(headers[i]);
-            String value = firstDataRow[i].trim();
+            String value = getValue(i, matrix);
             String type = guessType(value);
             columnHeaders.put(header, type);
         }
@@ -34,8 +29,17 @@ public class SqlHeaderBuilder {
         return columnHeaders;
     }
 
-    //TODO: Error Handeling for column names. Better handeling von database errors
-    // Fall abfangen wenn datentyp leerer string
+    // private methods //
+
+    private String getValue(int i, String[][] matrix) {
+        for (String[] row : matrix) {
+            String value = row[i];
+            if (value.equals("*")) continue;
+            return value;
+        }
+        throw new NoSuchElementException("No valid (non-*) value found in column index " + i);
+    }
+
     private String prepareForSQLColumnName(String input) {
         if (input == null || input.isEmpty()) {
             return "_";
