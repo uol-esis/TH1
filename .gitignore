@@ -6,6 +6,7 @@ target/
 ### .env Datei ignorieren ###
 *.env
 application-*.properties
+shared-snapshots/
 
 ### STS ###
 .apt_generated

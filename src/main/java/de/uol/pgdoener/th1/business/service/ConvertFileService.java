@@ -5,9 +5,9 @@ import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
+import de.uol.pgdoener.th1.business.service.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.data.entity.Structure;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
-import de.uol.pgdoener.th1.data.repository.DynamicTableRepository;
 import de.uol.pgdoener.th1.data.repository.StructureRepository;
 import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
 import de.uol.pgdoener.th1.metabase.MBService;
@@ -27,9 +27,11 @@ public class ConvertFileService {
     private final MBService mbService;
     private final TableStructureRepository tableStructureRepository;
     private final StructureRepository structureRepository;
-    private final DynamicTableRepository dynamicTableRepository;
+    private final CreateDatabaseService createDatabaseService;
 
-    public void convertAndSaveInDB(Long tableStructureId, MultipartFile file) {
+    public void convertAndSaveInDB(Long tableStructureId, Optional<String> optionalMode, MultipartFile file) {
+
+        String mode = optionalMode.orElseThrow();
 
         Optional<TableStructure> tableStructure = tableStructureRepository.findById(tableStructureId);
         if (tableStructure.isEmpty()) {
@@ -38,41 +40,15 @@ public class ConvertFileService {
         }
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
-
         TableStructureDto tableStructureDto = TableStructureMapper.toDto(tableStructure.get(), structureList);
-
         ConverterChainService converterService = new ConverterChainService(tableStructureDto);
 
-        try {
-            InputFile inputFile = new InputFile(file);
-            String[][] transformedMatrix = converterService.performTransformation(inputFile).data();
+        InputFile inputFile = new InputFile(file);
+        String[][] transformedMatrix = converterService.performTransformation(inputFile).data();
 
-            String tableName = tableStructure.get().getName()
-                    .toLowerCase()
-                    .trim()
-                    .replace(" ", "_")
-                    .replace(",", "_")
-                    .replace("-", "_")
-                    .replace(".", "_")
-                    .replace(":", "_")
-                    .replace(";", "_")
-                    .replace("(", "_")
-                    .replace(")", "_")
-                    + "_" + tableStructureId;
-            if (tableName.matches("\\d.*")) {
-                tableName = "d" + tableName;
-            }
+        String originalName = file.getOriginalFilename();
+        createDatabaseService.create(mode, originalName, transformedMatrix);
 
-            log.debug("Name for table: {}", tableName);
-
-            // Tabelle erstellen
-            dynamicTableRepository.createTableIfNotExists(tableName, transformedMatrix);
-            // Daten einfügen
-            dynamicTableRepository.insertData(tableName, transformedMatrix);
-        } catch (Exception e) {
-            log.error("Error processing file", e);
-            throw new RuntimeException("Error processing file", e);
-        }
         mbService.updateAllDatabases();
     }
 
@@ -86,37 +62,4 @@ public class ConvertFileService {
         }
     }
 
-    /*public void convertAndSaveToMinio(ConvertFileDto convertFileDto) {
-
-        Optional<TableStructure> tableStructure = tableStructureRepository.findById(convertFileDto.tableStructureId());
-        if (tableStructure.isEmpty()) {
-            throw new RuntimeException("Could not find table structure with id " + convertFileDto.tableStructureId());
-        }
-
-        long tableStructureId = tableStructure.get().getId();
-        List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
-
-        TableStructureDto tableStructureDto = TableStructureMapper.toDto(tableStructure.get(), structureList);
-
-        ConverterChainService converterService = CreateConverterService.createHandler(tableStructureDto);
-        try {
-            ByteArrayOutputStream transformedFileStream = converterService.performTransformation(convertFileDto.file());
-
-            minioClient.putObject(
-                    PutObjectArgs.builder()
-                            .bucket("warehouse")
-                            .object("transformed-file.csv")
-                            .stream(
-                                    new ByteArrayInputStream(transformedFileStream.toByteArray()),
-                                    transformedFileStream.size(),
-                                    -1 // Part size, -1 für Streaming
-                            )
-                            .contentType("text/csv")
-                            .build()
-            );
-
-        } catch (Exception e) {
-            throw new RuntimeException("Could not convert file " + convertFileDto.file(), e);
-        }
-    }*/
 }
