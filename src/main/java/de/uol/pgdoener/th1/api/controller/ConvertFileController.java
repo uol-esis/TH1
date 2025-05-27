@@ -28,9 +28,9 @@ public class ConvertFileController implements ConverterApiDelegate {
     private final ConvertFileService convertFileService;
 
     @Override
-    public ResponseEntity<Void> convertTable(Long tableStructureId, MultipartFile file) {
+    public ResponseEntity<Void> convertTable(Long tableStructureId, MultipartFile file, Optional<String> mode) {
         log.debug("Converting file {}", file.getOriginalFilename());
-        convertFileService.convertAndSaveInDB(tableStructureId, file);
+        convertFileService.convertAndSaveInDB(tableStructureId, mode, file);
         log.debug("File converted and saved in DB");
         return ResponseEntity.ok().build();
     }
