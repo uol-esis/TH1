@@ -3,6 +3,7 @@ package de.uol.pgdoener.th1.business.service.datatable.helper;
 import org.springframework.stereotype.Component;
 
 import java.text.Normalizer;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -14,7 +15,7 @@ public class SqlHeaderBuilder {
      */
     public Map<String, String> build(String[][] matrix) {
         String[] headers = matrix[0];
-        String[] firstDataRow = matrix[1];
+        String[] firstDataRow = getFirstDataRow(matrix);
 
         if (headers.length != firstDataRow.length) {
             throw new IllegalArgumentException("Header and data row length mismatch.");
@@ -34,8 +35,15 @@ public class SqlHeaderBuilder {
         return columnHeaders;
     }
 
-    //TODO: Error Handeling for column names. Better handeling von database errors
-    // Fall abfangen wenn datentyp leerer string
+    // private methods //
+
+    private String[] getFirstDataRow(String[][] matrix) {
+        return Arrays.stream(matrix, 1, matrix.length)
+                .filter(row -> Arrays.stream(row).noneMatch(cell -> cell.contains("*")))
+                .findFirst()
+                .orElseThrow();
+    }
+
     private String prepareForSQLColumnName(String input) {
         if (input == null || input.isEmpty()) {
             return "_";

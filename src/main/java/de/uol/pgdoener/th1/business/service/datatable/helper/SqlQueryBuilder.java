@@ -6,13 +6,10 @@ import java.util.*;
 
 @Component
 public class SqlQueryBuilder {
-    String sql = "INSERT INTO :table VALUES (:table)";
 
     public String buildCreateTableQuery(String tableName, Map<String, String> columns) {
         StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS \"" + tableName + "\" (");
         columns.forEach((col, type) -> query.append("\"").append(col).append("\" ").append(type).append(", "));
-        //query.append("PRIMARY KEY (\"id\")");
-        //query.append(")");
         query.setLength(query.length() - 2);
         query.append(")");
         return query.toString();
