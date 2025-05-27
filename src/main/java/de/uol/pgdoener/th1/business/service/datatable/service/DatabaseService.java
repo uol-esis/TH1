@@ -73,10 +73,6 @@ public class DatabaseService {
         schemaVersionService.saveVersion(tableName, "REPLACE", deleteSql, matrix);
     }
 
-    public List<Map<String, Object>> getTableMetadata(String tableName) {
-        return dynamicTableRepository.getTableMetadata();
-    }
-
     public List<String> getTableNames() {
         return dynamicTableRepository.getAllTableNames();
     }
