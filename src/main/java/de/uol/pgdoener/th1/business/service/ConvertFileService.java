@@ -31,7 +31,7 @@ public class ConvertFileService {
 
     public void convertAndSaveInDB(Long tableStructureId, Optional<String> optionalMode, MultipartFile file) {
 
-        String mode = optionalMode.orElseThrow();
+        String mode = optionalMode.orElse("CREATE");
 
         Optional<TableStructure> tableStructure = tableStructureRepository.findById(tableStructureId);
         if (tableStructure.isEmpty()) {
