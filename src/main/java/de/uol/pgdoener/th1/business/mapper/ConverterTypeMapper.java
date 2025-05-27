@@ -17,6 +17,8 @@ public abstract class ConverterTypeMapper {
             case RemoveRowByIndexStructure ignored -> ConverterTypeDto.REMOVE_ROW_BY_INDEX;
             case RemoveHeaderStructure ignored -> ConverterTypeDto.REMOVE_HEADER;
             case RemoveFooterStructure ignored -> ConverterTypeDto.REMOVE_FOOTER;
+            case RemoveTrailingColumnStructure ignored -> ConverterTypeDto.REMOVE_COLUMN_BY_INDEX;
+            case FillEmptyColumnStructure ignored -> ConverterTypeDto.FILL_EMPTY_COLUMN;
             default -> throw new IllegalStateException("Unexpected value: " + structure);
         };
     }
