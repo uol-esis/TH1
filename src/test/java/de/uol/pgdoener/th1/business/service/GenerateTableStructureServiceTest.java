@@ -75,6 +75,10 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
         assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
+        assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(7));
+        assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(8));
+        assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(8)).getSearch().orElseThrow());
+        assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(8)).getReplacement());
     }
 
     @Test
@@ -100,6 +104,10 @@ class GenerateTableStructureServiceTest {
         assertEquals(2, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(3)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(4));
         assertEquals(List.of("Stadtviertel", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(4)).getHeaderNames());
+        assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(5));
+        assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(6));
+        assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(6)).getSearch().orElseThrow());
+        assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(6)).getReplacement());
     }
 
     @Test
@@ -127,6 +135,10 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(5));
         assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(5)).getHeaderNames());
+        assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(6));
+        assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(7));
+        assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(7)).getSearch().orElseThrow());
+        assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(7)).getReplacement());
     }
 
     InputStream getInputStream(String path) {

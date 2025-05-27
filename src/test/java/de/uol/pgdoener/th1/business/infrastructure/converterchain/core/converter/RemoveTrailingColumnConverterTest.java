@@ -15,7 +15,7 @@ public class RemoveTrailingColumnConverterTest {
         // threshold = 2 (default), blackList = empty
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
                 .threshold(null)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
         String[][] matrix = new String[][]{
                 {"test", "", "test1"},
@@ -36,7 +36,7 @@ public class RemoveTrailingColumnConverterTest {
         // threshold = 2 (default), blackList = empty
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
                 .threshold(null)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
         String[][] matrix = new String[][]{
                 {"Header1", "Header2", "Header3", "Header4", ""},
@@ -62,7 +62,7 @@ public class RemoveTrailingColumnConverterTest {
     void shouldTruncateRowsBasedOnValidEntriesWithoutBlacklist() {
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
                 .threshold(null)
-                .blackList(List.of()); // No blacklist
+                .blockList(List.of()); // No blacklist
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
@@ -85,7 +85,7 @@ public class RemoveTrailingColumnConverterTest {
     void shouldTruncateWithBlacklistFiltering() {
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
                 .threshold(null)
-                .blackList(List.of("*", "REMOVE"));
+                .blockList(List.of("*", "REMOVE"));
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
@@ -107,7 +107,7 @@ public class RemoveTrailingColumnConverterTest {
     @Test
     void shouldReturnOriginalMatrixIfNoValidElements() {
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .blackList(List.of("*"))
+                .blockList(List.of("*"))
                 .threshold(null);
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 

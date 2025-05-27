@@ -62,7 +62,7 @@ public class RemoveHeaderConverter extends Converter {
             return false;
         }
 
-        List<String> validElements = removeHeaderStructure.getBlackList();
+        List<String> validElements = removeHeaderStructure.getBlockList();
         if (validElements.isEmpty()) {
             return true;
         }
