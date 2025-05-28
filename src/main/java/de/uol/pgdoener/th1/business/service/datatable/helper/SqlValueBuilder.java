@@ -49,7 +49,7 @@ public class SqlValueBuilder {
     }
 
     private static Object formatValue(String value, String columnType) {
-        if ("-".equals(value)) {
+        if ("*".equals(value)) {
             return null;
         }
 

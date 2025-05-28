@@ -32,8 +32,8 @@ public class SqlHeaderBuilder {
     // private methods //
 
     private String getValue(int i, String[][] matrix) {
-        for (String[] row : matrix) {
-            String value = row[i];
+        for (int rowIndex = 1; rowIndex < matrix.length; rowIndex++) {
+            String value = matrix[rowIndex][i];
             if (value.equals("*")) continue;
             return value;
         }
