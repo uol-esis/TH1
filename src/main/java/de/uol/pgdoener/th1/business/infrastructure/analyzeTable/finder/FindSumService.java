@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
 @Slf4j
@@ -20,9 +21,10 @@ import java.util.regex.Pattern;
 public class FindSumService {
 
     public Optional<SumReportDto> find(MatrixInfo matrixInfo, String[][] matrix, List<String> blockList) {
+        List<Predicate<String>> patterns = preparePatterns(blockList);
 
-        List<Integer> columnsWithSum = getColumnsWithSum(matrixInfo, matrix, blockList);
-        List<Integer> rowsWithSum = getRowsSum(matrixInfo, matrix, blockList);
+        List<Integer> columnsWithSum = getColumnsWithSum(matrixInfo, matrix, patterns);
+        List<Integer> rowsWithSum = getRowsSum(matrixInfo, matrix, patterns);
 
         if (columnsWithSum.isEmpty() && rowsWithSum.isEmpty())
             return Optional.empty();
@@ -33,39 +35,40 @@ public class FindSumService {
         return Optional.of(sumReport);
     }
 
-    private List<Integer> getColumnsWithSum(MatrixInfo matrixInfo, String[][] matrix, List<String> blockList) {
+    private List<Predicate<String>> preparePatterns(List<String> blockList) {
+        return blockList.stream()
+                .map(value -> Pattern.compile("^" + Pattern.quote(value) + "\\b.*"))
+                .map(Pattern::asPredicate)
+                .toList();
+    }
+
+    private List<Integer> getColumnsWithSum(MatrixInfo matrixInfo, String[][] matrix, List<Predicate<String>> patterns) {
         List<ColumnInfo> columnInfos = matrixInfo.columnInfos();
         List<Integer> columnsWithSum = new ArrayList<>();
         for (ColumnInfo columnInfo : columnInfos) {
             CellInfo firstCell = columnInfo.cellInfos().getFirst();
             String entry = matrix[firstCell.rowIndex()][firstCell.columnIndex()];
 
-            if (isInBlockList(entry, blockList)) columnsWithSum.add(firstCell.columnIndex());
+            if (isInBlockList(entry, patterns)) columnsWithSum.add(firstCell.columnIndex());
         }
         return columnsWithSum;
     }
 
-    private List<Integer> getRowsSum(MatrixInfo matrixInfo, String[][] matrix, List<String> blockList) {
+    private List<Integer> getRowsSum(MatrixInfo matrixInfo, String[][] matrix, List<Predicate<String>> patterns) {
         return matrixInfo.rowInfos().stream()
+                .parallel()
                 .filter(rowInfo -> rowInfo.cellInfos().stream()
                         .anyMatch(cellInfo -> {
                             String entry = matrix[cellInfo.rowIndex()][cellInfo.columnIndex()];
-                            return isInBlockList(entry, blockList);
+                            return isInBlockList(entry, patterns);
                         })
                 )
                 .map(RowInfo::rowIndex)
                 .toList();
     }
 
-    private boolean isInBlockList(String entry, List<String> blockList) {
-        for (String value : blockList) {
-            if (startsWithValue(entry, value)) return true;
-        }
-        return false;
-    }
-
-    private boolean startsWithValue(String entry, String value) {
-        return entry.toLowerCase().matches("^" + Pattern.quote(value) + "\\b.*");
+    private boolean isInBlockList(String entry, List<Predicate<String>> patterns) {
+        return patterns.stream().anyMatch(pattern -> pattern.test(entry));
     }
 
 }
