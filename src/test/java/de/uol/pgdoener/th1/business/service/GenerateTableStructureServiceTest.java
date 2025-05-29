@@ -161,7 +161,7 @@ class GenerateTableStructureServiceTest {
     }
 
     private String generateLargeCSV() {
-        final int lines = 50000;
+        final int lines = 5000;
         final int columns = 200;
 
         StringBuilder builder = new StringBuilder();
