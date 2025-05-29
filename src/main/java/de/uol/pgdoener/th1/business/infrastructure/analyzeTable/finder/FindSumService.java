@@ -60,6 +60,7 @@ public class FindSumService {
                 .filter(rowInfo -> rowInfo.cellInfos().stream()
                         .anyMatch(cellInfo -> {
                             String entry = matrix[cellInfo.rowIndex()][cellInfo.columnIndex()];
+                            entry = entry.toLowerCase();
                             return isInBlockList(entry, patterns);
                         })
                 )
