@@ -37,23 +37,34 @@ public class FindGroupedHeaderService {
             return Optional.empty();
         }
 
-        HeaderRectangle rectangle = findHeaderRectangle(matrixInfo);
+        Optional<HeaderRectangle> rectangle = findHeaderRectangle(matrixInfo);
+        if (rectangle.isEmpty()) {
+            return Optional.empty();
+        }
 
-        if (!validateRectangle(matrixInfo, rectangle)) {
+        if (!validateRectangle(matrixInfo, rectangle.get())) {
             return Optional.empty();
         }
 
         log.debug("Grouped header detected with {}", rectangle);
 
-        GroupedHeaderReportDto headerReport = buildGroupHeaderReport(rectangle, matrix);
+        GroupedHeaderReportDto headerReport = buildGroupHeaderReport(rectangle.get(), matrix);
 
         return Optional.of(headerReport);
     }
 
-    private HeaderRectangle findHeaderRectangle(MatrixInfo matrixInfo) {
+    private Optional<HeaderRectangle> findHeaderRectangle(MatrixInfo matrixInfo) {
         int width = matrixInfoService.detectRectangleWidth(matrixInfo);
+        if (width >= matrixInfo.columnInfos().size()) {
+            return Optional.empty();
+        }
+
         int height = matrixInfoService.detectRectangleHeight(matrixInfo, width);
-        return new HeaderRectangle(width, height);
+        if (height >= matrixInfo.rowInfos().size()) {
+            return Optional.empty();
+        }
+
+        return Optional.of(new HeaderRectangle(width, height));
     }
 
     private GroupedHeaderReportDto buildGroupHeaderReport(HeaderRectangle rectangle, String[][] matrix) {
