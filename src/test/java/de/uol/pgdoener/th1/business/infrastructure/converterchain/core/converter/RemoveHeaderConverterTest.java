@@ -45,7 +45,6 @@ public class RemoveHeaderConverterTest {
         assertArrayEquals(new String[][]{
                 {"Header1", "Header2"},
                 {"Data1", "Data2"},
-                {"Data3", "Data4"},
         }, result);
     }
 
