@@ -11,10 +11,10 @@ public class RemoveInvalidRowsConverterTest {
 
     @Test
     void testHandleRequestWithDefaultValues() {
-        // threshold = 2 (default), blackList = empty
+        // threshold = 2 (default), blockList = empty
         RemoveInvalidRowsStructureDto removeInvalidRowsStructure = new RemoveInvalidRowsStructureDto()
                 .threshold(null)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(removeInvalidRowsStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, ""},
@@ -37,10 +37,36 @@ public class RemoveInvalidRowsConverterTest {
     }
 
     @Test
+    void testHandleRequestWithDefaultValuesAndSmallTable() {
+        // threshold = 2 (default), blockList = empty
+        RemoveInvalidRowsStructureDto removeInvalidRowsStructure = new RemoveInvalidRowsStructureDto()
+                .threshold(null)
+                .blockList(List.of());
+        RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(removeInvalidRowsStructure);
+        String[][] matrix = new String[][]{
+                {"Invalid", null},
+                {"Invalid", ""},
+                {"Header1", "Header2"},
+                {"Invalid", null},
+                {"Invalid", ""},
+                {"Data1", "Data2"},
+                {"Data3", "Data4"},
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                {"Header1", "Header2"},
+                {"Data1", "Data2"},
+                {"Data3", "Data4"},
+        }, result);
+    }
+
+    @Test
     void testHandleRequestsLowerThreshold() {
         RemoveInvalidRowsStructureDto removeInvalidRowsStructure = new RemoveInvalidRowsStructureDto()
                 .threshold(1)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(removeInvalidRowsStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, ""},       // not valid
@@ -57,7 +83,7 @@ public class RemoveInvalidRowsConverterTest {
     void testHandleRequestsHigherThreshold() {
         RemoveInvalidRowsStructureDto removeInvalidRowsStructure = new RemoveInvalidRowsStructureDto()
                 .threshold(3)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(removeInvalidRowsStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, "", ""},       // not valid
@@ -73,10 +99,10 @@ public class RemoveInvalidRowsConverterTest {
 
 
     @Test
-    void testHandleRequestNoHeaderRowFoundWithNotValidElementsReturnsOriginal() {
+    void testHandleRequestNoInvalidRowFoundWithNotValidElementsReturnsOriginal() {
         RemoveInvalidRowsStructureDto structure = new RemoveInvalidRowsStructureDto()
                 .threshold(null)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(structure);
         String[][] matrix = new String[][]{
                 {null, "", ""},
@@ -90,10 +116,10 @@ public class RemoveInvalidRowsConverterTest {
     }
 
     @Test
-    void testHandleRequestNoHeaderRowFoundWithValidElementsReturnsOriginal() {
+    void testHandleRequestNoInvalidRowFoundWithValidElementsReturnsOriginal() {
         RemoveInvalidRowsStructureDto structure = new RemoveInvalidRowsStructureDto()
                 .threshold(null)
-                .blackList(List.of());
+                .blockList(List.of());
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(structure);
         String[][] matrix = new String[][]{
                 {"skip", "this"},
@@ -108,10 +134,10 @@ public class RemoveInvalidRowsConverterTest {
     }
 
     @Test
-    void testValidElementsOverridesDefaultValidation() {
+    void testValidElementsOverridesblockList() {
         RemoveInvalidRowsStructureDto structure = new RemoveInvalidRowsStructureDto()
                 .threshold(null)
-                .blackList(List.of("a", "b", "c"));
+                .blockList(List.of("a", "b", "c"));
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(structure);
 
         String[][] matrix = {
@@ -133,14 +159,39 @@ public class RemoveInvalidRowsConverterTest {
     }
 
     @Test
-    void testHeaderNotFoundDueToValidElementsMismatch() {
+    void testValidElementsOverridesblockListWithSmallTable() {
         RemoveInvalidRowsStructureDto structure = new RemoveInvalidRowsStructureDto()
                 .threshold(null)
-                .blackList(List.of("x", "y"));
+                .blockList(List.of("a", "b", "c"));
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(structure);
 
         String[][] matrix = {
-                {"a", "b", "c"},         // valid by default rules, but not in blackList
+                {"a", "b"},
+                {"a", "x"},
+                {"x", "y"},
+                {"a", "*"},
+                {"a", "b"},
+                {"d", "e"}
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                        {"x", "y"},
+                        {"d", "e"}},
+                result
+        );
+    }
+
+    @Test
+    void tesNoInvalidRowFoundAndOverridesblockListReturnsOriginal() {
+        RemoveInvalidRowsStructureDto structure = new RemoveInvalidRowsStructureDto()
+                .threshold(null)
+                .blockList(List.of("x", "y"));
+        RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(structure);
+
+        String[][] matrix = {
+                {"a", "b", "c"},         // valid by default rules, but not in blockList
                 {"d", "e", "f"}          // same
         };
 

@@ -28,6 +28,27 @@ public class RemoveHeaderConverterTest {
     }
 
     @Test
+    void testHandleRequestWithDefaultValuesAndSmallTable() {
+        RemoveHeaderStructureDto removeHeaderStructureDto = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blockList(List.of());
+        RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructureDto);
+        String[][] matrix = new String[][]{
+                {"Invalid", null},
+                {"Invalid", ""},
+                {"Header1", "Header2"},
+                {"Data1", "Data2"},
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                {"Header1", "Header2"},
+                {"Data1", "Data2"},
+        }, result);
+    }
+
+    @Test
     void testHandleRequestsLowerThreshold() {
         RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto()
                 .threshold(1)
@@ -137,6 +158,33 @@ public class RemoveHeaderConverterTest {
                         {"a", "*", null},              // 1 valid (below threshold)
                         {"a", "b", "c"},               // 3 valid → header row
                         {"d", "e", "f"}},
+                result
+        );
+    }
+
+    @Test
+    void testValidElementsOverridesBlocklistWithSmallTable() {
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(null)
+                .blockList(List.of("a", "b", "c"));
+        RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
+
+        String[][] matrix = {
+                {"a", "b"},
+                {"a", "x"},
+                {"x", "y"}, //HEADER
+                {"a", "*"},
+                {"a", "b"},
+                {"d", "e"}
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                        {"x", "y"},
+                        {"a", "*"},
+                        {"a", "b"},
+                        {"d", "e"}},
                 result
         );
     }
