@@ -69,7 +69,7 @@ public abstract class StructureMapper {
                     ConverterTypeDto.REMOVE_INVALID_ROWS
             )
                     .threshold(structure.getThreshold())
-                    .blackList(List.of(structure.getBlackList()));
+                    .blockList(List.of(structure.getBlackList()));
             case RemoveTrailingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
@@ -220,7 +220,7 @@ public abstract class StructureMapper {
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
                     structure.getThreshold().orElse(null),
-                    structure.getBlackList().toArray(new String[0])
+                    structure.getBlockList().toArray(new String[0])
             );
             case MergeColumnsStructureDto structure -> new MergeColumnsStructure(
                     null, // ID wird von der Datenbank generiert

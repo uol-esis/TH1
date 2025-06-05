@@ -37,6 +37,31 @@ class RemoveFooterConverterTest {
     }
 
     @Test
+    void testHandleRequestWithDefaultValuesAndSmallTable() {
+        RemoveFooterStructureDto removeFooterStructureDto = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blockList(List.of());
+        RemoveFooterConverter converter = new RemoveFooterConverter(removeFooterStructureDto);
+        String[][] matrix = new String[][]{
+                {"Data1", "Data2"},
+                {"Data3", "Data4"},
+                {"Data5", "Data6"},
+                {"Data7", "Data8"},
+                {"Footer", ""},
+                {"Footer", null}
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                {"Data1", "Data2"},
+                {"Data3", "Data4"},
+                {"Data5", "Data6"},
+                {"Data7", "Data8"},
+        }, result);
+    }
+
+    @Test
     void testHandleRequestsLowerThreshold() {
         RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
                 .threshold(1)
@@ -149,6 +174,31 @@ class RemoveFooterConverterTest {
                         {"a", "x", "d"},
                         {"x", "y", "z"},                // none valid
                 }, result
+        );
+    }
+
+    @Test
+    void testValidElementsOverridesBlocklistWithSmallTable() {
+        RemoveFooterStructureDto structure = new RemoveFooterStructureDto()
+                .threshold(null)
+                .blockList(List.of("a", "b", "c"));
+        RemoveFooterConverter converter = new RemoveFooterConverter(structure);
+
+        String[][] matrix = {
+                {"a", "b"},
+                {"a", "x"},
+                {"x", "y"},
+                {"a", "*"},
+                {"a", "b"},
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{
+                        {"a", "b"},
+                        {"a", "x"},
+                        {"x", "y"}},
+                result
         );
     }
 

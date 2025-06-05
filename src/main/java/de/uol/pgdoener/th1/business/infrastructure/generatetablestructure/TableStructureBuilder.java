@@ -171,7 +171,7 @@ public class TableStructureBuilder {
         RemoveInvalidRowsStructureDto removeInvalidRowStructure = new RemoveInvalidRowsStructureDto();
         removeInvalidRowStructure.converterType(ConverterTypeDto.REMOVE_INVALID_ROWS)
                 .threshold(settings.getThreshold())
-                .blackList(settings.getBlockList());
+                .blockList(settings.getBlockList());
         log.debug("Finish buildRemoveInvalidRowsStructure");
         tableStructure.addStructuresItem(removeInvalidRowStructure);
     }
