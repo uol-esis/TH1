@@ -39,6 +39,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('read:tablestructure')")
     public ResponseEntity<List<TableStructureSummaryDto>> getTableStructures() {
         log.debug("Getting all table structures");
         List<TableStructureSummaryDto> tableStructuresDto = tableStructureService.getAll();
@@ -47,6 +48,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('write:tablestructure')")
     public ResponseEntity<Void> deleteTableStructure(Long id) {
         log.debug("Deleting table structure with id {}", id);
         tableStructureService.deleteById(id);
@@ -55,6 +57,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('read:tablestructure')")
     public ResponseEntity<TableStructureGenerationResponseDto> generateTableStructure(
             MultipartFile file,
             TableStructureGenerationSettingsDto settings

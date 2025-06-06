@@ -29,6 +29,7 @@ public class ConvertFileController implements ConverterApiDelegate {
     private final ConvertFileService convertFileService;
 
     @Override
+    @PreAuthorize("hasAuthority('write:converter')")
     public ResponseEntity<Void> convertTable(Long tableStructureId, MultipartFile file, Optional<String> mode) {
         log.debug("Converting file {}", file.getOriginalFilename());
         convertFileService.convertAndSaveInDB(tableStructureId, mode, file);
@@ -38,6 +39,7 @@ public class ConvertFileController implements ConverterApiDelegate {
 
     //TODO: File kleiner machen, muss nicht nur 10 zurück geben sondern auch weniger datenpunkte umwandeln
     @Override
+    @PreAuthorize("hasAuthority('read:converter')")
     public ResponseEntity<List<List<String>>> previewConvertTable(MultipartFile file, TableStructureDto request, Optional<Integer> limit) {
         log.debug("Preview converting file {} with tableStructure {} and limit {}", file.getOriginalFilename(), request, limit);
         ConverterResult result = convertFileService.convertTest(request, file);
@@ -48,6 +50,7 @@ public class ConvertFileController implements ConverterApiDelegate {
 
     /// TODO: immer den aktuellen Datentyp setzen.
     @Override
+    @PreAuthorize("hasAuthority('write:converter')")
     public ResponseEntity<Resource> fileConvertTable(MultipartFile file, TableStructureDto request) {
         log.debug("Converting file {} with tableStructure {}", file.getOriginalFilename(), request);
         ConverterResult result = convertFileService.convertTest(request, file);
