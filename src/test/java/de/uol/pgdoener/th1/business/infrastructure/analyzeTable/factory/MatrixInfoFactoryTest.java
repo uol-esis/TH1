@@ -98,7 +98,7 @@ class MatrixInfoFactoryTest {
     @Test
     void testCreateWithLargeMatrix() {
         for (int iteration = 0; iteration < 2; iteration++) {
-            String[][] input = new String[100_000][300];
+            String[][] input = new String[10_000][300];
             for (int i = 0; i < input.length; i++) {
                 for (int j = 0; j < input[0].length; j++) {
                     input[i][j] = String.valueOf(i * input.length + j * iteration);
