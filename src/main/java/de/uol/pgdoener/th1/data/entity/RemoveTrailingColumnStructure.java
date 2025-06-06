@@ -14,14 +14,11 @@ import org.hibernate.annotations.Type;
 @AllArgsConstructor
 public class RemoveTrailingColumnStructure extends Structure {
 
-    public RemoveTrailingColumnStructure(Long id, int position, Long tableStructureId, String name, String description,
-                                         Integer threshold, String[] blackList) {
+    public RemoveTrailingColumnStructure(
+            Long id, int position, Long tableStructureId, String name, String description, String[] blackList) {
         super(id, position, tableStructureId, name, description);
-        this.threshold = threshold;
         this.blackList = blackList;
     }
-
-    private Integer threshold;
 
     @Type(StringArrayType.class)
     @Column(columnDefinition = "text[]", nullable = true)

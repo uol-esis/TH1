@@ -5,6 +5,7 @@ import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -14,78 +15,46 @@ public class RemoveTrailingColumnConverter extends Converter {
     private final RemoveTrailingColumnStructureDto structure;
 
     /**
-     * Handles a request to process a 2D array of strings, cleaning up each row
-     * by trimming it to only contain valid elements. A valid element is defined
-     * as:
-     * - Not null,
-     * - Not empty,
-     * - Not equal to "*".
+     * Processes a 2D String array by removing trailing columns that contain invalid entries.
+     * A valid entry is one that is not null, not empty, and not in the block list (e.g. "*").
      * <p>
-     * This method first finds the maximum count of valid elements in any row
-     * of the input matrix using the {@link #findMaxValidRowLength} method.
-     * It then creates a new cleaned matrix, where each row is truncated to
-     * the maximum count of valid elements.
-     * If no valid elements are found (i.e., maxValidElementCount == 0),
-     * the original matrix is returned.
+     * It finds the maximum valid column length across all rows,
+     * then creates a trimmed matrix by cutting off all trailing invalid columns.
+     * <p>
+     * If no valid entries are found, the original matrix is returned.
      *
-     * @param inputMatrix A 2D array (String[][]) that contains the input matrix
-     *                    to be processed. The matrix's rows will be cleaned
-     *                    based on valid element counts.
-     * @return A new 2D array (String[][]) where each row is truncated to the
-     * maximum count of valid elements found in any row. If no valid
-     * elements are found, the original matrix is returned.
+     * @param inputMatrix input 2D array to process
+     * @return processed 2D array with trailing invalid columns removed, or original matrix if none found
      */
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
         int maxValidRowLength = findMaxValidRowLength(inputMatrix);
 
         if (maxValidRowLength == 0) {
-            log.debug("No valid elements");
+            log.debug("No valid trailing columns found — returning original matrix");
             return super.handleRequest(inputMatrix);
         }
 
-        log.debug("Max valid element count found: {}", maxValidRowLength);
-
-        String[][] cleanedMatrix = new String[inputMatrix.length][];
-
-        for (int i = 0; i < inputMatrix.length; i++) {
-            String[] cleanedRow = new String[maxValidRowLength];
-            System.arraycopy(inputMatrix[i], 0, cleanedRow, 0, maxValidRowLength);
-            cleanedMatrix[i] = cleanedRow;
-        }
+        String[][] cleanedMatrix = createCleanedMatrix(inputMatrix, maxValidRowLength);
         return super.handleRequest(cleanedMatrix);
     }
 
     /**
-     * Finds the maximum number of valid elements in any row of a 2D array.
-     * A valid element is defined as:
-     * - Not null,
-     * - Not empty,
-     * - Not equal to "*".
-     * <p>
-     * This method iterates through each row of the 2D array, counting the valid elements.
-     * It returns the maximum count of valid elements found in any single row.
-     * The iteration stops early if a row's valid element count equals the number of elements in that row.
+     * Determines the maximum number of valid columns found at the end of any row.
      *
-     * @param inputMatrix A 2D array (String[][]) where each row is examined for valid elements.
-     *                    Each row is checked individually for valid entries.
-     * @return The maximum number of valid elements found in any row of the input array.
+     * @param inputMatrix the input 2D array
+     * @return the maximum number of valid columns across all rows
      */
     private int findMaxValidRowLength(String[][] inputMatrix) {
         int maxValidRowLength = 0;
-        for (int i = 0; i < inputMatrix.length; i++) {
-            String[] row = inputMatrix[i];
-            int validRowLength = getValidRowLength(row);
-
-            log.debug("Row {} has {} valid elements.", i, validRowLength);
+        for (String[] row : inputMatrix) {
+            int validRowLength = findValidRowLength(row);
 
             if (validRowLength > maxValidRowLength) {
-                log.debug("Find maxRowLength at id {} with {} valid elements", i, validRowLength);
                 maxValidRowLength = validRowLength;
             }
 
             if (maxValidRowLength == row.length) {
-                log.debug("No column trailing found");
                 break;
             }
         }
@@ -94,13 +63,12 @@ public class RemoveTrailingColumnConverter extends Converter {
     }
 
     /**
-     * Counts the number of valid elements in a row.
-     * A valid element is defined as one that is neither null, empty, nor a literal "*".
+     * Determines the number of valid elements from the beginning up to the last valid index.
      *
-     * @param row The row of elements to be checked.
-     * @return The count of valid elements in the row.
+     * @param row the array representing a row of entries
+     * @return number of valid elements (excluding trailing invalid entries)
      */
-    private int getValidRowLength(String[] row) {
+    private int findValidRowLength(String[] row) {
         int validRowLength = row.length;
         for (int i = row.length - 1; i >= 0; i--) {
             if (isValidEntry(row[i])) {
@@ -113,30 +81,35 @@ public class RemoveTrailingColumnConverter extends Converter {
     }
 
     /**
-     * Determines whether an entry is valid.
-     * A valid element is defined as:
-     * - Not null,
-     * - Not empty,
-     * - Not equal to "*".
-     * <p>
-     * It can also be further checked against a blacklist, where any entry matching
-     * an element in the blacklist is considered invalid.
+     * Checks whether a given entry is valid.
+     * Valid means the entry is not null, not blank, and does not contain any blocked strings.
      *
-     * @param entry The entry to be checked.
-     * @return true if the entry is valid, false otherwise.
+     * @param entry the string entry to check
+     * @return true if valid, false otherwise
      */
     private boolean isValidEntry(String entry) {
         if (entry == null || entry.isBlank()) {
-            log.debug("Entry is invalid (null or blank).");
             return false;
         }
 
         List<String> validElements = structure.getBlockList();
         if (validElements.isEmpty()) {
-            log.debug("No blacklist defined, entry '{}' is valid.", entry);
             return true;
         }
 
-        return validElements.stream().noneMatch(entry::contains);
+        return validElements.stream().noneMatch(entry::equals);
+    }
+
+    /**
+     * Creates a new matrix by removing trailing columns beyond the given column end index.
+     *
+     * @param inputMatrix    the original 2D array
+     * @param columnEndIndex the column index up to which data should be kept (exclusive)
+     * @return new 2D array with trailing columns removed
+     */
+    private String[][] createCleanedMatrix(String[][] inputMatrix, int columnEndIndex) {
+        return Arrays.stream(inputMatrix)
+                .map(row -> Arrays.copyOfRange(row, 0, columnEndIndex))
+                .toArray(String[][]::new);
     }
 }

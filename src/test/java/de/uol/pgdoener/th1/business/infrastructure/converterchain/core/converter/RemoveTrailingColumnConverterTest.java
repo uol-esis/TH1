@@ -11,11 +11,8 @@ public class RemoveTrailingColumnConverterTest {
 
 
     @Test
-    void testHandleRequestWitDefaultValues() {
-        // threshold = 2 (default), blackList = empty
-        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .threshold(null)
-                .blockList(List.of());
+    void testNoTrailingMatrixToRemove() {
+        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto().blockList(List.of());
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
         String[][] matrix = new String[][]{
                 {"test", "", "test1"},
@@ -32,11 +29,8 @@ public class RemoveTrailingColumnConverterTest {
     }
 
     @Test
-    void testHandleRequestWithDefaultValues() {
-        // threshold = 2 (default), blackList = empty
-        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .threshold(null)
-                .blockList(List.of());
+    void testRemoveSingleTrailingEmptyColumn() {
+        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto().blockList(List.of());
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
         String[][] matrix = new String[][]{
                 {"Header1", "Header2", "Header3", "Header4", ""},
@@ -59,10 +53,29 @@ public class RemoveTrailingColumnConverterTest {
     }
 
     @Test
-    void shouldTruncateRowsBasedOnValidEntriesWithoutBlacklist() {
-        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .threshold(null)
-                .blockList(List.of()); // No blacklist
+    void testRemoveMultipleTrailingEmptyColumns() {
+        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto().blockList(List.of());
+        RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
+
+        String[][] matrix = {
+                {"Header1", "Header2", "", "", ""},
+                {"Data1", "Data2", "", "", ""},
+                {"Data3", "Data4", "", "", ""},
+        };
+
+        String[][] expected = {
+                {"Header1", "Header2"},
+                {"Data1", "Data2"},
+                {"Data3", "Data4"},
+        };
+
+        String[][] result = converter.handleRequest(matrix);
+        assertArrayEquals(expected, result);
+    }
+
+    @Test
+    void testRemoveTrailingColumnsWithMixedValuesWithoutBlacklist() {
+        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto().blockList(List.of());
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
@@ -82,14 +95,13 @@ public class RemoveTrailingColumnConverterTest {
     }
 
     @Test
-    void shouldTruncateWithBlacklistFiltering() {
+    void testRemoveTrailingColumnsConsideringBlacklist() {
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .threshold(null)
-                .blockList(List.of("*", "REMOVE"));
+                .blockList(List.of("*"));
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
-                {"A", "B", "*", "", ""},
+                {"A", "B", "*", "*", ""},
                 {"1", "2", "3", "", ""},
                 {"X", "", "*", "", ""}
         };
@@ -105,10 +117,32 @@ public class RemoveTrailingColumnConverterTest {
     }
 
     @Test
-    void shouldReturnOriginalMatrixIfNoValidElements() {
+    void testRemoveTrailingColumnsWithPartialBlacklistMatch() {
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .blockList(List.of("*"))
-                .threshold(null);
+                .blockList(List.of("*"));
+        RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
+
+        String[][] input = {
+                {"A", "B", "C", "C*D", "*"},
+                {"1", "2", "3", "*", ""},
+                {"X", "", "*", "", ""}
+        };
+
+        String[][] expected = {
+                {"A", "B", "C", "C*D"},
+                {"1", "2", "3", "*"},
+                {"X", "", "*", ""}
+        };
+
+        String[][] result = converter.handleRequest(input);
+        assertArrayEquals(expected, result);
+    }
+
+
+    @Test
+    void testReturnOriginalMatrixIfNoValidElementExist() {
+        RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
+                .blockList(List.of("*"));
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
