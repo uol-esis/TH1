@@ -1,6 +1,7 @@
 spring.datasource.username=example
 spring.datasource.password=example
 spring.datasource.url=jdbc:postgresql://localhost:5432/example
+snapshot.dir=./shared-snapshots
 security.authorizationUrl=https://auth.example.com/some/path
 security.tokenUrl=https://auth.example.com/some/path
 # spring.security.oauth2.authorizationserver.endpoint.token-uri=

@@ -16,7 +16,7 @@ public class RemoveHeaderConverter extends Converter {
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
         Integer headerRowIndex = null;
-        int threshold = removeHeaderStructure.getThreshold().orElse(2);
+        int threshold = getThreshold(inputMatrix[0].length, removeHeaderStructure);
 
         // Find the first line with at least two valid elements
         for (int i = 0; i < inputMatrix.length; i++) {
@@ -43,6 +43,21 @@ public class RemoveHeaderConverter extends Converter {
         return super.handleRequest(cleanedMatrix);
     }
 
+    // private Methods //
+
+    /**
+     * Determines the threshold for the minimum number of valid columns per row.
+     * If the table has 2 or fewer columns, a lower default threshold (1) is used.
+     * Otherwise, a default threshold of 2 is applied, unless a specific value is provided in the DTO.
+     *
+     * @param dto The DTO containing an optional threshold value.
+     * @return The threshold to be used.
+     */
+    private int getThreshold(int tableWidth, RemoveHeaderStructureDto dto) {
+        int defaultThreshold = (tableWidth <= 2) ? 1 : 2;
+        return dto.getThreshold().orElse(defaultThreshold);
+    }
+
     /**
      * Counts the number of valid elements in a row.
      * Valid = not null, not empty, not equal to "*"
@@ -62,7 +77,7 @@ public class RemoveHeaderConverter extends Converter {
             return false;
         }
 
-        List<String> validElements = removeHeaderStructure.getBlackList();
+        List<String> validElements = removeHeaderStructure.getBlockList();
         if (validElements.isEmpty()) {
             return true;
         }

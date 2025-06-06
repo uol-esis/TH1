@@ -5,7 +5,6 @@ import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Slf4j
@@ -53,7 +52,6 @@ public class RemoveTrailingColumnConverter extends Converter {
             String[] cleanedRow = new String[maxValidRowLength];
             System.arraycopy(inputMatrix[i], 0, cleanedRow, 0, maxValidRowLength);
             cleanedMatrix[i] = cleanedRow;
-            log.debug("Processed row {}: {}", i, Arrays.toString(cleanedRow));
         }
         return super.handleRequest(cleanedMatrix);
     }
@@ -133,7 +131,7 @@ public class RemoveTrailingColumnConverter extends Converter {
             return false;
         }
 
-        List<String> validElements = structure.getBlackList();
+        List<String> validElements = structure.getBlockList();
         if (validElements.isEmpty()) {
             log.debug("No blacklist defined, entry '{}' is valid.", entry);
             return true;

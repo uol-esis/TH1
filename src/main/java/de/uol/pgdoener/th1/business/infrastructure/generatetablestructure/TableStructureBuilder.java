@@ -77,7 +77,21 @@ public class TableStructureBuilder {
                     reanalysisCause = ReportTypeDto.SUM;
                     break reportsLoop;
                 }
-                case ColumnTypeMismatchReportDto r -> unresolvedReports.add(r);
+                case ColumnTypeMismatchReportDto r -> {
+                    List<ColumnTypeMismatchDto> unresolvedMismatches = new ArrayList<>();
+
+                    for (ColumnTypeMismatchDto mismatch : r.getMismatches()) {
+                        if (mismatch.getReplacementSearch().isEmpty()) {
+                            unresolvedMismatches.add(mismatch);
+                        } else {
+                            buildReplaceEntriesStructureFromColumnTypeMismatch(mismatch);
+                        }
+                    }
+
+                    if (!unresolvedMismatches.isEmpty()) {
+                        unresolvedReports.add(new ColumnTypeMismatchReportDto().mismatches(unresolvedMismatches));
+                    }
+                }
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
                 case EmptyHeaderReportDto r -> unresolvedReports.add(r);
@@ -96,6 +110,19 @@ public class TableStructureBuilder {
         );
     }
 
+    private void buildReplaceEntriesStructureFromColumnTypeMismatch(ColumnTypeMismatchDto mismatch) {
+        log.debug("Start buildReplaceEntriesStructure for column index {}", mismatch.getColumnIndex());
+        ReplaceEntriesStructureDto structure = new ReplaceEntriesStructureDto()
+                .converterType(ConverterTypeDto.REPLACE_ENTRIES)
+                .startColumn(mismatch.getColumnIndex())
+                .endColumn(mismatch.getColumnIndex() + 1)
+                .startRow(1)
+                .search(mismatch.getReplacementSearch().orElseThrow())
+                .replacement(mismatch.getReplacementValue().orElseThrow());
+        log.debug("Finish buildReplaceEntriesStructure for column index {}", mismatch.getColumnIndex());
+        tableStructure.addStructuresItem(structure);
+    }
+
     /**
      * Builds converter structure for removing header rows.
      */
@@ -104,7 +131,7 @@ public class TableStructureBuilder {
         RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto();
         removeHeaderStructure.converterType(ConverterTypeDto.REMOVE_HEADER)
                 .threshold(settings.getThreshold())
-                .setBlackList(settings.getBlockList());
+                .setBlockList(settings.getBlockList());
         log.debug("Finish buildRemoveHeaderStructure");
         tableStructure.addStructuresItem(removeHeaderStructure);
     }
@@ -117,7 +144,7 @@ public class TableStructureBuilder {
         RemoveFooterStructureDto removeFooterStructure = new RemoveFooterStructureDto();
         removeFooterStructure.converterType(ConverterTypeDto.REMOVE_FOOTER)
                 .threshold(settings.getThreshold())
-                .setBlackList(settings.getBlockList());
+                .setBlockList(settings.getBlockList());
         log.debug("Finish buildRemoveFooterStructure");
         tableStructure.addStructuresItem(removeFooterStructure);
     }
@@ -130,7 +157,7 @@ public class TableStructureBuilder {
         RemoveTrailingColumnStructureDto removeTrailingColumnStructure = new RemoveTrailingColumnStructureDto();
         removeTrailingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
                 .threshold(settings.getThreshold())
-                .blackList(settings.getBlockList());
+                .blockList(settings.getBlockList());
         log.debug("Finish buildRemoveTrailingColumnStructure");
         tableStructure.addStructuresItem(removeTrailingColumnStructure);
     }
@@ -144,7 +171,7 @@ public class TableStructureBuilder {
         RemoveInvalidRowsStructureDto removeInvalidRowStructure = new RemoveInvalidRowsStructureDto();
         removeInvalidRowStructure.converterType(ConverterTypeDto.REMOVE_INVALID_ROWS)
                 .threshold(settings.getThreshold())
-                .blackList(settings.getBlockList());
+                .blockList(settings.getBlockList());
         log.debug("Finish buildRemoveInvalidRowsStructure");
         tableStructure.addStructuresItem(removeInvalidRowStructure);
     }

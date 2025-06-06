@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.business.service;
 
+import de.uol.pgdoener.th1.business.service.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
 import de.uol.pgdoener.th1.data.repository.DynamicTableRepository;
 import de.uol.pgdoener.th1.data.repository.StructureRepository;
@@ -31,12 +32,14 @@ class ConvertFileServiceTest {
     StructureRepository structureRepository;
     @Mock
     DynamicTableRepository dynamicTableRepository;
+    @Mock
+    CreateDatabaseService createDatabaseService;
 
     ConvertFileService convertFileService;
 
     @BeforeEach
     void setUp() {
-        convertFileService = new ConvertFileService(mbService, tableStructureRepository, structureRepository, dynamicTableRepository);
+        convertFileService = new ConvertFileService(mbService, tableStructureRepository, structureRepository, createDatabaseService);
     }
 
     @Test
@@ -52,7 +55,7 @@ class ConvertFileServiceTest {
         when(structureRepository.findByTableStructureId(1L)).thenReturn(List.of());
         MockMultipartFile file = new MockMultipartFile("file", "test.csv", "text/csv", "test;test1".getBytes());
 
-        assertThrows(MetabaseException.class, () -> convertFileService.convertAndSaveInDB(1L, file));
+        assertThrows(MetabaseException.class, () -> convertFileService.convertAndSaveInDB(1L, Optional.empty(), file));
     }
 
 }

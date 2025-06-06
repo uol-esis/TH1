@@ -39,7 +39,7 @@ public class RemoveInvalidRowsConverter extends Converter {
      */
     private List<Integer> findInvalidRowIndices(String[][] inputMatrix) {
         List<Integer> invalidIndices = new ArrayList<>();
-        int threshold = removeHeaderStructure.getThreshold().orElse(2);
+        int threshold = getThreshold(inputMatrix[0].length, removeHeaderStructure);
 
         for (int i = 0; i < inputMatrix.length; i++) {
             String[] row = inputMatrix[i];
@@ -54,20 +54,16 @@ public class RemoveInvalidRowsConverter extends Converter {
     }
 
     /**
-     * Builds a new matrix without invalid rows.
+     * Determines the threshold for the minimum number of valid columns per row.
+     * If the table has 2 or fewer columns, a lower default threshold (1) is used.
+     * Otherwise, a default threshold of 2 is applied, unless a specific value is provided in the DTO.
+     *
+     * @param dto The DTO containing an optional threshold value.
+     * @return The threshold to be used.
      */
-    private String[][] buildCleanMatrix(String[][] inputMatrix, List<Integer> invalidIndices) {
-        int validRowCount = inputMatrix.length - invalidIndices.size();
-        String[][] cleanedMatrix = new String[validRowCount][];
-        int cleanedMatrixIndex = 0;
-
-        for (int i = 0; i < inputMatrix.length; i++) {
-            if (!invalidIndices.contains(i)) {
-                cleanedMatrix[cleanedMatrixIndex++] = inputMatrix[i];
-            }
-        }
-
-        return cleanedMatrix;
+    private int getThreshold(int tableWidth, RemoveInvalidRowsStructureDto dto) {
+        int defaultThreshold = (tableWidth <= 2) ? 1 : 2;
+        return dto.getThreshold().orElse(defaultThreshold);
     }
 
     /**
@@ -89,11 +85,28 @@ public class RemoveInvalidRowsConverter extends Converter {
             return false;
         }
 
-        List<String> validElements = removeHeaderStructure.getBlackList();
+        List<String> validElements = removeHeaderStructure.getBlockList();
         if (validElements.isEmpty()) {
             return true;
         }
 
         return validElements.stream().noneMatch(entry::contains);
+    }
+
+    /**
+     * Builds a new matrix without invalid rows.
+     */
+    private String[][] buildCleanMatrix(String[][] inputMatrix, List<Integer> invalidIndices) {
+        int validRowCount = inputMatrix.length - invalidIndices.size();
+        String[][] cleanedMatrix = new String[validRowCount][];
+        int cleanedMatrixIndex = 0;
+
+        for (int i = 0; i < inputMatrix.length; i++) {
+            if (!invalidIndices.contains(i)) {
+                cleanedMatrix[cleanedMatrixIndex++] = inputMatrix[i];
+            }
+        }
+
+        return cleanedMatrix;
     }
 }
