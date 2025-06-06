@@ -156,7 +156,6 @@ public class TableStructureBuilder {
         log.debug("Start buildRemoveTrailingColumnStructure");
         RemoveTrailingColumnStructureDto removeTrailingColumnStructure = new RemoveTrailingColumnStructureDto();
         removeTrailingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
-                .threshold(settings.getThreshold())
                 .blockList(settings.getBlockList());
         log.debug("Finish buildRemoveTrailingColumnStructure");
         tableStructure.addStructuresItem(removeTrailingColumnStructure);

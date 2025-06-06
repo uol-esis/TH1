@@ -73,7 +73,6 @@ public abstract class StructureMapper {
             case RemoveTrailingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
-                    .threshold(structure.getThreshold())
                     .blockList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
@@ -185,7 +184,6 @@ public abstract class StructureMapper {
                     tableStructureId,
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
-                    structure.getThreshold().orElse(null),
                     structure.getBlockList().toArray(new String[0])
             );
             case RemoveLeadingColumnStructureDto structure -> new RemoveLeadingColumnStructure(
