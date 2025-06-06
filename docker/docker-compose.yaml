@@ -1,3 +1,6 @@
+# Example compose file for local development and testing
+# DO NOT USE IN PRODUCTION!
+# DO NOT USE DEFAULT CREDENTIALS IN PRODUCTION!
 name: th1
 services:
 
@@ -19,7 +22,7 @@ services:
   db:
     image: postgres:17-alpine
     ports:
-     - "5432:5432"
+      - "5432:5432"
     env_file:
       - db.env
     networks:

@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.security;
+package de.uol.pgdoener.th1.config;
 
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +16,11 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -76,7 +74,7 @@ public class SecurityConfig {
             // read client roles
             Map<String, Map<String, Collection<String>>> resource_access = jwt.getClaim("resource_access");
             // TODO get client_id from env variable
-            Collection<String> roles =  resource_access.get("th1").get("roles");
+            Collection<String> roles = resource_access.get("th1").get("roles");
 
             // read also realm roles
             Map<String, Collection<String>> realmAccess = jwt.getClaim("realm_access");
