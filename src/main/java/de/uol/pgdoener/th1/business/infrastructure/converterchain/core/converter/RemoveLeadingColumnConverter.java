@@ -55,7 +55,7 @@ public class RemoveLeadingColumnConverter extends Converter {
             }
 
             if (columnStartIndex == row.length) {
-                log.debug("No column trailing found — returning original matrix");
+                log.debug("No leading trailing found — returning original matrix");
                 break;
             }
         }
