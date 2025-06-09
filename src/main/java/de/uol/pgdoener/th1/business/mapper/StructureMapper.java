@@ -186,6 +186,14 @@ public abstract class StructureMapper {
                     structure.getDescription().orElse(null),
                     structure.getBlockList().toArray(new String[0])
             );
+            case RemoveLeadingColumnStructureDto structure -> new RemoveLeadingColumnStructure(
+                    null, // ID wird von der Datenbank generiert
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getBlockList().toArray(new String[0])
+            );
             case ReplaceEntriesStructureDto structure -> new ReplaceEntriesStructure(
                     null, // ID wird von der Datenbank generiert
                     position,
