@@ -10,7 +10,7 @@ services:
     environment:
       SPRING_DATASOURCE_USERNAME: example
       SPRING_DATASOURCE_PASSWORD: example
-      SECURITY_ALLOWED-ORIGINS: localhost
+      SECURITY_ALLOWED-ORIGINS: http://localhost:5173,http://locahost:8080
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/example
       SECURITY_AUTHORIZATIONURL: http://localhost:8085/realms/th1/protocol/openid-connect/auth
       SECURITY_TOKENURL: http://localhost:8085/realms/th1/protocol/openid-connect/token
