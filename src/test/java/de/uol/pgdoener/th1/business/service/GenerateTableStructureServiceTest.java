@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         FindEmptyHeaderService.class,
         FindSameAsHeaderService.class,
         FindSumService.class,
-        FindColumnMismatchService.class,
+        FindColumnMismatchServiceNew.class,
         FindMergableColumnsService.class,
         AnalyzeMatrixInfoService.class,
         GenerateTableStructureService.class,

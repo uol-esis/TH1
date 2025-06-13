@@ -84,8 +84,7 @@ public abstract class StructureMapper {
                     .regexSearch(structure.getRegexSearch())
                     .startRow(structure.getStartRow())
                     .endRow(structure.getEndRow())
-                    .startColumn(structure.getStartColumn())
-                    .endColumn(structure.getEndColumn());
+                    .columnIndex(structure.getColumns());
             case SplitRowStructure structure -> new SplitRowStructureDto(
                     ConverterTypeDto.SPLIT_ROW,
                     structure.getColumnIndex()
@@ -203,10 +202,9 @@ public abstract class StructureMapper {
                     structure.getReplacement(),
                     structure.getSearch().orElse(null),
                     structure.getRegexSearch().orElse(null),
+                    structure.getColumnIndex(),
                     structure.getStartRow().orElse(null),
-                    structure.getEndRow().orElse(null),
-                    structure.getStartColumn().orElse(null),
-                    structure.getEndColumn().orElse(null)
+                    structure.getEndRow().orElse(null)
             );
             case SplitRowStructureDto structure -> new SplitRowStructure(
                     null, // ID wird von der Datenbank generiert

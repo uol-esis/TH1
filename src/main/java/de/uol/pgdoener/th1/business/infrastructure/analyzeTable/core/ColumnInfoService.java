@@ -33,6 +33,25 @@ public class ColumnInfoService {
     }
 
     /**
+     * Determines the dominant ValueType of a column by skipping the header
+     * and returning the first non-empty value type found.
+     *
+     * @param columnInfo the column to analyze
+     * @return the dominant ValueType, or EMPTY if none found
+     */
+    public ValueType getType(ColumnInfo columnInfo, int dataStart) {
+        List<CellInfo> cellInfos = columnInfo.cellInfos();
+        // Start at index 1 to skip header
+        for (int i = dataStart; i < cellInfos.size(); i++) {
+            ValueType type = cellInfos.get(i).valueType();
+            if (type == ValueType.EMPTY || type == ValueType.NULL) continue;
+            return type;
+        }
+
+        return ValueType.EMPTY;
+    }
+
+    /**
      * Checks if the given columns are mergeable.
      * Columns are mergeable if only one column in any given row has an entry.
      * The first row is ignored as it should be the header.

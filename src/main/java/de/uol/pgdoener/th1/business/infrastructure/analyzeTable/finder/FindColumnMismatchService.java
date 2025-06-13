@@ -22,12 +22,12 @@ public class FindColumnMismatchService {
     public Optional<ColumnTypeMismatchReportDto> find(MatrixInfo matrixInfo, String[][] matrix) {
         List<ColumnTypeMismatchDto> mismatches = matrixInfo.columnInfos().stream()
                 .filter(columnInfoService::hasTypeMismatch)
-                .map(i -> new ColumnTypeMismatchDto(i.columnIndex()))
+                .map(i -> new ColumnTypeMismatchDto(List.of(i.columnIndex())))
                 .toList();
         if (mismatches.isEmpty()) return Optional.empty();
 
         for (ColumnTypeMismatchDto mismatch : mismatches) {
-            ColumnInfo columnInfo = matrixInfo.columnInfos().get(mismatch.getColumnIndex());
+            ColumnInfo columnInfo = matrixInfo.columnInfos().get(mismatch.getColumnIndex().getFirst());
             Optional<String> noDataString = getNoDataStringIfNumbersColumn(columnInfo, matrix);
             if (noDataString.isPresent() && !noDataString.get().equals(NO_DATA_STRING)) {
                 mismatch.replacementSearch(noDataString.get());

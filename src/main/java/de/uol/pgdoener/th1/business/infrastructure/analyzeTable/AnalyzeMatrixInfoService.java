@@ -26,7 +26,7 @@ public class AnalyzeMatrixInfoService {
     private final FindEmptyColumnService findEmptyColumnService;
     private final FindEmptyHeaderService findEmptyHeaderService;
     private final FindSameAsHeaderService findSameAsHeaderService;
-    private final FindColumnMismatchService findColumnMismatchService;
+    private final FindColumnMismatchServiceNew findColumnMismatchService;
     private final FindMergableColumnsService findMergableColumnsService;
     private final FindSumService findSumReportService;
 
