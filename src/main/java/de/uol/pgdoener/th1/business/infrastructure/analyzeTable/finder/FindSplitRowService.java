@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Slf4j
@@ -22,8 +24,8 @@ public class FindSplitRowService {
      * @param matrix     Actual table data in 2D String array
      * @return Optional list of columns that contain cells with multiple values (e.g. separated by newline or comma)
      */
-    public Optional<SplitRowReportDto> find(MatrixInfo matrixInfo, String[][] matrix) {
-
+    public Optional<List<SplitRowReportDto>> find(MatrixInfo matrixInfo, String[][] matrix) {
+        List<SplitRowReportDto> rows = new ArrayList<>();
         for (ColumnInfo column : matrixInfo.columnInfos()) {
             String delimiter = findDelimiter(column, matrix);
 
@@ -35,13 +37,13 @@ public class FindSplitRowService {
             report.columnIndex(column.columnIndex());
             report.delimiter(delimiter);
             log.debug("Detected splitRowReport with '{}' in column {}", delimiter, column.columnIndex());
-            return Optional.of(report);
+            rows.add(report);
         }
 
-        return Optional.empty();
+        return rows.isEmpty() ? Optional.empty() : Optional.of(rows);
     }
 
-    // ========== Private helper methods ==========
+    // ========== Private helper methods ========== //
 
     /**
      * Finds a possible delimiter in a column indicating that at least one cell contains multiple values.
@@ -56,7 +58,7 @@ public class FindSplitRowService {
             if (cell.rowIndex() == 0) {
                 continue; // Skip first row (usually header)
             }
-            
+
             String cellContent = matrix[cell.rowIndex()][column.columnIndex()];
             delimiter = detectDelimiter(cellContent);
             if (delimiter == null) continue;

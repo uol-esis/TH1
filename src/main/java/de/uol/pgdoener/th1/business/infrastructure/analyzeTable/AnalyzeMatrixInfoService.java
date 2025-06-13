@@ -38,9 +38,9 @@ public class AnalyzeMatrixInfoService {
             reports.add(optionalGroupedHeaderReport.get());
             return reports;
         }
-        Optional<SplitRowReportDto> optionalSplitRowReport = findSplitRowService.find(matrixInfo, matrix);
+        Optional<List<SplitRowReportDto>> optionalSplitRowReport = findSplitRowService.find(matrixInfo, matrix);
         if (optionalSplitRowReport.isPresent()) {
-            reports.add(optionalSplitRowReport.get());
+            reports.addAll(optionalSplitRowReport.get());
             return reports;
         }
         Optional<SumReportDto> optionalSumReport = findSumReportService.find(matrixInfo, matrix, settings.getSumBlockList());
