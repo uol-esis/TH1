@@ -3,9 +3,9 @@ package de.uol.pgdoener.th1.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
-import io.swagger.v3.oas.models.security.Scopes;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -15,6 +15,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://stackoverflow.com/a/77139978">stackoverflow</a>
  */
+@ConditionalOnProperty(name = "app.security.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
 @Configuration
 public class OpenApiConfig {
@@ -27,10 +28,10 @@ public class OpenApiConfig {
      * 'application/octet-stream' is not supported]
      *
      * @param converter
-     * @param openAPI partly configured openAPI config generated from the specs file.
+     * @param openAPI   partly configured openAPI config generated from the specs file.
      */
     public OpenApiConfig(MappingJackson2HttpMessageConverter converter, OpenAPI openAPI, @Value("${security.authorizationUrl}") String authorizationUrl, @Value("${security.tokenUrl}")
-    String tokenUrl ) {
+    String tokenUrl) {
         var supportedMediaTypes = new ArrayList<>(converter.getSupportedMediaTypes());
         supportedMediaTypes.add(new MediaType("application", "octet-stream"));
         converter.setSupportedMediaTypes(supportedMediaTypes);

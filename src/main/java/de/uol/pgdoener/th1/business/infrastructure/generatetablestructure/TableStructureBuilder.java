@@ -31,11 +31,16 @@ public class TableStructureBuilder {
         if (removeFooterSettings.isEnabled()) {
             buildRemoveFooterStructure(removeFooterSettings);
         }
-        RemoveColumnsSettingsDto removeColumnsSettings = settings.getRemoveColumns().orElse(new RemoveColumnsSettingsDto());
-        if (removeColumnsSettings.isEnabled()) {
-            buildRemoveTrailingColumnStructure(removeColumnsSettings);
+        RemoveTrailingColumnSettingsDto removeTrailingColumnSettings = settings.getRemoveTrailingColumn()
+                .orElse(new RemoveTrailingColumnSettingsDto());
+        if (removeTrailingColumnSettings.isEnabled()) {
+            buildRemoveTrailingColumnStructure(removeTrailingColumnSettings);
         }
-
+        RemoveLeadingColumnSettingsDto removeLeadingColumnSettingsDto = settings.getRemoveLeadingColumn()
+                .orElse(new RemoveLeadingColumnSettingsDto());
+        if (removeLeadingColumnSettingsDto.isEnabled()) {
+            buildRemoveLeadingColumnStructure(removeLeadingColumnSettingsDto);
+        }
         RemoveInvalidRowsSettingsDto removeInvalidRowsSettings = settings.getRemoveInvalidRows().orElse(new RemoveInvalidRowsSettingsDto());
         if (removeInvalidRowsSettings.isEnabled()) {
             buildRemoveInvalidRowsStructure(removeInvalidRowsSettings);
@@ -92,13 +97,23 @@ public class TableStructureBuilder {
                         unresolvedReports.add(new ColumnTypeMismatchReportDto().mismatches(unresolvedMismatches));
                     }
                 }
+                case MergeableColumnsReportDto r -> {
+                    buildMergeableColumnsStructureFromColumnTypeMismatch(r);
+                    earlyBreak = true;
+                    reanalysisCause = ReportTypeDto.MERGEABLE_COLUMNS;
+                    break reportsLoop;
+                }
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
                 case EmptyHeaderReportDto r -> unresolvedReports.add(r);
-                case MergeableColumnsReportDto r -> unresolvedReports.add(r);
                 case SameAsHeaderReportDto r -> unresolvedReports.add(r);
                 case MissingEntryReportDto r -> unresolvedReports.add(r);
-                case SplitRowReportDto r -> unresolvedReports.add(r);
+                case SplitRowReportDto r -> {
+                    buildSplitRowReportDto(r);
+                    earlyBreak = true;
+                    reanalysisCause = ReportTypeDto.SPLIT_ROW;
+                    break reportsLoop;
+                }
             }
         }
 
@@ -120,6 +135,28 @@ public class TableStructureBuilder {
                 .replacement(mismatch.getReplacementValue().orElseThrow());
         log.debug("Finish buildReplaceEntriesStructure for column index {}", mismatch.getColumnIndex());
         tableStructure.addStructuresItem(structure);
+    }
+
+    private void buildMergeableColumnsStructureFromColumnTypeMismatch(MergeableColumnsReportDto report) {
+        log.debug("Start buildMergeableColumnsStructure for column index");
+        MergeColumnsStructureDto structure = new MergeColumnsStructureDto()
+                .converterType(ConverterTypeDto.MERGE_COLUMNS)
+                .columnIndex(report.getMergeables());
+        log.debug("Finish buildMergeableColumnsStructure for column index");
+        tableStructure.addStructuresItem(structure);
+    }
+
+    /**
+     * Builds converter structure for removing header rows.
+     */
+    private void buildSplitRowReportDto(SplitRowReportDto report) {
+        log.debug("Start buildSplitRowStructure");
+        SplitRowStructureDto SplitRowStructure = new SplitRowStructureDto();
+        SplitRowStructure.converterType(ConverterTypeDto.SPLIT_ROW)
+                .columnIndex(report.getColumnIndex())
+                .delimiter(report.getDelimiter());
+        log.debug("Finish buildSplitRowStructure");
+        tableStructure.addStructuresItem(SplitRowStructure);
     }
 
     /**
@@ -151,13 +188,25 @@ public class TableStructureBuilder {
     /**
      * Builds converter structure for removing trailing column.
      */
-    private void buildRemoveTrailingColumnStructure(RemoveColumnsSettingsDto settings) {
+    private void buildRemoveTrailingColumnStructure(RemoveTrailingColumnSettingsDto settings) {
         log.debug("Start buildRemoveTrailingColumnStructure");
         RemoveTrailingColumnStructureDto removeTrailingColumnStructure = new RemoveTrailingColumnStructureDto();
         removeTrailingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
                 .blockList(settings.getBlockList());
         log.debug("Finish buildRemoveTrailingColumnStructure");
         tableStructure.addStructuresItem(removeTrailingColumnStructure);
+    }
+
+    /**
+     * Builds converter structure for removing leading column.
+     */
+    private void buildRemoveLeadingColumnStructure(RemoveLeadingColumnSettingsDto settings) {
+        log.debug("Start buildRemoveLeadingColumnStructure");
+        RemoveLeadingColumnStructureDto RemoveLeadingColumnStructure = new RemoveLeadingColumnStructureDto();
+        RemoveLeadingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
+                .blockList(settings.getBlockList());
+        log.debug("Finish buildRemoveLeadingColumnStructure");
+        tableStructure.addStructuresItem(RemoveLeadingColumnStructure);
     }
 
 

@@ -1,9 +1,6 @@
 package de.uol.pgdoener.th1.business.infrastructure.analyzeTable;
 
-import de.uol.pgdoener.th1.business.dto.GroupedHeaderReportDto;
-import de.uol.pgdoener.th1.business.dto.ReportDto;
-import de.uol.pgdoener.th1.business.dto.SumReportDto;
-import de.uol.pgdoener.th1.business.dto.TableStructureGenerationSettingsDto;
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.MatrixInfo;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.factory.MatrixInfoFactory;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.finder.*;
@@ -29,6 +26,7 @@ public class AnalyzeMatrixInfoService {
     private final FindColumnMismatchServiceNew findColumnMismatchService;
     private final FindMergableColumnsService findMergableColumnsService;
     private final FindSumService findSumReportService;
+    private final FindSplitRowService findSplitRowService;
 
     public List<ReportDto> analyze(String[][] matrix, TableStructureGenerationSettingsDto settings) {
         MatrixInfo matrixInfo = matrixInfoFactory.createParallel(matrix);
@@ -38,6 +36,11 @@ public class AnalyzeMatrixInfoService {
         Optional<GroupedHeaderReportDto> optionalGroupedHeaderReport = findGroupedHeaderService.find(matrixInfo, matrix);
         if (optionalGroupedHeaderReport.isPresent()) {
             reports.add(optionalGroupedHeaderReport.get());
+            return reports;
+        }
+        Optional<List<SplitRowReportDto>> optionalSplitRowReport = findSplitRowService.find(matrixInfo, matrix);
+        if (optionalSplitRowReport.isPresent()) {
+            reports.addAll(optionalSplitRowReport.get());
             return reports;
         }
         Optional<SumReportDto> optionalSumReport = findSumReportService.find(matrixInfo, matrix, settings.getSumBlockList());
