@@ -7,69 +7,94 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FindColumnMismatchService {
-
-    private static final String NO_DATA_STRING = "*";
-
     private final ColumnInfoService columnInfoService;
+    private final MatrixInfoService matrixInfoService;
 
+    /**
+     * Analyzes the given matrix for column-wise type mismatches.
+     * <p>
+     * For each column, the expected type is determined (e.g., NUMBER or STRING).
+     * Then, all cells below the header are checked:
+     * - If a cell's actual type differs from the expected type (excluding NULL),
+     * the cell's value is collected as a mismatch candidate.
+     * <p>
+     * The result is a report containing entries that do not match the expected column type,
+     * including the offending value and the indices of the columns in which they appear.
+     *
+     * @param matrixInfo the structural metadata describing columns and cell types
+     * @param matrix     the raw data matrix
+     * @return an Optional containing a mismatch report; never empty, but can contain no mismatches
+     */
     public Optional<ColumnTypeMismatchReportDto> find(MatrixInfo matrixInfo, String[][] matrix) {
-        List<ColumnTypeMismatchDto> mismatches = matrixInfo.columnInfos().stream()
-                .filter(columnInfoService::hasTypeMismatch)
-                .map(i -> new ColumnTypeMismatchDto(List.of(i.columnIndex())))
-                .toList();
-        if (mismatches.isEmpty()) return Optional.empty();
+        Map<String, Set<Integer>> mismatchIndex = new HashMap<>();
+        int headerEndIndex = matrixInfoService.detectHeaderEndIndex(matrixInfo);
 
-        for (ColumnTypeMismatchDto mismatch : mismatches) {
-            ColumnInfo columnInfo = matrixInfo.columnInfos().get(mismatch.getColumnIndex().getFirst());
-            Optional<String> noDataString = getNoDataStringIfNumbersColumn(columnInfo, matrix);
-            if (noDataString.isPresent() && !noDataString.get().equals(NO_DATA_STRING)) {
-                mismatch.replacementSearch(noDataString.get());
-                mismatch.replacementValue(NO_DATA_STRING);
+        for (ColumnInfo columnInfo : matrixInfo.columnInfos()) {
+            ValueType expectedType = columnInfoService.getType(columnInfo, headerEndIndex);
+            int columnIndex = columnInfo.columnIndex();
+
+            for (CellInfo cellInfo : columnInfo.cellInfos()) {
+                if (cellInfo.rowIndex() < headerEndIndex) continue;
+
+                ValueType actualType = cellInfo.valueType();
+                if (actualType == ValueType.NULL) continue;
+                if (isSameValueType(expectedType, actualType)) continue;
+
+                String entry = matrix[cellInfo.rowIndex()][cellInfo.columnIndex()];
+                String key = entry.isBlank() ? "" : entry;
+                mismatchIndex.computeIfAbsent(key, k -> new HashSet<>()).add(columnIndex);
             }
         }
 
-        return Optional.of(new ColumnTypeMismatchReportDto().mismatches(mismatches));
+        ColumnTypeMismatchReportDto report = buildColumnTypeMismatchReportDto(mismatchIndex);
+        return Optional.of(report);
+    }
+
+    // ----------------- Private helper methods ----------------- //
+
+    /**
+     * Determines if the actual value type does not match the expected one.
+     */
+    private boolean isSameValueType(ValueType expected, ValueType actual) {
+        return switch (expected) {
+            case NUMBER -> actual == ValueType.NUMBER;
+            case STRING -> actual == ValueType.STRING;
+            default -> false;
+        };
     }
 
     /**
-     * This method checks if the given column is column with numbers and strings.
-     * If that is the case and the strings are all the same, it returns the string.
-     * If the column is not a numbers column or the strings are not all the same,
-     * it returns an empty Optional.
-     * The returned string is the "no data" string, which can be replaced with the
-     * default value for "no data".
-     *
-     * @param columnInfo the column to check
-     * @return the string representing "no data".
+     * Builds a complete report DTO from the collected mismatched entries.
      */
-    private Optional<String> getNoDataStringIfNumbersColumn(ColumnInfo columnInfo, String[][] matrix) {
-        String noDataString = null;
-
-        List<CellInfo> cellInfos = columnInfo.cellInfos();
-        // first cell is the header, so we start from index 1
-        for (int i = 1; i < cellInfos.size(); i++) {
-            CellInfo cellInfo = cellInfos.get(i);
-            String entry = matrix[cellInfo.rowIndex()][cellInfo.columnIndex()];
-
-            if (cellInfo.valueType() == ValueType.STRING || cellInfo.valueType() == ValueType.EMPTY) {
-                if (noDataString == null) {
-                    noDataString = entry;
-                } else if (!noDataString.equals(entry)) {
-                    return Optional.empty();
-                }
-            } else if (cellInfo.valueType() != ValueType.NUMBER) {
-                return Optional.empty();
-            }
-        }
-
-        return Optional.ofNullable(noDataString);
+    private ColumnTypeMismatchReportDto buildColumnTypeMismatchReportDto(Map<String, Set<Integer>> numberIndex) {
+        List<ColumnTypeMismatchDto> mismatches = buildMismatches(numberIndex);
+        ColumnTypeMismatchReportDto report = new ColumnTypeMismatchReportDto();
+        report.setMismatches(mismatches);
+        return report;
     }
 
+    /**
+     * Constructs a list of mismatch DTOs from the index of problematic entries.
+     * Each mismatch includes the affected column indices and suggested replacement.
+     */
+    private List<ColumnTypeMismatchDto> buildMismatches(Map<String, Set<Integer>> numberIndex) {
+        List<ColumnTypeMismatchDto> mismatches = new ArrayList<>();
+        numberIndex.forEach((key, indices) -> {
+            ColumnTypeMismatchDto mismatch = new ColumnTypeMismatchDto();
+            mismatch.setColumnIndex(indices.stream().toList());
+            mismatch.setReplacementSearch(Optional.ofNullable(key));
+
+            boolean isInvalidKey = key == null || key.length() < 2;
+            mismatch.setReplacementValue(isInvalidKey ? Optional.of("*") : Optional.empty());
+
+            mismatches.add(mismatch);
+        });
+        return mismatches;
+    }
 }
