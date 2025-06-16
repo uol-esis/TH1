@@ -3,9 +3,9 @@ package de.uol.pgdoener.th1.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -27,8 +27,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@ConditionalOnProperty(name = "app.security.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
+@Profile("prod")
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
