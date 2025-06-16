@@ -25,14 +25,14 @@ public class RemoveFooterConverter extends Converter {
             long validElementCount = countValidElements(row);
 
             if (validElementCount > threshold) {
-                log.debug("Find LasValidRow at id {} with {} valid elements", i, validElementCount);
+                log.debug("Find lastValidRow at id {} with {} valid elements", i, validElementCount);
                 lastValidRowIndex = i;
                 break;
             }
         }
 
         if (lastValidRowIndex == null) {
-            log.debug("No Footer to remove found");
+            log.debug("No footer to remove found");
             return super.handleRequest(inputMatrix);
         }
 

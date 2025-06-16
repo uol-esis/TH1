@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationTest")
+@ActiveProfiles("prod")
 class TableStructuresApiTest {
 
     private static final String basePath = "/api/v1/table-structures";
