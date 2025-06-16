@@ -203,11 +203,11 @@ public class TableStructureBuilder {
      */
     private void buildRemoveLeadingColumnStructure(RemoveLeadingColumnSettingsDto settings) {
         log.debug("Start buildRemoveLeadingColumnStructure");
-        RemoveLeadingColumnStructureDto RemoveLeadingColumnStructure = new RemoveLeadingColumnStructureDto();
-        RemoveLeadingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
+        RemoveLeadingColumnStructureDto removeLeadingColumnStructure = new RemoveLeadingColumnStructureDto();
+        removeLeadingColumnStructure.converterType(ConverterTypeDto.REMOVE_TRAILING_COLUMN)
                 .blockList(settings.getBlockList());
         log.debug("Finish buildRemoveLeadingColumnStructure");
-        tableStructure.addStructuresItem(RemoveLeadingColumnStructure);
+        tableStructure.addStructuresItem(removeLeadingColumnStructure);
     }
 
 

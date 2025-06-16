@@ -7,3 +7,4 @@ springdoc.swagger-ui.oauth.client-id=< id >
 # urls for auth server to be used in swagger ui
 security.authorizationUrl=https://auth.example.com/some/path
 security.tokenUrl=https://auth.example.com/some/path
+app.security.enabled=false
