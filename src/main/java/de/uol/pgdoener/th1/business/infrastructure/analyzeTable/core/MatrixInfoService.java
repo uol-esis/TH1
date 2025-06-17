@@ -42,6 +42,26 @@ public class MatrixInfoService {
         return height;
     }
 
+    public int detectHeaderEndIndex(MatrixInfo matrixInfo) {
+        int maxChecksPerColumn = 5;
+
+        for (ColumnInfo columnInfo : matrixInfo.columnInfos()) {
+            int checks = 0;
+
+            for (CellInfo cellInfo : columnInfo.cellInfos()) {
+                if (checks >= maxChecksPerColumn) break;
+
+                if (cellInfo.valueType() == ValueType.NULL || cellInfo.valueType() == ValueType.EMPTY) continue;
+
+                checks++;
+
+                if (cellInfo.valueType() == ValueType.NUMBER) {
+                    return cellInfo.rowIndex();
+                }
+            }
+        }
+        return 1;
+    }
 
     public boolean isRectangleValid(MatrixInfo matrixInfo, int width, int height) {
         for (int i = 0; i < height; i++) {

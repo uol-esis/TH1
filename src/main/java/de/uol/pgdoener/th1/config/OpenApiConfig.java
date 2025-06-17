@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 /**
  * @see <a href="https://stackoverflow.com/a/77139978">stackoverflow</a>
  */
+@ConditionalOnProperty(name = "app.security.enabled", havingValue = "true", matchIfMissing = true)
 @Slf4j
 @Profile("prod")
 @Configuration

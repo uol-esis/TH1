@@ -86,7 +86,7 @@ public class TableStructureBuilder {
                     List<ColumnTypeMismatchDto> unresolvedMismatches = new ArrayList<>();
 
                     for (ColumnTypeMismatchDto mismatch : r.getMismatches()) {
-                        if (mismatch.getReplacementSearch().isEmpty()) {
+                        if (mismatch.getReplacementValue().isEmpty()) {
                             unresolvedMismatches.add(mismatch);
                         } else {
                             buildReplaceEntriesStructureFromColumnTypeMismatch(mismatch);
@@ -129,8 +129,7 @@ public class TableStructureBuilder {
         log.debug("Start buildReplaceEntriesStructure for column index {}", mismatch.getColumnIndex());
         ReplaceEntriesStructureDto structure = new ReplaceEntriesStructureDto()
                 .converterType(ConverterTypeDto.REPLACE_ENTRIES)
-                .startColumn(mismatch.getColumnIndex())
-                .endColumn(mismatch.getColumnIndex() + 1)
+                .columnIndex(mismatch.getColumnIndex())
                 .startRow(1)
                 .search(mismatch.getReplacementSearch().orElseThrow())
                 .replacement(mismatch.getReplacementValue().orElseThrow());

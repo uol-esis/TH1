@@ -17,6 +17,7 @@ public class CellInfoFactory {
 
     private ValueType detectType(String entry) {
 
+        if (entry.equals("*")) return ValueType.NULL;
         if (entry.isBlank()) return ValueType.EMPTY;
         if (isDouble(entry)) return ValueType.NUMBER;
         if (isBoolean(entry)) return ValueType.BOOLEAN;

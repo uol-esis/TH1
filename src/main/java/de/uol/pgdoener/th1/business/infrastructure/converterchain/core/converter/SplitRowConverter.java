@@ -51,8 +51,7 @@ public class SplitRowConverter extends Converter {
         // Add rows after the split
         List<String[]> footer = Arrays.asList(matrix).subList(endRow, matrix.length);
         rows.addAll(footer);
-
-        return rows.toArray(new String[0][]);
+        String[][] newMatrix = rows.toArray(new String[0][]);
+        return super.handleRequest(newMatrix);
     }
-
 }

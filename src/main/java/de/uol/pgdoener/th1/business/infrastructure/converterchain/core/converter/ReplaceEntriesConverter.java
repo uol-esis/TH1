@@ -4,6 +4,7 @@ import de.uol.pgdoener.th1.business.dto.ReplaceEntriesStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.function.UnaryOperator;
 
 @RequiredArgsConstructor
@@ -14,12 +15,10 @@ public class ReplaceEntriesConverter extends Converter {
     @Override
     public String[][] handleRequest(String[][] matrix) {
         final int rows = matrix.length;
-        final int columns = matrix[0].length;
 
-        final int startRow = structure.getStartRow().orElse(0);
+        List<Integer> columnIndex = structure.getColumnIndex();
+        final int startRow = structure.getStartRow().orElse(1);
         final int endRow = structure.getEndRow().orElse(rows);
-        final int startColumn = structure.getStartColumn().orElse(0);
-        final int endColumn = structure.getEndColumn().orElse(columns);
 
         if (structure.getReplacement() == null) {
             throwConverterException("Replacement value must not be null.");
@@ -28,7 +27,7 @@ public class ReplaceEntriesConverter extends Converter {
         final UnaryOperator<String> mapper = getMapper();
 
         for (int i = startRow; i < endRow; i++) {
-            for (int j = startColumn; j < endColumn; j++) {
+            for (Integer j : columnIndex) {
                 matrix[i][j] = mapper.apply(matrix[i][j]);
             }
         }
