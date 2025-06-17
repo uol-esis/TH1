@@ -3,7 +3,9 @@ package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +34,7 @@ public class ColumnInfoService {
         return false;
     }
 
+
     /**
      * Determines the dominant ValueType of a column by skipping the header
      * and returning the first non-empty value type found.
@@ -39,16 +42,22 @@ public class ColumnInfoService {
      * @param columnInfo the column to analyze
      * @return the dominant ValueType, or EMPTY if none found
      */
-    public ValueType getType(ColumnInfo columnInfo, int dataStart) {
+    public ValueType getType(ColumnInfo columnInfo) {
+        Map<ValueType, Integer> typeCounts = new EnumMap<>(ValueType.class);
         List<CellInfo> cellInfos = columnInfo.cellInfos();
+
         // Start at index 1 to skip header
-        for (int i = dataStart; i < cellInfos.size(); i++) {
+        for (int i = 1; i < cellInfos.size(); i++) {
             ValueType type = cellInfos.get(i).valueType();
             if (type == ValueType.EMPTY || type == ValueType.NULL) continue;
-            return type;
-        }
+            int newCount = typeCounts.merge(type, 1, Integer::sum);
 
-        return ValueType.EMPTY;
+            if (newCount > 5) break;
+        }
+        return typeCounts.entrySet().stream()
+                .max(Map.Entry.comparingByValue())
+                .map(Map.Entry::getKey)
+                .orElse(ValueType.EMPTY);
     }
 
     /**

@@ -14,7 +14,6 @@ import java.util.*;
 @RequiredArgsConstructor
 public class FindColumnMismatchService {
     private final ColumnInfoService columnInfoService;
-    private final MatrixInfoService matrixInfoService;
 
     /**
      * Analyzes the given matrix for column-wise type mismatches.
@@ -33,14 +32,14 @@ public class FindColumnMismatchService {
      */
     public Optional<ColumnTypeMismatchReportDto> find(MatrixInfo matrixInfo, String[][] matrix) {
         Map<String, Set<Integer>> mismatchIndex = new HashMap<>();
-        int headerEndIndex = matrixInfoService.detectHeaderEndIndex(matrixInfo);
 
         for (ColumnInfo columnInfo : matrixInfo.columnInfos()) {
-            ValueType expectedType = columnInfoService.getType(columnInfo, headerEndIndex);
+            ValueType expectedType = columnInfoService.getType(columnInfo);
             int columnIndex = columnInfo.columnIndex();
 
             for (CellInfo cellInfo : columnInfo.cellInfos()) {
-                if (cellInfo.rowIndex() < headerEndIndex) continue;
+                //skip header
+                if (cellInfo.rowIndex() < 1) continue;
 
                 ValueType actualType = cellInfo.valueType();
                 if (actualType == ValueType.NULL) continue;

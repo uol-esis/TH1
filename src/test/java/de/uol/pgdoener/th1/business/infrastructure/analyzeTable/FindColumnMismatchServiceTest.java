@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Slf4j
@@ -54,7 +55,44 @@ class FindColumnMismatchServiceTest {
         Optional<ColumnTypeMismatchReportDto> reports = findColumnMismatchService.find(matrixInfo, matrix);
 
         assertTrue(reports.isPresent());
-        log.info("Column mismatch: {}", reports.get());
+        assertEquals(reports.get().getMismatches().getFirst().getReplacementSearch(), Optional.of(""));
+        assertEquals(reports.get().getMismatches().getFirst().getReplacementValue(), Optional.of("*"));
+        assertEquals(reports.get().getMismatches().get(1).getReplacementSearch(), Optional.of("a"));
+        assertEquals(reports.get().getMismatches().get(1).getReplacementValue(), Optional.empty());
+        assertEquals(reports.get().getMismatches().get(2).getReplacementSearch(), Optional.of("-"));
+        assertEquals(reports.get().getMismatches().get(2).getReplacementValue(), Optional.of("*"));
+    }
+
+    @Test
+    void testFindColumnMismatchWithGroupedHeader() {
+        String[][] matrix = new String[][]{
+                {"Header1", "Header2"},
+                {"Header3", "Header4"},
+                {"1", "9"},
+                {"-", "2"},
+                {"4", ""},
+                {"5", "3"},
+                {"6", "a"},
+                {"7", "8"},
+                {"8", "-"},
+                {"9", "10"},
+                {"10", "11"}
+        };
+        MatrixInfo matrixInfo = matrixInfoFactory.create(matrix);
+
+        Optional<ColumnTypeMismatchReportDto> reports = findColumnMismatchService.find(matrixInfo, matrix);
+
+        assertTrue(reports.isPresent());
+        assertEquals(reports.get().getMismatches().getFirst().getReplacementSearch(), Optional.of(""));
+        assertEquals(reports.get().getMismatches().getFirst().getReplacementValue(), Optional.of("*"));
+        assertEquals(reports.get().getMismatches().get(1).getReplacementSearch(), Optional.of("a"));
+        assertEquals(reports.get().getMismatches().get(1).getReplacementValue(), Optional.empty());
+        assertEquals(reports.get().getMismatches().get(2).getReplacementSearch(), Optional.of("Header3"));
+        assertEquals(reports.get().getMismatches().get(2).getReplacementValue(), Optional.empty());
+        assertEquals(reports.get().getMismatches().get(3).getReplacementSearch(), Optional.of("Header4"));
+        assertEquals(reports.get().getMismatches().get(3).getReplacementValue(), Optional.empty());
+        assertEquals(reports.get().getMismatches().get(4).getReplacementSearch(), Optional.of("-"));
+        assertEquals(reports.get().getMismatches().get(4).getReplacementValue(), Optional.of("*"));
     }
 
 }
