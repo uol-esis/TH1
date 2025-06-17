@@ -90,11 +90,17 @@ public class FindColumnMismatchService {
             mismatch.setColumnIndex(indices.stream().toList());
             mismatch.setReplacementSearch(Optional.ofNullable(key));
 
-            boolean isInvalidKey = key == null || key.length() < 2;
-            mismatch.setReplacementValue(isInvalidKey ? Optional.of("*") : Optional.empty());
+            mismatch.setReplacementValue(isInvalidKey(key) ? Optional.of("*") : Optional.empty());
 
             mismatches.add(mismatch);
         });
         return mismatches;
+    }
+
+    private boolean isInvalidKey(String key) {
+        if (key == null || key.isEmpty()) {
+            return true;
+        }
+        return key.length() == 1 && !Character.isLetterOrDigit(key.charAt(0));
     }
 }
