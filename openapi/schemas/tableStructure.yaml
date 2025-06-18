@@ -1,7 +1,0 @@
-type: object
-required:
-  - id
-properties:
-  id:
-    type: string
-  # TODO other fields to be added here

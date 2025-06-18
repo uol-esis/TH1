@@ -1,0 +1,12 @@
+{
+  "name": "Table Structure 1",
+  "structures": [
+    {
+      "converterType": "FILL_EMPTY_CELLS",
+      "rowIndex": [
+        -1
+      ]
+    }
+  ],
+  "endRow": 4
+}

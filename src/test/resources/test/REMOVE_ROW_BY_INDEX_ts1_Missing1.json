@@ -1,0 +1,10 @@
+{
+  "name": "Table Structure 1",
+  "structures": [
+    {
+      "converterType": "REMOVE_ROW_BY_INDEX"
+    }
+  ],
+  "endRow": 4,
+  "endColumn": 2
+}

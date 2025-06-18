@@ -1,81 +1,75 @@
 package de.uol.pgdoener.th1.api.controller;
 
-import de.uol.pgdoener.th1.api.payload.request.CreateTableStructure;
+import de.uol.pgdoener.th1.api.ConverterApiDelegate;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
+import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.service.ConvertFileService;
-import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
-@Validated
-@RestController
-@RequestMapping("v1")
-@RequiredArgsConstructor
 @Slf4j
-public class ConvertFileController {
+@Component
+@RequiredArgsConstructor
+public class ConvertFileController implements ConverterApiDelegate {
 
     private final ConvertFileService convertFileService;
 
-    @PostMapping
-    @RequestMapping("/convert/{tableStructureId}")
-    public ResponseEntity<String> convertFile(
-            @PathVariable("tableStructureId") @NotNull @Positive Long tableStructureId,
-            @RequestPart("file") MultipartFile file) {
-        log.info("Converting file {}", file.getOriginalFilename());
-        convertFileService.convertAndSaveInDB(tableStructureId, file);
-
-        return ResponseEntity.ok("TableStructure created");
+    @Override
+    public ResponseEntity<Void> convertTable(Long tableStructureId, MultipartFile file, Optional<String> mode) {
+        log.debug("Converting file {}", file.getOriginalFilename());
+        convertFileService.convertAndSaveInDB(tableStructureId, mode, file);
+        log.debug("File converted and saved in DB");
+        return ResponseEntity.ok().build();
     }
 
     //TODO: File kleiner machen, muss nicht nur 10 zurück geben sondern auch weniger datenpunkte umwandeln
-    @PostMapping
-    @RequestMapping("/convert-test")
-    public ResponseEntity<?> convertFileTest(
-            @RequestPart("createTableStructure") @Valid CreateTableStructure request,
-            @RequestPart("file") MultipartFile file,
-            @RequestParam(name = "preview", defaultValue = "false") boolean preview
-    ) {
-        TableStructureDto tableStructureDto = TableStructureMapper.toDto(request);
-        List<String> convertedLines = convertFileService.convertTest(tableStructureDto, file);
+    @Override
+    public ResponseEntity<List<List<String>>> previewConvertTable(MultipartFile file, TableStructureDto request, Optional<Integer> limit) {
+        log.debug("Preview converting file {} with tableStructure {} and limit {}", file.getOriginalFilename(), request, limit);
+        ConverterResult result = convertFileService.convertTest(request, file);
+        List<List<String>> previewLines = result.dataAsListOfLists().stream().limit(limit.orElseThrow()).toList();
+        log.debug("File converted and returning preview");
+        return ResponseEntity.ok(previewLines);
+    }
 
-        if (preview) {
-            // Return the first 10 lines as a JSON response
-            List<String> previewLines = convertedLines.stream().limit(10).collect(Collectors.toList());
-            return ResponseEntity.ok(previewLines);
-        }
+    /// TODO: immer den aktuellen Datentyp setzen.
+    @Override
+    public ResponseEntity<Resource> fileConvertTable(MultipartFile file, TableStructureDto request) {
+        log.debug("Converting file {} with tableStructure {}", file.getOriginalFilename(), request);
+        ConverterResult result = convertFileService.convertTest(request, file);
 
         // Return the full converted file as a download
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteArrayOutputStream outputStream;
         try {
-            outputStream.write(String.join("\n", convertedLines).getBytes(StandardCharsets.UTF_8));
+            outputStream = result.dataAsCsvStream();
         } catch (IOException e) {
+            log.error("Error while preparing file for download", e);
             throw new RuntimeException("Error while preparing file for download", e);
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDisposition(ContentDisposition.builder("attachment")
-                .filename("converted_file.txt")
+                .filename("converted_file.csv")
                 .build());
         headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
 
+        log.debug("File converted and returning download");
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(outputStream.toByteArray());
+                .body(new ByteArrayResource(outputStream.toByteArray()));
     }
+
 }

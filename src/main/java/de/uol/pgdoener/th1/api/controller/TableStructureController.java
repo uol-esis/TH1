@@ -1,46 +1,68 @@
 package de.uol.pgdoener.th1.api.controller;
 
-import de.uol.pgdoener.th1.api.payload.request.CreateTableStructure;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.dto.TableStructuresDto;
-import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
+import de.uol.pgdoener.th1.api.TableStructuresApiDelegate;
+import de.uol.pgdoener.th1.business.dto.*;
 import de.uol.pgdoener.th1.business.service.TableStructureService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.stereotype.Component;
+import org.springframework.web.multipart.MultipartFile;
 
-@Validated
-@RestController
-@RequestMapping("v1/table-structures")
+import java.util.List;
+
+@Slf4j
+@Component
 @RequiredArgsConstructor
-public class TableStructureController {
+public class TableStructureController implements TableStructuresApiDelegate {
 
     private final TableStructureService tableStructureService;
 
-    @PostMapping
-    public ResponseEntity<String> createTableStructure(@RequestBody @Valid CreateTableStructure request) {
-        TableStructureDto tableStructureDto = TableStructureMapper.toDto(request);
-        tableStructureService.create(tableStructureDto);
-
-        return ResponseEntity.ok("TableStructure created");
+    @Override
+    public ResponseEntity<Long> createTableStructure(TableStructureDto request) {
+        log.debug("Creating table structure {}", request);
+        long id = tableStructureService.create(request);
+        log.debug("Table structure created");
+        return ResponseEntity.status(201).body(id);
     }
 
-    @GetMapping
-    @RequestMapping("/{id}")
-    public ResponseEntity<TableStructureDto> getTableStructures(@PathVariable("id") Long id) {
+    @Override
+    public ResponseEntity<TableStructureDto> getTableStructure(Long id) {
+        log.debug("Getting table structure with id {}", id);
         TableStructureDto tableStructureDto = tableStructureService.getById(id);
-
+        log.debug("Table structure found");
         return ResponseEntity.ok(tableStructureDto);
     }
 
-    @GetMapping
-    @RequestMapping()
-    public ResponseEntity<TableStructuresDto> getTableStructures() {
-        TableStructuresDto tableStructuresDto = tableStructureService.getAll();
-
+    @Override
+    public ResponseEntity<List<TableStructureSummaryDto>> getTableStructures() {
+        log.debug("Getting all table structures");
+        List<TableStructureSummaryDto> tableStructuresDto = tableStructureService.getAll();
+        log.debug("Table structures found");
         return ResponseEntity.ok(tableStructuresDto);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteTableStructure(Long id) {
+        log.debug("Deleting table structure with id {}", id);
+        tableStructureService.deleteById(id);
+        log.debug("Table structure deleted");
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<TableStructureGenerationResponseDto> generateTableStructure(
+            MultipartFile file,
+            TableStructureGenerationSettingsDto settings
+    ) {
+        log.debug("Generating Table structure for file {} with settings {}", file.getOriginalFilename(), settings);
+        Pair<TableStructureDto, List<ReportDto>> result = tableStructureService.generateTableStructure(file, settings);
+        log.debug("Table structure generated");
+        TableStructureGenerationResponseDto responseDto = new TableStructureGenerationResponseDto();
+        responseDto.setTableStructure(result.getFirst());
+        responseDto.setReports(result.getSecond());
+        return ResponseEntity.ok(responseDto);
     }
 
 }
