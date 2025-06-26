@@ -114,14 +114,14 @@ public class FindSplitRowService {
      */
     private static final String[] POSSIBLE_DELIMITERS = {
             "\\r?\\n",   // Line break (Unix or Windows)
-            ",",         // Comma
-            ";",         // Semicolon
-            "·",         // Middle dot
-            "•",         // Bullet
-            "\\|",       // Pipe
-            "/",         // Slash
-            "\\t",       // Tab
-            "\\s{2,}"    // Two or more spaces
+//            ",",         // Comma
+//            ";",         // Semicolon
+//            "·",         // Middle dot
+//            "•",         // Bullet
+//            "\\|",       // Pipe
+//            "/",         // Slash
+//            "\\t",       // Tab
+//            "\\s{2,}"    // Two or more spaces
     };
 
 }
