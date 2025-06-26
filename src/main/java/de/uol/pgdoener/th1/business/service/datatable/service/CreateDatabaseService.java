@@ -30,8 +30,8 @@ public class CreateDatabaseService {
                 return;
             case "RESTRUCTURE":
                 return;
-            //databaseService.transformDatabaseTableWithValues(tableName, transformedMatrix);
-            //return;
+            default:
+                throw new IllegalArgumentException("Unknown mode: " + mode);
         }
     }
 
