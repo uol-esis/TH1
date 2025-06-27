@@ -74,6 +74,10 @@ public abstract class StructureMapper {
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
                     .blockList(List.of(structure.getBlackList()));
+            case RemoveLeadingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
+                    ConverterTypeDto.REMOVE_LEADING_COLUMN
+            )
+                    .blockList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
                     structure.getReplacement()
