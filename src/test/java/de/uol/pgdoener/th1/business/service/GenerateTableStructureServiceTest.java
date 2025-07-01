@@ -60,8 +60,6 @@ class GenerateTableStructureServiceTest {
 
         TableStructureDto tableStructure = result.getFirst();
         List<ReportDto> unresolvedReports = result.getSecond();
-        System.out.println(tableStructure);
-        System.out.println(unresolvedReports);
 
         assertInstanceOf(RemoveHeaderStructureDto.class, tableStructure.getStructures().getFirst());
         assertInstanceOf(RemoveFooterStructureDto.class, tableStructure.getStructures().get(1));
@@ -76,16 +74,19 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartColumn().orElseThrow());
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(7));
-        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
         assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(8));
         assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(9));
-        assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(9)).getSearch().orElseThrow());
+        assertEquals("", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(9)).getSearch().orElseThrow());
         assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(9)).getReplacement());
+        assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(10));
+        assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(10)).getSearch().orElseThrow());
+        assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(10)).getReplacement());
     }
 
     @Test
-    void testGenerationGroupedHeaderOneHeader() throws IOException {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderOneHeader.csv"));
+    void testGenerationGroupedHeaderI() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderI.csv"));
         InputFile inputFile = new InputFile(file);
         TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
 
@@ -93,25 +94,82 @@ class GenerateTableStructureServiceTest {
 
         TableStructureDto tableStructure = result.getFirst();
         List<ReportDto> unresolvedReports = result.getSecond();
-        System.out.println(tableStructure);
-        System.out.println(unresolvedReports);
 
-        assertInstanceOf(RemoveHeaderStructureDto.class, tableStructure.getStructures().getFirst());
-        assertInstanceOf(RemoveFooterStructureDto.class, tableStructure.getStructures().get(1));
-        assertInstanceOf(RemoveTrailingColumnStructureDto.class, tableStructure.getStructures().get(2));
-        assertInstanceOf(RemoveLeadingColumnStructureDto.class, tableStructure.getStructures().get(3));
-        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(4));
-        assertEquals(List.of(0), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getRowIndex());
-        assertEquals(List.of(0), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getColumnIndex());
-        assertEquals(1, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getStartColumn().orElseThrow());
-        assertEquals(2, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(4)).getStartRow().orElseThrow());
-        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(5));
-        assertEquals(List.of("Stadtviertel", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(5)).getHeaderNames());
-        assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(6));
-        assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(7));
-        assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(7)).getSearch().orElseThrow());
-        assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(7)).getReplacement());
+        assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(4));
+        assertInstanceOf(FillEmptyColumnStructureDto.class, tableStructure.getStructures().get(5));
+        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(6));
+        assertEquals(List.of(0, 1), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getRowIndex());
+        assertEquals(List.of(0, 1, 2), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getColumnIndex());
+        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartColumn().orElseThrow());
+        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartRow().orElseThrow());
+        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(7));
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
     }
+
+
+//    @Test
+//    void testGenerationGroupedHeaderI_I() throws IOException {
+//        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderI-I.csv"));
+//        InputFile inputFile = new InputFile(file);
+//        TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
+//
+//        Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
+//
+//        TableStructureDto tableStructure = result.getFirst();
+//        List<ReportDto> unresolvedReports = result.getSecond();
+//
+//        assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(4));
+//        assertInstanceOf(FillEmptyColumnStructureDto.class, tableStructure.getStructures().get(5));
+//        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(6));
+//        assertEquals(List.of(0, 1), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getRowIndex());
+//        assertEquals(List.of(0, 1, 2), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getColumnIndex());
+//        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartColumn().orElseThrow());
+//        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartRow().orElseThrow());
+//        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(7));
+//        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
+//    }
+
+    @Test
+    void testGenerationGroupedHeaderII() throws IOException {
+        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderII.csv"));
+        InputFile inputFile = new InputFile(file);
+        TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
+
+        Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
+
+        TableStructureDto tableStructure = result.getFirst();
+        List<ReportDto> unresolvedReports = result.getSecond();
+
+        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(5));
+        assertEquals(List.of(0), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getRowIndex());
+        assertEquals(List.of(0, 1, 2), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getColumnIndex());
+        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartColumn().orElseThrow());
+        assertEquals(2, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
+        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
+    }
+
+//    @Test
+//    void testGenerationGroupedHeaderIII() throws IOException {
+//        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderIII.csv"));
+//        InputFile inputFile = new InputFile(file);
+//        TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
+//
+//        Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
+//
+//        TableStructureDto tableStructure = result.getFirst();
+//        List<ReportDto> unresolvedReports = result.getSecond();
+//        System.out.println(tableStructure);
+//        System.out.println(unresolvedReports);
+//
+//        assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(5));
+//        assertEquals(List.of(0), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getRowIndex());
+//        assertEquals(List.of(0, 1, 2), ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getColumnIndex());
+//        assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartColumn().orElseThrow());
+//        assertEquals(2, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
+//        assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
+//        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
+//    }
 
     @Test
     void testGenerationGroupedHeaderTwoHeader() throws IOException {
@@ -138,7 +196,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(1, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartColumn().orElseThrow());
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
-        assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
+        assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
         assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(7));
         assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(8));
         assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(8)).getSearch().orElseThrow());

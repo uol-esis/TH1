@@ -74,6 +74,10 @@ public abstract class StructureMapper {
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
                     .blockList(List.of(structure.getBlackList()));
+            case RemoveLeadingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
+                    ConverterTypeDto.REMOVE_TRAILING_COLUMN
+            )
+                    .blockList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
                     structure.getReplacement()
@@ -236,7 +240,23 @@ public abstract class StructureMapper {
                     structure.getHeaderName(),
                     structure.getPrecedenceOrder().toArray(new Integer[0])
             );
-            // no default needed, all cases are handled
+            case TransposeMatrixStructureDto structure -> new TransposeMatrixStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null)
+            );
+            case PivotMatrixStructureDto structure -> new PivotMatrixStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getPivotField(),
+                    structure.getBlockIndices().toArray(new Integer[0]),
+                    structure.getKeysToCarryForward().toArray(new String[0])
+            );
         };
     }
 
