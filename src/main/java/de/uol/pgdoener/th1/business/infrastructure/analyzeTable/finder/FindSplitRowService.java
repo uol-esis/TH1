@@ -4,6 +4,7 @@ import de.uol.pgdoener.th1.business.dto.SplitRowReportDto;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.CellInfo;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.ColumnInfo;
 import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.ValueType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,11 +54,14 @@ public class FindSplitRowService {
      * @return The detected delimiter string or null if none found
      */
     private String findDelimiter(ColumnInfo column, String[][] matrix) {
+        int maxChecks = 10;
+        int checks = 0;
+
         String delimiter = null;
         for (CellInfo cell : column.cellInfos()) {
-            if (cell.rowIndex() == 0) {
-                continue; // Skip first row (usually header)
-            }
+            if (cell.rowIndex() == 0) continue;
+            if (cell.valueType() == ValueType.NUMBER) break;
+            if (checks++ >= maxChecks) break;
 
             String cellContent = matrix[cell.rowIndex()][column.columnIndex()];
             delimiter = detectDelimiter(cellContent);
@@ -114,14 +118,6 @@ public class FindSplitRowService {
      */
     private static final String[] POSSIBLE_DELIMITERS = {
             "\\r?\\n",   // Line break (Unix or Windows)
-            ",",         // Comma
-            ";",         // Semicolon
-            "·",         // Middle dot
-            "•",         // Bullet
-            "\\|",       // Pipe
-            "/",         // Slash
-            "\\t",       // Tab
-            "\\s{2,}"    // Two or more spaces
     };
 
 }
