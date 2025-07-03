@@ -23,6 +23,17 @@ class FillEmptyRowConverterTest {
     }
 
     @Test
+    void testHandleRequestWithEmptyValues() {
+        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0));
+        FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
+        String[][] matrix = new String[][]{{"", "t", "", "s", ""}, {"", "w", "o", "r", "d"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"", "t", "t", "s", "s"}, {"", "w", "o", "r", "d"}}, result);
+    }
+
+    @Test
     void testHandleRequestMultipleRows() {
         FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0, 1));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
@@ -67,15 +78,6 @@ class FillEmptyRowConverterTest {
         FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(-1));
         FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
         String[][] matrix = new String[][]{{"t", "", "s", ""}, {"w", "o", "r", "d"}};
-
-        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
-    }
-
-    @Test
-    void testHandleRequestMultipleRowsWithEmptyValues() {
-        FillEmptyRowStructureDto structure = new FillEmptyRowStructureDto(null, List.of(0, 1));
-        FillEmptyRowConverter converter = new FillEmptyRowConverter(structure);
-        String[][] matrix = new String[][]{{"", "", "", ""}, {"", "o", "", "d"}};
 
         assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }

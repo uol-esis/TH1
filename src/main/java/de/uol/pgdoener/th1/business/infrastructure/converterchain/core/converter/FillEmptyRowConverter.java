@@ -29,7 +29,7 @@ public class FillEmptyRowConverter extends Converter {
                     lastNonEmptyValue = row[i];
                 } else {
                     if (lastNonEmptyValue.isBlank()) {
-                        throwConverterException("No non-empty value found in the row to fill empty cells");
+                        continue;
                     }
                     row[i] = lastNonEmptyValue;
                 }
