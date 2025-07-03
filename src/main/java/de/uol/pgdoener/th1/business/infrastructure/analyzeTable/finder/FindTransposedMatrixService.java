@@ -1,0 +1,123 @@
+package de.uol.pgdoener.th1.business.infrastructure.analyzeTable.finder;
+
+import de.uol.pgdoener.th1.business.dto.TransposeMatrixReportDto;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.CellInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.ColumnInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.MatrixInfo;
+import de.uol.pgdoener.th1.business.infrastructure.analyzeTable.core.RowInfo;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class FindTransposedMatrixService {
+
+    /**
+     * Detects if the provided matrix is likely a transposed table.
+     * A transposed matrix typically has string labels in the first column,
+     * numeric values across the first row, and more columns than rows.
+     *
+     * @param matrixInfo metadata structure (not used directly here but available)
+     * @param matrix     the raw matrix data
+     * @return an Optional containing a TransposedMatrixReportDto if the structure matches
+     */
+    public Optional<TransposeMatrixReportDto> find(MatrixInfo matrixInfo, String[][] matrix) {
+        if (isEmpty(matrixInfo)) return Optional.empty();
+
+        int rowCount = matrixInfo.rowInfos().size();
+        int columnCount = matrixInfo.columnInfos().size();
+
+        if (!hasTransposedShape(rowCount, columnCount)) return Optional.empty();
+
+        double labelRatio = calculateLabelRatioInFirstColumn(matrixInfo);
+        double numberRatio = calculateNumberRatioInFirstRow(matrixInfo);
+
+        boolean likelyTransposed = labelRatio > 0.6 && numberRatio > 0.6;
+
+        if (likelyTransposed) {
+            TransposeMatrixReportDto report = new TransposeMatrixReportDto();
+            report.setDetected(true);
+            return Optional.of(report);
+        }
+
+        return Optional.empty();
+    }
+
+    /**
+     * Checks whether the matrix is empty or malformed.
+     */
+    private boolean isEmpty(String[][] matrix) {
+        return matrix == null || matrix.length == 0 || matrix[0].length == 0;
+    }
+
+    /**
+     * Checks if the matrix shape is more typical of a transposed matrix
+     * (more columns than rows).
+     */
+    private boolean hasTransposedShape(int rowCount, int columnCount) {
+        return columnCount > rowCount;
+    }
+
+    /**
+     * Calculates the proportion of label-like strings in the first column (excluding header).
+     */
+    private double calculateLabelRatioInFirstColumn(MatrixInfo matrixInfo) {
+        ColumnInfo firstColumn = matrixInfo.columnInfos().get(0);
+        int labelCount = 0;
+        int total = firstColumn.cellInfos().size() - 1; // ohne Header
+
+        for (int i = 1; i < firstColumn.cellInfos().size(); i++) {
+            CellInfo cell = firstColumn.cellInfos().get(i);
+            if (isLikelyLabel(cell)) {
+                labelCount++;
+            }
+        }
+
+        return total == 0 ? 0 : (double) labelCount / total;
+    }
+
+    /**
+     * Calculates the proportion of numeric-looking values in the first row (excluding header).
+     */
+    private double calculateNumberRatioInFirstRow(MatrixInfo matrixInfo) {
+        RowInfo firstRow = matrixInfo.rowInfos().get(0);
+        int numberCount = 0;
+        int total = firstRow.cellInfos().size() - 1;
+
+        for (int i = 1; i < firstRow.cellInfos().size(); i++) {
+            CellInfo cell = firstRow.cellInfos().get(i);
+            if (isNumber(cell)) {
+                numberCount++;
+            }
+        }
+
+        return total == 0 ? 0 : (double) numberCount / total;
+    }
+
+    /**
+     * Checks if a string looks like a label (non-empty and not a number).
+     */
+    private boolean isLikelyLabel(String value) {
+        return cellInfoService.isString(cell);
+    }
+
+    /**
+     * Checks if a string can be interpreted as a number.
+     * German number format is supported (dot as thousand separator, comma as decimal).
+     */
+    private boolean isNumber(String value) {
+        if (value == null || value.isBlank()) return false;
+
+        try {
+            String normalized = value.replace(".", "").replace(",", ".").trim();
+            Double.parseDouble(normalized);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+}

@@ -40,6 +40,4 @@ public class PivotMatrixStructure extends Structure {
     @Type(StringArrayType.class)
     @Column(columnDefinition = "text[]")
     private String[] keysToCarryForward;
-
-
 }
