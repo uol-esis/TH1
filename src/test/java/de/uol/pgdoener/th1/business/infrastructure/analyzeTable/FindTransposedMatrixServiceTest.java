@@ -49,8 +49,9 @@ class FindTransposedMatrixServiceTest {
         };
 
         MatrixInfo matrixInfo = matrixInfoFactory.create(matrix);
-        Optional<TransposeMatrixReportDto> result = findTransposedMatrixService.find(matrixInfo, matrix);
+        Optional<TransposeMatrixReportDto> result = findTransposedMatrixService.find(matrixInfo);
 
+        System.out.println(result);
         assertTrue(result.isPresent());
         assertTrue(result.get().isDetected());
     }
@@ -66,7 +67,7 @@ class FindTransposedMatrixServiceTest {
         };
 
         MatrixInfo matrixInfo = matrixInfoFactory.create(matrix);
-        Optional<TransposeMatrixReportDto> result = findTransposedMatrixService.find(matrixInfo, matrix);
+        Optional<TransposeMatrixReportDto> result = findTransposedMatrixService.find(matrixInfo);
 
         assertFalse(result.isPresent());
     }

@@ -5,6 +5,7 @@ import de.uol.pgdoener.th1.data.entity.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -106,6 +107,19 @@ public abstract class StructureMapper {
                     .name(structure.getName())
                     .description(structure.getDescription())
                     .precedenceOrder(List.of(structure.getPrecedenceOrder()));
+            case TransposeMatrixStructure structure -> new TransposeMatrixStructureDto(
+                    ConverterTypeDto.TRANSPOSE_MATRIX
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription());
+            case PivotMatrixStructure structure -> new PivotMatrixStructureDto(
+                    ConverterTypeDto.PIVOT_MATRIX
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription())
+                    .pivotField(structure.getPivotField())
+                    .keysToCarryForward(Arrays.asList(structure.getKeysToCarryForward()))
+                    .blockIndices(List.of(structure.getBlockIndices()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
