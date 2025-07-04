@@ -1,9 +1,0 @@
-spring.datasource.username=example
-spring.datasource.password=example
-spring.datasource.url=jdbc:postgresql://localhost:5432/example
-snapshot.dir=./shared-snapshots
-spring.security.oauth2.resourceserver.jwt.issuer-uri=https://auth.example.com/some/path
-springdoc.swagger-ui.oauth.client-id=< id >
-# urls for auth server to be used in swagger ui
-security.authorizationUrl=https://auth.example.com/some/path
-security.tokenUrl=https://auth.example.com/some/path

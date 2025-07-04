@@ -5,7 +5,7 @@ target/
 
 ### .env Datei ignorieren ###
 *.env
-application-*.properties
+application-*.yaml
 shared-snapshots/
 
 ### STS ###
