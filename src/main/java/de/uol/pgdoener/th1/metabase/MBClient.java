@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.metabase;
 
+import de.uol.pgdoener.th1.autoconfigure.MetabaseProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -23,23 +23,23 @@ public class MBClient {
 
     /**
      * The API key used to notify Metabase to update its cache.
-     * It can be set in Metabase using the "MB_API_KEY" environment variable.
+     * It can be set in Metabase using the "TH1_MB_API_KEY" environment variable.
      */
-    @Value("${mb.api.key}")
-    private String notifyKey;
+    private final String notifyKey;
 
     /**
      * This key is used for all other API calls.
      * This key has to be created manually in Metabase.
      * See <a href="https://www.metabase.com/docs/latest/people-and-groups/api-keys#create-an-api-key">here</a> for more information.
      */
-    @Value("${mb.api.general.key}")
-    private String generalKey;
+    private final String generalKey;
 
-    public MBClient(@Value("${mb.api.basePath}") String basePath) {
+    public MBClient(MetabaseProperties metabaseProperties) {
         this.restClient = RestClient.builder()
-                .baseUrl(basePath)
+                .baseUrl(metabaseProperties.getBasePath())
                 .build();
+        this.notifyKey = metabaseProperties.getKey();
+        this.generalKey = metabaseProperties.getGeneralKey();
     }
 
     /**

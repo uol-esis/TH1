@@ -1,10 +1,10 @@
 package de.uol.pgdoener.th1.business.service;
 
+import de.uol.pgdoener.th1.autoconfigure.SnapshotProperties;
 import de.uol.pgdoener.th1.data.entity.SchemaVersion;
 import de.uol.pgdoener.th1.data.repository.SchemaVersionRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -13,8 +13,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class SchemaVersionService {
 
-    @Value("${snapshot.dir}")
-    private String snapshotPath;
+    private final SnapshotProperties snapshotProperties;
 
     private final SnapshotService snapshotService;
     private final SchemaVersionRepository schemaVersionRepository;
@@ -38,7 +37,7 @@ public class SchemaVersionService {
         schemaVersion.setVersion(version);
         schemaVersion.setChangeType(changeType);
         schemaVersion.setChangeSql(sql);
-        schemaVersion.setSnapshotPath(snapshotPath);
+        schemaVersion.setSnapshotPath(snapshotProperties.getDir());
         schemaVersion.setChangedAt(new java.sql.Timestamp(System.currentTimeMillis()));
 
         schemaVersionRepository.save(schemaVersion);
