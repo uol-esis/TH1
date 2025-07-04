@@ -114,6 +114,7 @@ public class TableStructureBuilder {
                     reanalysisCause = ReportTypeDto.SPLIT_ROW;
                     break reportsLoop;
                 }
+                case TransposeMatrixReportDto r -> unresolvedReports.add(r);
             }
         }
 
