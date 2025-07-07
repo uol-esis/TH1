@@ -7,6 +7,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "th1.snapshot")
 public class SnapshotProperties {
 
+    /**
+     * The directory where the snapshots are stored.
+     */
     private String dir;
 
 }

@@ -9,9 +9,21 @@ import java.util.List;
 @ConfigurationProperties(prefix = "th1.security")
 public class SecurityProperties {
 
+    /**
+     * Allowed origins for CORS.
+     * example for keycloak would be: http://localhost:8080
+     */
     private List<String> allowedOrigins;
 
+    /**
+     * Authorization URL for OAuth2.
+     * example for keycloak would be: http://localhost:8080/realms/example/protocol/openid-connect/auth
+     */
     private String authorizationUrl;
+    /**
+     * Token URL for OAuth2.
+     * example for keycloak would be: http://localhost:8080/realms/example/protocol/openid-connect/token
+     */
     private String tokenUrl;
 
 }
