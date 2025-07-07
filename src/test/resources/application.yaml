@@ -29,7 +29,8 @@ th1:
     general-key: <key>
     base-path: http://example.com:3000/api
   security:
-    allowed-origins: *
+    allowed-origins:
+      - "*"
     authorization-url: localhost
     token-url: localhost
   snapshot:
