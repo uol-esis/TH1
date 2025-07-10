@@ -1,34 +1,18 @@
 package de.uol.pgdoener.th1.business.infrastructure.converterchain;
 
-import de.uol.pgdoener.th1.business.dto.StructureDto;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.Converter;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterFactory;
 import de.uol.pgdoener.th1.business.infrastructure.exceptions.TransformationException;
+import lombok.AllArgsConstructor;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.List;
-
 @Slf4j
+@AllArgsConstructor
 public class ConverterChainService {
-    private final TableStructureDto tableStructure;
     private final ConverterChain converterChain;
-
-    public ConverterChainService(@NonNull TableStructureDto tableStructure) {
-        this.tableStructure = tableStructure;
-        this.converterChain = new ConverterChain();
-
-        List<StructureDto> structures = this.tableStructure.getStructures();
-        for (int i = 0; i < structures.size(); i++) {
-            Converter converter = ConverterFactory.createConverter(structures.get(i));
-            converter.setIndex(i);
-            this.converterChain.add(converter);
-        }
-    }
 
     public ConverterResult performTransformation(@NonNull InputFile inputFile) throws TransformationException {
         String[][] inputMatrix = inputFile.asStringArray();
@@ -48,9 +32,11 @@ public class ConverterChainService {
      * @return the result of the transformation
      * @throws TransformationException if an error occurs during the transformation
      */
-    public ConverterResult performTransformation(@NonNull String[][] rawMatrix) throws TransformationException {
+    public ConverterResult performTransformation(
+            @NonNull String[][] rawMatrix, Integer endRow, Integer endColumn
+    ) throws TransformationException {
         String[][] transformedMatrix;
-        String[][] matrix = cutOffMatrix(rawMatrix, tableStructure);
+        String[][] matrix = cutOffMatrix(rawMatrix, endRow, endColumn);
         if (matrix.length == 0 || matrix[0].length == 0) {
             log.debug("No data found in the input file");
             return new ConverterResult(tableStructure, matrix);
@@ -64,14 +50,14 @@ public class ConverterChainService {
         return new ConverterResult(tableStructure, transformedMatrix);
     }
 
-    private static String[][] cutOffMatrix(String[][] inputMatrix, TableStructureDto tableStructure) {
-        if (tableStructure.getEndColumn().isPresent() || tableStructure.getEndRow().isPresent()) {
+    private static String[][] cutOffMatrix(String[][] inputMatrix, Integer endRow, Integer endColumn) {
+        if (endColumn != null || endRow != null) {
 
             int maxRow = inputMatrix.length;
             int maxCol = inputMatrix[0].length;
 
             // Falls endRow oder endColumn nicht gesetzt sind, bestimmen wir die Größe dynamisch
-            int rowLength = Math.min(tableStructure.getEndRow().orElse(maxRow), maxRow);
+            int rowLength = Math.min(endRow.orElse(maxRow), maxRow);
             int colLength = Math.min(tableStructure.getEndColumn().orElse(maxCol), maxCol);
 
             // Matrix initialisieren

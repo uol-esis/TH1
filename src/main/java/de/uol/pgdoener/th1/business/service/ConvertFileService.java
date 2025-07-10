@@ -3,7 +3,9 @@ package de.uol.pgdoener.th1.business.service;
 import de.uol.pgdoener.th1.business.dto.TableStructureDto;
 import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.business.infrastructure.InputFile;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainBuilder;
 import de.uol.pgdoener.th1.business.infrastructure.converterchain.ConverterChainService;
+import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterChain;
 import de.uol.pgdoener.th1.business.mapper.TableStructureMapper;
 import de.uol.pgdoener.th1.business.service.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.data.entity.Structure;
@@ -41,7 +43,8 @@ public class ConvertFileService {
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
         TableStructureDto tableStructureDto = TableStructureMapper.toDto(tableStructure.get(), structureList);
-        ConverterChainService converterService = new ConverterChainService(tableStructureDto);
+        ConverterChain converterChain = new ConverterChainBuilder(tableStructureDto).build();
+        ConverterChainService converterService = new ConverterChainService(converterChain, tableStructureDto);
 
         InputFile inputFile = new InputFile(file);
         String[][] transformedMatrix = converterService.performTransformation(inputFile).data();

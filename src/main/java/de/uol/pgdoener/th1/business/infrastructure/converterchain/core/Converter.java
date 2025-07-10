@@ -9,7 +9,6 @@ import lombok.Setter;
  * At the end of the method, it should call the handleRequest of this super class.
  */
 public abstract class Converter {
-
     protected Converter nextConverter;
     @Setter
     protected int index;
