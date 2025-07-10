@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 
+import static de.uol.pgdoener.th1.data.entity.MatchType.CONTAINS;
+import static de.uol.pgdoener.th1.data.entity.MatchType.EQUALS;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class StructureMapper {
 
@@ -120,6 +123,16 @@ public abstract class StructureMapper {
                     .pivotField(structure.getPivotField())
                     .keysToCarryForward(Arrays.asList(structure.getKeysToCarryForward()))
                     .blockIndices(List.of(structure.getBlockIndices()));
+            case RemoveKeywordsStructure structure -> new RemoveKeywordsStructureDto(
+                    ConverterTypeDto.REMOVE_KEYWORD,
+                    structure.getRemoveRows(),
+                    structure.getRemoveColumns(),
+                    structure.getIgnoreCase(),
+                    convertMatchTypeToDto(structure.getMatchType())
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription())
+                    .keywords(Arrays.asList(structure.getKeywords()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
@@ -271,6 +284,40 @@ public abstract class StructureMapper {
                     structure.getBlockIndices().toArray(new Integer[0]),
                     structure.getKeysToCarryForward().toArray(new String[0])
             );
+            case RemoveKeywordsStructureDto structure -> new RemoveKeywordsStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getKeywords().toArray(new String[0]),
+                    structure.isRemoveRows(),
+                    structure.isRemoveColumns(),
+                    structure.isIgnoreCase(),
+                    convertMatchTypeToEntity(structure.getMatchType())
+            );
+        };
+    }
+
+    private static MatchType convertMatchTypeToEntity(RemoveKeywordsStructureDto.MatchTypeEnum dtoEnum) {
+        if (dtoEnum == null) {
+            return EQUALS; // Default oder null-behandlung
+        }
+        return switch (dtoEnum) {
+            case CONTAINS -> CONTAINS;
+            case EQUALS -> EQUALS;
+            default -> throw new IllegalArgumentException("Unknown matchType: " + dtoEnum);
+        };
+    }
+
+
+    private static RemoveKeywordsStructureDto.MatchTypeEnum convertMatchTypeToDto(MatchType matchType) {
+        if (matchType == null) {
+            return RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS;
+        }
+        return switch (matchType) {
+            case CONTAINS -> RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS;
+            case EQUALS -> RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS;
         };
     }
 

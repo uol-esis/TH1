@@ -43,7 +43,7 @@ public class AnalyzeMatrixInfoService {
             reports.addAll(optionalSplitRowReport.get());
             return reports;
         }
-        Optional<SumReportDto> optionalSumReport = findSumReportService.find(matrixInfo, matrix, settings.getSumBlockList());
+        Optional<SumReportDto> optionalSumReport = findSumReportService.find(matrixInfo, matrix, settings.getRemoveKeywords().orElseThrow().getKeywords());
         if (optionalSumReport.isPresent()) {
             reports.add(optionalSumReport.get());
             return reports;
