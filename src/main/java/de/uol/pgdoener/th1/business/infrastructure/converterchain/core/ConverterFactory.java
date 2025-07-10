@@ -26,6 +26,7 @@ public abstract class ConverterFactory {
             case MergeColumnsStructureDto s -> new MergeColumnsConverter(s);
             case TransposeMatrixStructureDto s -> new TransposeMatrixConverter(s);
             case PivotMatrixStructureDto s -> new PivotMatrixConverter(s);
+            case RemoveKeywordsStructureDto s -> new RemoveKeywordsConverter(s);
         };
     }
 }
