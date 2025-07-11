@@ -24,6 +24,8 @@ public abstract class ConverterTypeMapper {
             case RemoveInvalidRowStructure ignored -> ConverterTypeDto.REMOVE_INVALID_ROWS;
             case MergeColumnsStructure ignored -> ConverterTypeDto.MERGE_COLUMNS;
             case SplitRowStructure ignored -> ConverterTypeDto.SPLIT_ROW;
+            case TransposeMatrixStructure ignored -> ConverterTypeDto.TRANSPOSE_MATRIX;
+            case PivotMatrixStructure ignored -> ConverterTypeDto.PIVOT_MATRIX;
             default -> throw new IllegalStateException("Unexpected value: " + structure);
         };
     }
