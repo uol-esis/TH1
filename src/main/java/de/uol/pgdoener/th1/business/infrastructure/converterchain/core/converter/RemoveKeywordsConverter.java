@@ -22,10 +22,6 @@ public class RemoveKeywordsConverter extends Converter {
      */
     @Override
     public String[][] handleRequest(String[][] inputMatrix) {
-        if (inputMatrix == null || inputMatrix.length == 0) {
-            return super.handleRequest(inputMatrix);
-        }
-
         String[][] resultMatrix = inputMatrix;
 
         if (structure.isRemoveColumns()) {
@@ -50,26 +46,25 @@ public class RemoveKeywordsConverter extends Converter {
      * @return a new matrix with columns removed where the header matches a keyword
      */
     private String[][] removeColumnsWithHeaderKeywords(String[][] matrix) {
-        int columnCount = matrix[0].length;
+        int rowLength = matrix.length;
+        int columnLength = matrix[0].length;
+
         List<Integer> columnsToRemove = identifyColumnsToRemove(matrix[0]);
 
-        if (columnsToRemove.isEmpty()) {
-            return matrix;
-        }
+        int newColumnLength = columnLength - columnsToRemove.size();
+        String[][] newMatrix = new String[rowLength][newColumnLength];
 
-        int newColCount = columnCount - columnsToRemove.size();
-        String[][] result = new String[matrix.length][newColCount];
-
-        for (int row = 0; row < matrix.length; row++) {
+        for (int rowIndex = 0; rowIndex < rowLength; rowIndex++) {
             int newColIndex = 0;
-            for (int col = 0; col < columnCount; col++) {
-                if (!columnsToRemove.contains(col)) {
-                    result[row][newColIndex++] = matrix[row][col];
+            for (int colIndex = 0; colIndex < columnLength; colIndex++) {
+                if (!columnsToRemove.contains(colIndex)) {
+                    String cellEntry = matrix[rowIndex][colIndex];
+                    newMatrix[rowIndex][newColIndex++] = cellEntry;
                 }
             }
         }
 
-        return result;
+        return newMatrix;
     }
 
     /**
@@ -101,7 +96,6 @@ public class RemoveKeywordsConverter extends Converter {
         List<String[]> filteredRows = new ArrayList<>();
 
         for (int i = 0; i < matrix.length; i++) {
-            // Header bleibt immer erhalten
             if (i == 0) {
                 filteredRows.add(matrix[i]);
                 continue;
