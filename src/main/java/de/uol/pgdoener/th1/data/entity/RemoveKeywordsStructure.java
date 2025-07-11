@@ -8,12 +8,10 @@ import jakarta.persistence.Enumerated;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class RemoveKeywordsStructure extends Structure {
@@ -39,19 +37,15 @@ public class RemoveKeywordsStructure extends Structure {
     }
 
     @Type(StringArrayType.class)
-    @Column(columnDefinition = "text[]", nullable = false)
+    @Column(columnDefinition = "text[]", nullable = true)
     private String[] keywords;
 
-    @Column(nullable = false)
     private Boolean removeRows = true;
 
-    @Column(nullable = false)
     private Boolean removeColumns = true;
 
-    @Column(nullable = false)
     private Boolean ignoreCase = true;
-
-    @Column(nullable = false)
+    
     @Enumerated(EnumType.STRING)
     private MatchType matchType = MatchType.EQUALS;
 
