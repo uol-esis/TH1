@@ -1,9 +1,9 @@
 package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.ConverterApiDelegate;
-import de.uol.pgdoener.th1.business.dto.TableStructureDto;
-import de.uol.pgdoener.th1.business.infrastructure.ConverterResult;
-import de.uol.pgdoener.th1.business.service.ConvertFileService;
+import de.uol.pgdoener.th1.application.dto.TableStructureDto;
+import de.uol.pgdoener.th1.application.infrastructure.ConverterResult;
+import de.uol.pgdoener.th1.application.service.ConvertFileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;

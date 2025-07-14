@@ -1,10 +1,10 @@
 package de.uol.pgdoener.th1;
 
-import de.uol.pgdoener.th1.business.infrastructure.converterchain.core.ConverterException;
-import de.uol.pgdoener.th1.business.infrastructure.exceptions.InputFileException;
-import de.uol.pgdoener.th1.business.infrastructure.exceptions.TableStructureGenerationException;
-import de.uol.pgdoener.th1.business.infrastructure.exceptions.TransformationException;
-import de.uol.pgdoener.th1.business.service.ServiceException;
+import de.uol.pgdoener.th1.application.converterchain.exception.ConverterException;
+import de.uol.pgdoener.th1.application.infrastructure.exceptions.InputFileException;
+import de.uol.pgdoener.th1.application.infrastructure.exceptions.TableStructureGenerationException;
+import de.uol.pgdoener.th1.application.infrastructure.exceptions.TransformationException;
+import de.uol.pgdoener.th1.application.service.ServiceException;
 import de.uol.pgdoener.th1.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;

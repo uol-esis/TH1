@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.api.validation;
 
-import de.uol.pgdoener.th1.business.dto.ReportTypeDto;
+import de.uol.pgdoener.th1.application.dto.ReportTypeDto;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
