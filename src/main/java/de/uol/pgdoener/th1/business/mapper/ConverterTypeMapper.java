@@ -18,10 +18,14 @@ public abstract class ConverterTypeMapper {
             case RemoveHeaderStructure ignored -> ConverterTypeDto.REMOVE_HEADER;
             case RemoveFooterStructure ignored -> ConverterTypeDto.REMOVE_FOOTER;
             case RemoveTrailingColumnStructure ignored -> ConverterTypeDto.REMOVE_COLUMN_BY_INDEX;
+            case RemoveLeadingColumnStructure ignored -> ConverterTypeDto.REMOVE_LEADING_COLUMN;
             case FillEmptyColumnStructure ignored -> ConverterTypeDto.FILL_EMPTY_COLUMN;
             case ReplaceEntriesStructure ignored -> ConverterTypeDto.REPLACE_ENTRIES;
             case RemoveInvalidRowStructure ignored -> ConverterTypeDto.REMOVE_INVALID_ROWS;
             case MergeColumnsStructure ignored -> ConverterTypeDto.MERGE_COLUMNS;
+            case SplitRowStructure ignored -> ConverterTypeDto.SPLIT_ROW;
+            case TransposeMatrixStructure ignored -> ConverterTypeDto.TRANSPOSE_MATRIX;
+            case PivotMatrixStructure ignored -> ConverterTypeDto.PIVOT_MATRIX;
             default -> throw new IllegalStateException("Unexpected value: " + structure);
         };
     }
