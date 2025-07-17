@@ -12,6 +12,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -21,6 +23,7 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.oauth2Login;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -29,7 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-@ActiveProfiles("integrationTest")
+@ActiveProfiles("prod")
 class TableStructuresApiTest {
 
     private static final String basePath = "/api/v1/table-structures";
@@ -62,6 +65,13 @@ class TableStructuresApiTest {
         tableStructureRepository.deleteAll();
     }
 
+    private SecurityMockMvcRequestPostProcessors.OAuth2LoginRequestPostProcessor authorizedLogin() {
+        return oauth2Login()
+                .authorities(
+                        new SimpleGrantedAuthority("write:tablestructure"),
+                        new SimpleGrantedAuthority("read:tablestructure"));
+    }
+
     @Test
     void createTableStructureEndpoint() throws Exception {
 
@@ -69,6 +79,7 @@ class TableStructuresApiTest {
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
         mockMvc.perform(post(basePath)
+                        .with(authorizedLogin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -100,11 +111,13 @@ class TableStructuresApiTest {
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
         mockMvc.perform(post(basePath)
+                        .with(authorizedLogin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isCreated());
         mockMvc.perform(post(basePath)
+                        .with(authorizedLogin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -120,12 +133,14 @@ class TableStructuresApiTest {
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
         mockMvc.perform(post(basePath)
+                .with(authorizedLogin())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(tableStructureJson)
                 .accept(MediaType.APPLICATION_JSON));
 
         // begin test
-        mockMvc.perform(get(basePath))
+        mockMvc.perform(get(basePath)
+                        .with(authorizedLogin()))
                 .andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
@@ -136,6 +151,7 @@ class TableStructuresApiTest {
         String tableStructureJson = tableStructure.getContentAsString(StandardCharsets.UTF_8);
 
         mockMvc.perform(post(basePath)
+                        .with(authorizedLogin())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(tableStructureJson)
                         .accept(MediaType.APPLICATION_JSON))
@@ -143,7 +159,8 @@ class TableStructuresApiTest {
 
         Long id = tableStructureRepository.findAll().iterator().next().getId();
 
-        mockMvc.perform(delete(basePath + "/" + id))
+        mockMvc.perform(delete(basePath + "/" + id)
+                        .with(authorizedLogin()))
                 .andExpect(status().isNoContent());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
@@ -153,11 +170,19 @@ class TableStructuresApiTest {
     @Test
     void deleteTableStructuresEndpointNonExistent() throws Exception {
 
-        mockMvc.perform(delete(basePath + "/1"))
+        mockMvc.perform(delete(basePath + "/1")
+                        .with(authorizedLogin()))
                 .andExpect(status().isNotFound());
 
         Assertions.assertEquals(0, tableStructureRepository.count());
 
+    }
+
+    @Test
+    void deleteTableStructuresEndpointUnauthorized() throws Exception {
+        mockMvc.perform(delete(basePath + "/1"))
+                .andExpect(status().isUnauthorized());
+        Assertions.assertEquals(0, tableStructureRepository.count());
     }
 
 }

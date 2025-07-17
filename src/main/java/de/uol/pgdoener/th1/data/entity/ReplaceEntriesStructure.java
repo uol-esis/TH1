@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -12,16 +14,15 @@ import lombok.NoArgsConstructor;
 public class ReplaceEntriesStructure extends Structure {
 
     public ReplaceEntriesStructure(Long id, int position, Long tableStructureId, String name, String description,
-                                   String replacement, String search, String regexSearch,
-                                   Integer startRow, Integer endRow, Integer startColumn, Integer endColumn) {
+                                   String replacement, String search, String regexSearch, List<Integer> columns,
+                                   Integer startRow, Integer endRow) {
         super(id, position, tableStructureId, name, description);
         this.replacement = replacement;
         this.search = search;
         this.regexSearch = regexSearch;
+        this.columns = columns;
         this.startRow = startRow;
         this.endRow = endRow;
-        this.startColumn = startColumn;
-        this.endColumn = endColumn;
     }
 
     private String replacement;
@@ -29,9 +30,8 @@ public class ReplaceEntriesStructure extends Structure {
     private String search;
     private String regexSearch;
 
+    private List<Integer> columns;
     private Integer startRow;
     private Integer endRow;
-    private Integer startColumn;
-    private Integer endColumn;
 
 }

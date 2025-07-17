@@ -5,6 +5,7 @@ import de.uol.pgdoener.th1.data.entity.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.Arrays;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
@@ -74,6 +75,10 @@ public abstract class StructureMapper {
                     ConverterTypeDto.REMOVE_TRAILING_COLUMN
             )
                     .blockList(List.of(structure.getBlackList()));
+            case RemoveLeadingColumnStructure structure -> new RemoveTrailingColumnStructureDto(
+                    ConverterTypeDto.REMOVE_LEADING_COLUMN
+            )
+                    .blockList(List.of(structure.getBlackList()));
             case ReplaceEntriesStructure structure -> new ReplaceEntriesStructureDto(
                     ConverterTypeDto.REPLACE_ENTRIES,
                     structure.getReplacement()
@@ -84,8 +89,7 @@ public abstract class StructureMapper {
                     .regexSearch(structure.getRegexSearch())
                     .startRow(structure.getStartRow())
                     .endRow(structure.getEndRow())
-                    .startColumn(structure.getStartColumn())
-                    .endColumn(structure.getEndColumn());
+                    .columnIndex(structure.getColumns());
             case SplitRowStructure structure -> new SplitRowStructureDto(
                     ConverterTypeDto.SPLIT_ROW,
                     structure.getColumnIndex()
@@ -103,6 +107,19 @@ public abstract class StructureMapper {
                     .name(structure.getName())
                     .description(structure.getDescription())
                     .precedenceOrder(List.of(structure.getPrecedenceOrder()));
+            case TransposeMatrixStructure structure -> new TransposeMatrixStructureDto(
+                    ConverterTypeDto.TRANSPOSE_MATRIX
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription());
+            case PivotMatrixStructure structure -> new PivotMatrixStructureDto(
+                    ConverterTypeDto.PIVOT_MATRIX
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription())
+                    .pivotField(structure.getPivotField())
+                    .keysToCarryForward(Arrays.asList(structure.getKeysToCarryForward()))
+                    .blockIndices(List.of(structure.getBlockIndices()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
@@ -203,10 +220,9 @@ public abstract class StructureMapper {
                     structure.getReplacement(),
                     structure.getSearch().orElse(null),
                     structure.getRegexSearch().orElse(null),
+                    structure.getColumnIndex(),
                     structure.getStartRow().orElse(null),
-                    structure.getEndRow().orElse(null),
-                    structure.getStartColumn().orElse(null),
-                    structure.getEndColumn().orElse(null)
+                    structure.getEndRow().orElse(null)
             );
             case SplitRowStructureDto structure -> new SplitRowStructure(
                     null, // ID wird von der Datenbank generiert
@@ -238,7 +254,23 @@ public abstract class StructureMapper {
                     structure.getHeaderName(),
                     structure.getPrecedenceOrder().toArray(new Integer[0])
             );
-            // no default needed, all cases are handled
+            case TransposeMatrixStructureDto structure -> new TransposeMatrixStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null)
+            );
+            case PivotMatrixStructureDto structure -> new PivotMatrixStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getPivotField(),
+                    structure.getBlockIndices().toArray(new Integer[0]),
+                    structure.getKeysToCarryForward().toArray(new String[0])
+            );
         };
     }
 

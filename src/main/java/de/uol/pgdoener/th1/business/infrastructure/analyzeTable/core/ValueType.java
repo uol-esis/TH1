@@ -4,5 +4,6 @@ public enum ValueType {
     NUMBER,
     BOOLEAN,
     STRING,
-    EMPTY
+    EMPTY,
+    NULL
 }
