@@ -42,7 +42,7 @@ public class FindGroupedHeaderService {
             return Optional.empty();
         }
 
-        if (!validateRectangle(matrixInfo, rectangle.get()) || rectangle.get().height > 5 || rectangle.get().width > 5) {
+        if (!validateRectangle(matrixInfo, rectangle.get())) {
             return Optional.empty();
         }
 
@@ -101,7 +101,7 @@ public class FindGroupedHeaderService {
     }
 
     private boolean validateRectangle(MatrixInfo matrixInfo, HeaderRectangle rectangle) {
-        if (rectangle.height() > matrixInfo.rowInfos().size() / 2) {
+        if (rectangle.height() > 5) {
             // unrealistic height
             return false;
         }
