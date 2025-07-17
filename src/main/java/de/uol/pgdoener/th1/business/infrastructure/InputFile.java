@@ -135,7 +135,7 @@ public class InputFile {
     private String[][] readExcelToMatrix(WorkbookFactory workbookFactory) throws IOException {
         try (Workbook workbook = workbookFactory.create(file.getInputStream())) {
             FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-            
+
             Iterator<Sheet> sheetIterator = workbook.sheetIterator();
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
@@ -155,31 +155,38 @@ public class InputFile {
                         matrix[rowNum][i] = "";
                         continue;
                     }
-                    switch (row.getCell(i).getCellType()) {
-                        case STRING -> matrix[rowNum][i] = row.getCell(i).getStringCellValue();
-                        case NUMERIC -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getNumericCellValue());
-                        case BOOLEAN -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getBooleanCellValue());
-                        case FORMULA -> {
-                            CellValue cellValue = evaluator.evaluate(row.getCell(i));
-                            if (cellValue == null) {
-                                matrix[rowNum][i] = ""; // oder "ERROR" oder was passt
-                                break;
-                            }
-                            switch (cellValue.getCellType()) {
-                                case STRING -> matrix[rowNum][i] = cellValue.getStringValue();
-                                case NUMERIC -> matrix[rowNum][i] = String.valueOf(cellValue.getNumberValue());
-                                case BOOLEAN -> matrix[rowNum][i] = String.valueOf(cellValue.getBooleanValue());
-                                case ERROR -> matrix[rowNum][i] = "ERROR";
-                                default -> matrix[rowNum][i] = "UNKNOWN";
-                            }
-                        }
-                        case BLANK -> matrix[rowNum][i] = "";
-                        case ERROR -> matrix[rowNum][i] = "ERROR";
-                        default -> matrix[rowNum][i] = "UNKNOWN";
-                    }
+                    matrix[rowNum][i] = getCellValueAsString(row.getCell(i), evaluator);
                 }
             }
             return matrix;
+        }
+    }
+
+    private String getCellValueAsString(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                CellValue cellValue = evaluator.evaluate(cell);
+                if (cellValue == null) return "";
+                return switch (cellValue.getCellType()) {
+                    case STRING -> cellValue.getStringValue();
+                    case NUMERIC -> String.valueOf(cellValue.getNumberValue());
+                    case BOOLEAN -> String.valueOf(cellValue.getBooleanValue());
+                    case ERROR -> "ERROR";
+                    default -> "UNKNOWN";
+                };
+            case BLANK:
+                return "";
+            case ERROR:
+                return "ERROR";
+            default:
+                return "UNKNOWN";
         }
     }
 
