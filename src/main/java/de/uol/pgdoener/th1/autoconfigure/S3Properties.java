@@ -10,15 +10,15 @@ public class S3Properties {
     /**
      * The URL of the S3 service.
      */
-    private String url;
+    private String url = "http://localhost:3900";
     /**
      * The access key for the S3 service.
      */
-    private String accessKey;
+    private String accessKey = "<access key>";
     /**
      * The secret key for the S3 service.
      */
-    private String secretKey;
+    private String secretKey = "<secret key>";
     /**
      * The region for the S3 service.
      */
