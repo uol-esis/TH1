@@ -42,7 +42,7 @@ public class FindGroupedHeaderService {
             return Optional.empty();
         }
 
-        if (!validateRectangle(matrixInfo, rectangle.get())) {
+        if (!validateRectangle(matrixInfo, rectangle.get()) || rectangle.get().height > 5 || rectangle.get().width > 5) {
             return Optional.empty();
         }
 
