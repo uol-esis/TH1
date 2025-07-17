@@ -14,8 +14,16 @@ springdoc:
       client-id: < id >
 
 th1:
-  snapshots:
+  snapshot:
     dir: ./shared-snapshots
   security:
     authorization-url: https://auth.example.com/some/path
     token-url: https://auth.example.com/some/path
+    objectstorage:
+      type: s3
+      s3:
+        access-key: <access key>
+        secret-key: <secret key>
+        url: http://localhost:3900
+        bucket:
+          name: th1-bucket
