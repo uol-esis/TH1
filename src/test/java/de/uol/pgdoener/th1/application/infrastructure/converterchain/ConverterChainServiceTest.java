@@ -1,6 +1,9 @@
 package de.uol.pgdoener.th1.application.infrastructure.converterchain;
 
 import de.uol.pgdoener.th1.application.converterchain.exception.ConverterException;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterChainFactory;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterFactory;
+import de.uol.pgdoener.th1.application.converterchain.model.ConverterChain;
 import de.uol.pgdoener.th1.application.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.application.dto.FillEmptyRowStructureDto;
 import de.uol.pgdoener.th1.application.dto.RemoveRowByIndexStructureDto;
@@ -15,7 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -24,26 +28,9 @@ class ConverterChainServiceTest {
     @Mock
     InputFile inputFile;
 
-    @Test
-    void testConstructorNoStructures() {
-        TableStructureDto tableStructure = new TableStructureDto();
-
-        assertDoesNotThrow(() -> new ConverterChainService(tableStructure));
-    }
-
-    @Test
-    void testConstructorWithStructures() {
-        TableStructureDto tableStructure = new TableStructureDto();
-        tableStructure.addStructuresItem(new FillEmptyRowStructureDto().addRowIndexItem(0));
-
-        assertDoesNotThrow(() -> new ConverterChainService(tableStructure));
-    }
-
-    @Test
-    @SuppressWarnings("ConstantConditions")
-    void testConstructorWithNull() {
-        assertThrows(NullPointerException.class, () -> new ConverterChainService(null));
-    }
+    ConverterFactory converterFactory = new ConverterFactory();
+    ConverterChainFactory chainFactory = new ConverterChainFactory(converterFactory);
+    ConverterChainService converterChainService = new ConverterChainService();
 
     @Test
     void testPerformTransformationNoStructures() {
@@ -51,9 +38,10 @@ class ConverterChainServiceTest {
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
         TableStructureDto tableStructure = new TableStructureDto();
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        ConverterResult result = converterChainService.performTransformation(inputFile);
+        ConverterChain converterChain = chainFactory.create(tableStructure);
+        String[][] outputMatrix = converterChainService.performTransformation(inputFile, converterChain);
+        ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
 
         assertEquals(List.of(List.of("A", "B"), List.of("C", "D")), result.dataAsListOfLists());
         assertEquals(tableStructure, result.tableStructure());
@@ -65,9 +53,10 @@ class ConverterChainServiceTest {
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
         TableStructureDto tableStructure = new TableStructureDto();
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        ConverterResult result = converterChainService.performTransformation(inputFile);
+        ConverterChain converterChain = chainFactory.create(tableStructure);
+        String[][] outputMatrix = converterChainService.performTransformation(inputFile, converterChain);
+        ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
 
         assertEquals(List.of(), result.dataAsListOfLists());
         assertEquals(tableStructure, result.tableStructure());
@@ -79,9 +68,10 @@ class ConverterChainServiceTest {
         when(inputFile.asStringArray()).thenReturn(inputMatrix);
 
         TableStructureDto tableStructure = new TableStructureDto();
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        ConverterResult result = converterChainService.performTransformation(inputFile);
+        ConverterChain converterChain = chainFactory.create(tableStructure);
+        String[][] outputMatrix = converterChainService.performTransformation(inputFile, converterChain);
+        ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
 
         assertEquals(List.of(List.of()), result.dataAsListOfLists());
         assertEquals(tableStructure, result.tableStructure());
@@ -95,9 +85,9 @@ class ConverterChainServiceTest {
         TableStructureDto tableStructure = new TableStructureDto();
         tableStructure.addStructuresItem(new RemoveRowByIndexStructureDto().addRowIndexItem(0));
 
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
-
-        ConverterResult result = converterChainService.performTransformation(inputFile);
+        ConverterChain converterChain = chainFactory.create(tableStructure);
+        String[][] outputMatrix = converterChainService.performTransformation(inputFile, converterChain);
+        ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
 
         assertEquals(List.of(List.of("C", "D")), result.dataAsListOfLists());
         assertEquals(tableStructure, result.tableStructure());
@@ -108,9 +98,10 @@ class ConverterChainServiceTest {
         when(inputFile.asStringArray()).thenThrow(new InputFileException("Test exception"));
 
         TableStructureDto tableStructure = new TableStructureDto();
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
 
-        assertThrows(InputFileException.class, () -> converterChainService.performTransformation(inputFile));
+        ConverterChain converterChain = chainFactory.create(tableStructure);
+
+        assertThrows(InputFileException.class, () -> converterChainService.performTransformation(inputFile, converterChain));
     }
 
     @Test
@@ -122,9 +113,9 @@ class ConverterChainServiceTest {
         // -1 is usually not possible at this point, but this is used to test the exception handling
         tableStructure.addStructuresItem(new FillEmptyRowStructureDto().addRowIndexItem(-1));
 
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
+        ConverterChain converterChain = chainFactory.create(tableStructure);
 
-        ConverterException e = assertThrows(ConverterException.class, () -> converterChainService.performTransformation(inputFile));
+        ConverterException e = assertThrows(ConverterException.class, () -> converterChainService.performTransformation(inputFile, converterChain));
         assertEquals(0, e.getConverterIndex());
     }
 

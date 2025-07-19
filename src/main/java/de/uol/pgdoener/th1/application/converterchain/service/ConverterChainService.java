@@ -2,23 +2,23 @@ package de.uol.pgdoener.th1.application.converterchain.service;
 
 import de.uol.pgdoener.th1.application.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.converterchain.model.ConverterChain;
-import de.uol.pgdoener.th1.application.dto.TableStructureDto;
-import de.uol.pgdoener.th1.application.infrastructure.ConverterResult;
 import de.uol.pgdoener.th1.application.infrastructure.InputFile;
 import de.uol.pgdoener.th1.application.infrastructure.exceptions.TransformationException;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 @Slf4j
+@Service
 @RequiredArgsConstructor
 public class ConverterChainService {
-    private final TableStructureDto tableStructure;
-    private final ConverterChain converterChain;
 
-    public ConverterResult performTransformation(@NonNull InputFile inputFile) throws TransformationException {
+    public String[][] performTransformation(
+            @NonNull InputFile inputFile, ConverterChain converterChain
+    ) throws TransformationException {
         String[][] inputMatrix = inputFile.asStringArray();
-        return performTransformation(inputMatrix);
+        return performTransformation(inputMatrix, converterChain);
     }
 
     /**
@@ -34,40 +34,20 @@ public class ConverterChainService {
      * @return the result of the transformation
      * @throws TransformationException if an error occurs during the transformation
      */
-    public ConverterResult performTransformation(@NonNull String[][] rawMatrix) throws TransformationException {
+    public String[][] performTransformation(
+            @NonNull String[][] rawMatrix, ConverterChain converterChain
+    ) throws TransformationException {
         String[][] transformedMatrix;
         if (rawMatrix.length == 0 || rawMatrix[0].length == 0) {
             log.debug("No data found in the input file");
-            return new ConverterResult(tableStructure, rawMatrix);
+            return rawMatrix;
         }
         Converter first = converterChain.getFirst();
         if (first == null) {
             log.debug("No converter found");
-            return new ConverterResult(tableStructure, rawMatrix);
+            return rawMatrix;
         }
         transformedMatrix = first.handleRequest(rawMatrix);
-        return new ConverterResult(tableStructure, transformedMatrix);
+        return transformedMatrix;
     }
-
-    //private static String[][] cutOffMatrix(String[][] inputMatrix, Integer endRow, Integer endColumn) {
-    //    if (endColumn != null || endRow != null) {
-//
-    //        int maxRow = inputMatrix.length;
-    //        int maxCol = inputMatrix[0].length;
-//
-    //        // Falls endRow oder endColumn nicht gesetzt sind, bestimmen wir die Größe dynamisch
-    //        int rowLength = Math.min(endRow.orElse(maxRow), maxRow);
-    //        int colLength = Math.min(tableStructure.getEndColumn().orElse(maxCol), maxCol);
-//
-    //        // Matrix initialisieren
-    //        String[][] outputMatrix = new String[rowLength][colLength];
-//
-    //        // Daten in die Matrix kopieren
-    //        for (int i = 0; i < rowLength; i++) {
-    //            System.arraycopy(inputMatrix[i], 0, outputMatrix[i], 0, Math.min(inputMatrix[i].length, colLength));
-    //        }
-    //        return outputMatrix;
-    //    }
-    //    return inputMatrix;
-    //}
 }

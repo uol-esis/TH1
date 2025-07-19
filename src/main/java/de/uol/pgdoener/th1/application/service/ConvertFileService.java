@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.application.service;
 
-import de.uol.pgdoener.th1.application.converterchain.builder.ConverterChainBuilder;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterChainFactory;
 import de.uol.pgdoener.th1.application.converterchain.model.ConverterChain;
 import de.uol.pgdoener.th1.application.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
@@ -29,8 +29,9 @@ public class ConvertFileService {
     private final MBService mbService;
     private final TableStructureRepository tableStructureRepository;
     private final StructureRepository structureRepository;
-    private final ConverterChainBuilder converterChainBuilder;
+    private final ConverterChainFactory converterChainFactory;
     private final CreateDatabaseService createDatabaseService;
+    private final ConverterChainService converterChainService;
 
     public void convertAndSaveInDB(Long tableStructureId, Optional<String> optionalMode, MultipartFile file) {
 
@@ -44,11 +45,10 @@ public class ConvertFileService {
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
         TableStructureDto tableStructureDto = TableStructureMapper.toDto(tableStructure.get(), structureList);
-        ConverterChain converterChain = converterChainBuilder.build(tableStructureDto);
-        ConverterChainService converterService = new ConverterChainService(tableStructureDto, converterChain);
-
+        ConverterChain converterChain = converterChainFactory.create(tableStructureDto);
         InputFile inputFile = new InputFile(file);
-        String[][] transformedMatrix = converterService.performTransformation(inputFile).data();
+
+        String[][] transformedMatrix = converterChainService.performTransformation(inputFile, converterChain);
 
         String originalName = file.getOriginalFilename();
         createDatabaseService.create(mode, originalName, transformedMatrix);
@@ -58,9 +58,10 @@ public class ConvertFileService {
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
         InputFile inputFile = new InputFile(file);
-        ConverterChainService converterService = new ConverterChainService(tableStructureDto);
+        ConverterChain converterChain = converterChainFactory.create(tableStructureDto);
         try {
-            return converterService.performTransformation(inputFile);
+            String[][] transformedMatrix = converterChainService.performTransformation(inputFile, converterChain);
+            return new ConverterResult(tableStructureDto, transformedMatrix);
         } catch (Exception e) {
             throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);
         }

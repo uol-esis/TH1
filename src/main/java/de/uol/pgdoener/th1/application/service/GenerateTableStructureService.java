@@ -1,6 +1,8 @@
 package de.uol.pgdoener.th1.application.service;
 
 import de.uol.pgdoener.th1.application.analyzeTable.AnalyzeMatrixInfoService;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterChainFactory;
+import de.uol.pgdoener.th1.application.converterchain.model.ConverterChain;
 import de.uol.pgdoener.th1.application.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.application.dto.ReportDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
@@ -14,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -21,11 +24,13 @@ import java.util.List;
  * Service for generating table structure from a given input file.
  */
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class GenerateTableStructureService {
 
     private final AnalyzeMatrixInfoService analyzeMatrixInfoService;
+    private final ConverterChainFactory converterChainFactory;
+    private final ConverterChainService converterChainService;
 
     /**
      * Main entry point to generate a table structure from the input file.
@@ -89,8 +94,9 @@ public class GenerateTableStructureService {
 
     private String[][] runConverter(String[][] inputMatrix, TableStructureDto tableStructure) {
         if (tableStructure.getStructures().isEmpty()) return inputMatrix;
-        ConverterChainService converterChainService = new ConverterChainService(tableStructure);
-        ConverterResult result = converterChainService.performTransformation(inputMatrix);
+        ConverterChain converterChain = converterChainFactory.create(tableStructure);
+        String[][] outputMatrix = converterChainService.performTransformation(inputMatrix, converterChain);
+        ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
         return result.data();
     }
 

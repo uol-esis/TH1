@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.application.service;
 
-import de.uol.pgdoener.th1.application.converterchain.builder.ConverterChainBuilder;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterChainFactory;
+import de.uol.pgdoener.th1.application.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.application.service.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.data.entity.TableStructure;
 import de.uol.pgdoener.th1.data.repository.DynamicTableRepository;
@@ -36,7 +37,9 @@ class ConvertFileServiceTest {
     @Mock
     CreateDatabaseService createDatabaseService;
     @Mock
-    ConverterChainBuilder converterChainBuilder;
+    ConverterChainFactory converterChainFactory;
+    @Mock
+    ConverterChainService converterChainService;
 
     ConvertFileService convertFileService;
 
@@ -46,8 +49,9 @@ class ConvertFileServiceTest {
                 mbService,
                 tableStructureRepository,
                 structureRepository,
-                converterChainBuilder,
-                createDatabaseService
+                converterChainFactory,
+                createDatabaseService,
+                converterChainService
         );
     }
 

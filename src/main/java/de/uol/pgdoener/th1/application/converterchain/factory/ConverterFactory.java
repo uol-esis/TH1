@@ -1,17 +1,16 @@
-package de.uol.pgdoener.th1.application.converterchain.builder;
+package de.uol.pgdoener.th1.application.converterchain.factory;
 
 import de.uol.pgdoener.th1.application.converterchain.converter.*;
 import de.uol.pgdoener.th1.application.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.*;
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
-@NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Component
+@NoArgsConstructor()
 public class ConverterFactory {
 
-    public Converter createConverter(StructureDto structure) {
+    public Converter create(StructureDto structure) {
         return switch (structure) {
             case RemoveGroupedHeaderStructureDto s -> new RemoveGroupedHeaderConverter(s);
             case FillEmptyRowStructureDto s -> new FillEmptyRowConverter(s);

@@ -3,7 +3,6 @@ package de.uol.pgdoener.th1.application.analyzeTable.finder;
 import de.uol.pgdoener.th1.application.analyzeTable.model.*;
 import de.uol.pgdoener.th1.application.dto.ColumnTypeMismatchDto;
 import de.uol.pgdoener.th1.application.dto.ColumnTypeMismatchReportDto;
-import de.uol.pgdoener.th1.application.infrastructure.analyzeTable.core.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
