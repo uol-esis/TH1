@@ -97,12 +97,7 @@ public class TableStructureBuilder {
                     RemoveKeywordsSettingsDto removeKeywordsSettingsDto = settings.getRemoveKeywords().orElse(new RemoveKeywordsSettingsDto());
                     if (removeKeywordsSettingsDto.isEnabled()) {
                         buildRemoveKeywordStructure(removeKeywordsSettingsDto);
-                    } else {
-                        unresolvedReports.add(r);
-                        // earlyBreak = true;
-                        // reanalysisCause = ReportTypeDto.SUM;
-                        // break reportsLoop;
-                    }
+                    } else unresolvedReports.add(r);
                 }
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
