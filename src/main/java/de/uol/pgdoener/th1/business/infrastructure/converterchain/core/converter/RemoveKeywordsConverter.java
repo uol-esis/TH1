@@ -41,6 +41,38 @@ public class RemoveKeywordsConverter extends Converter {
     // ----------------- Private helper methods ----------------- //
 
     /**
+     * Builds a regular expression Pattern based on the configured keywords, match type, and case sensitivity.
+     * <p>
+     * The pattern is used to efficiently match cell values against the given keyword list, supporting either
+     * exact matches (EQUALS) or partial matches (CONTAINS). Keywords are properly escaped to avoid regex issues.
+     * If no keywords are provided, a pattern is returned that never matches any string.
+     *
+     * @return a compiled Pattern representing the keyword matching logic
+     */
+    private Pattern buildPattern() {
+        if (structure.getKeywords() == null || structure.getKeywords().isEmpty()) {
+            return Pattern.compile("a^"); // never matches
+        }
+        List<String> escapedKeywords = new ArrayList<>();
+        for (String kw : structure.getKeywords()) {
+            if (kw != null) {
+                escapedKeywords.add(Pattern.quote(kw));
+            }
+        }
+        String joined = String.join("|", escapedKeywords);
+        String regex = switch (structure.getMatchType()) {
+            case RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS -> ".*(" + joined + ").*";
+            case RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS -> "^(" + joined + ")$";
+            default -> {
+                log.warn("Unknown matchType '{}', defaulting to CONTAINS", structure.getMatchType());
+                yield ".*(" + joined + ").*";
+            }
+        };
+        int flags = structure.isIgnoreCase() ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0;
+        return Pattern.compile(regex, flags);
+    }
+
+    /**
      * Removes all columns from the matrix whose header values match any of the configured keywords.
      * <p>
      * Only the first row (header) is used for comparison.
@@ -139,28 +171,5 @@ public class RemoveKeywordsConverter extends Converter {
         if (value == null) return false;
         String cellValue = structure.isIgnoreCase() ? value.toLowerCase() : value;
         return keywordPattern.matcher(cellValue).matches();
-    }
-
-    private Pattern buildPattern() {
-        if (structure.getKeywords() == null || structure.getKeywords().isEmpty()) {
-            return Pattern.compile("a^"); // never matches
-        }
-        List<String> escapedKeywords = new ArrayList<>();
-        for (String kw : structure.getKeywords()) {
-            if (kw != null) {
-                escapedKeywords.add(Pattern.quote(kw));
-            }
-        }
-        String joined = String.join("|", escapedKeywords);
-        String regex = switch (structure.getMatchType()) {
-            case RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS -> ".*(" + joined + ").*";
-            case RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS -> "^(" + joined + ")$";
-            default -> {
-                log.warn("Unknown matchType '{}', defaulting to CONTAINS", structure.getMatchType());
-                yield ".*(" + joined + ").*";
-            }
-        };
-        int flags = structure.isIgnoreCase() ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0;
-        return Pattern.compile(regex, flags);
     }
 }
