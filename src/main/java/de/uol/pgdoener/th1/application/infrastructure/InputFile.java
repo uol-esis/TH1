@@ -8,9 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -136,6 +134,8 @@ public class InputFile {
 
     private String[][] readExcelToMatrix(WorkbookFactory workbookFactory) throws IOException {
         try (Workbook workbook = workbookFactory.create(file.getInputStream())) {
+            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
             Iterator<Sheet> sheetIterator = workbook.sheetIterator();
             //TODO handle multiple sheets
             Sheet sheet = sheetIterator.next();
@@ -155,18 +155,38 @@ public class InputFile {
                         matrix[rowNum][i] = "";
                         continue;
                     }
-                    switch (row.getCell(i).getCellType()) {
-                        case STRING -> matrix[rowNum][i] = row.getCell(i).getStringCellValue();
-                        case NUMERIC -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getNumericCellValue());
-                        case BOOLEAN -> matrix[rowNum][i] = String.valueOf(row.getCell(i).getBooleanCellValue());
-                        case FORMULA -> matrix[rowNum][i] = row.getCell(i).getCellFormula();
-                        case BLANK -> matrix[rowNum][i] = "";
-                        case ERROR -> matrix[rowNum][i] = "ERROR";
-                        default -> matrix[rowNum][i] = "UNKNOWN";
-                    }
+                    matrix[rowNum][i] = getCellValueAsString(row.getCell(i), evaluator);
                 }
             }
             return matrix;
+        }
+    }
+
+    private String getCellValueAsString(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null) return "";
+        switch (cell.getCellType()) {
+            case STRING:
+                return cell.getStringCellValue();
+            case NUMERIC:
+                return String.valueOf(cell.getNumericCellValue());
+            case BOOLEAN:
+                return String.valueOf(cell.getBooleanCellValue());
+            case FORMULA:
+                CellValue cellValue = evaluator.evaluate(cell);
+                if (cellValue == null) return "";
+                return switch (cellValue.getCellType()) {
+                    case STRING -> cellValue.getStringValue();
+                    case NUMERIC -> String.valueOf(cellValue.getNumberValue());
+                    case BOOLEAN -> String.valueOf(cellValue.getBooleanValue());
+                    case ERROR -> "ERROR";
+                    default -> "UNKNOWN";
+                };
+            case BLANK:
+                return "";
+            case ERROR:
+                return "ERROR";
+            default:
+                return "UNKNOWN";
         }
     }
 

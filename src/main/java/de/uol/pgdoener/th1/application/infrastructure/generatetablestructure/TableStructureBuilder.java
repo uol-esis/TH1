@@ -45,16 +45,12 @@ public class TableStructureBuilder {
         if (removeInvalidRowsSettings.isEnabled()) {
             buildRemoveInvalidRowsStructure(removeInvalidRowsSettings);
         }
-        RemoveKeywordsSettingsDto removeKeywordsSettingsDto = settings.getRemoveKeywords().orElse(new RemoveKeywordsSettingsDto());
-        if (removeKeywordsSettingsDto.isEnabled()) {
-            buildRemoveKeywordStructure(removeKeywordsSettingsDto);
-        }
     }
 
     /**
      * This method iterates over the provided reports and adds structures to the table structure
      */
-    public BuildResult buildTableStructure(List<ReportDto> reports) {
+    public BuildResult buildTableStructure(List<ReportDto> reports, TableStructureGenerationSettingsDto settings) {
         List<ReportDto> unresolvedReports = new ArrayList<>();
         boolean earlyBreak = false;
         ReportTypeDto reanalysisCause = null;
@@ -74,6 +70,16 @@ public class TableStructureBuilder {
                     // break since no other reports should be acted upon after the removal of the grouped header
                     earlyBreak = true;
                     reanalysisCause = ReportTypeDto.GROUPED_HEADER;
+                    break reportsLoop;
+                }
+                case SumReportDto r -> {
+                    if (!r.getRowIndex().isEmpty())
+                        buildRemoveRowByIndexStructure(r.getRowIndex());
+                    if (!r.getColumnIndex().isEmpty())
+                        buildRemoveColumnByIndexStructure(r.getColumnIndex());
+                    // break since indices have shifted after those converters
+                    earlyBreak = true;
+                    reanalysisCause = ReportTypeDto.SUM;
                     break reportsLoop;
                 }
                 case ColumnTypeMismatchReportDto r -> {
@@ -97,7 +103,17 @@ public class TableStructureBuilder {
                     reanalysisCause = ReportTypeDto.MERGEABLE_COLUMNS;
                     break reportsLoop;
                 }
-                case SumReportDto r -> unresolvedReports.add(new SumReportDto());
+                case SumReportDto r -> {
+                    RemoveKeywordsSettingsDto removeKeywordsSettingsDto = settings.getRemoveKeywords().orElse(new RemoveKeywordsSettingsDto());
+                    if (removeKeywordsSettingsDto.isEnabled()) {
+                        buildRemoveKeywordStructure(removeKeywordsSettingsDto);
+                    } else {
+                        unresolvedReports.add(r);
+                        // earlyBreak = true;
+                        // reanalysisCause = ReportTypeDto.SUM;
+                        // break reportsLoop;
+                    }
+                }
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
                 case EmptyHeaderReportDto r -> unresolvedReports.add(r);
