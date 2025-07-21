@@ -50,7 +50,7 @@ public class TableStructureBuilder {
     /**
      * This method iterates over the provided reports and adds structures to the table structure
      */
-    public BuildResult buildTableStructure(List<ReportDto> reports) {
+    public BuildResult buildTableStructure(List<ReportDto> reports, TableStructureGenerationSettingsDto settings) {
         List<ReportDto> unresolvedReports = new ArrayList<>();
         boolean earlyBreak = false;
         ReportTypeDto reanalysisCause = null;
@@ -70,16 +70,6 @@ public class TableStructureBuilder {
                     // break since no other reports should be acted upon after the removal of the grouped header
                     earlyBreak = true;
                     reanalysisCause = ReportTypeDto.GROUPED_HEADER;
-                    break reportsLoop;
-                }
-                case SumReportDto r -> {
-                    if (!r.getRowIndex().isEmpty())
-                        buildRemoveRowByIndexStructure(r.getRowIndex());
-                    if (!r.getColumnIndex().isEmpty())
-                        buildRemoveColumnByIndexStructure(r.getColumnIndex());
-                    // break since indices have shifted after those converters
-                    earlyBreak = true;
-                    reanalysisCause = ReportTypeDto.SUM;
                     break reportsLoop;
                 }
                 case ColumnTypeMismatchReportDto r -> {
@@ -102,6 +92,12 @@ public class TableStructureBuilder {
                     earlyBreak = true;
                     reanalysisCause = ReportTypeDto.MERGEABLE_COLUMNS;
                     break reportsLoop;
+                }
+                case SumReportDto r -> {
+                    RemoveKeywordsSettingsDto removeKeywordsSettingsDto = settings.getRemoveKeywords().orElse(new RemoveKeywordsSettingsDto());
+                    if (removeKeywordsSettingsDto.isEnabled()) {
+                        buildRemoveKeywordStructure(removeKeywordsSettingsDto);
+                    } else unresolvedReports.add(r);
                 }
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
@@ -273,6 +269,23 @@ public class TableStructureBuilder {
                 .columnIndex(reportDto.getColumnsToFill());
         log.debug("Finish buildFillEmptyColumnStructure");
         tableStructure.addStructuresItem(fillEmptyColumnStructure);
+    }
+
+    /**
+     * Builds converter structure to fill partially filled rows.
+     */
+    private void buildRemoveKeywordStructure(RemoveKeywordsSettingsDto removeKeywordsSettingsDto) {
+        log.debug("Start buildRemoveKeywordStructure");
+        RemoveKeywordsStructureDto removeKeywordsStructure = new RemoveKeywordsStructureDto();
+        removeKeywordsStructure.converterType(ConverterTypeDto.REMOVE_KEYWORD)
+                .keywords(removeKeywordsSettingsDto.getKeywords())
+                .removeRows(removeKeywordsSettingsDto.isRemoveRows())
+                .removeColumns(removeKeywordsSettingsDto.isRemoveColumns())
+                .ignoreCase(removeKeywordsSettingsDto.isIgnoreCase())
+                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.
+                        valueOf(removeKeywordsSettingsDto.getMatchType().getValue()));
+        log.debug("Finish buildRemoveKeywordStructure");
+        tableStructure.addStructuresItem(removeKeywordsStructure);
     }
 
     private void buildRemoveRowByIndexStructure(List<Integer> rowIndex) {

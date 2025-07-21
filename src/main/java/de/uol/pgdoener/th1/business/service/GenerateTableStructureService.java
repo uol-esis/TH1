@@ -54,7 +54,7 @@ public class GenerateTableStructureService {
                 List<ReportDto> reports = analyzeMatrixInfoService.analyze(convertedMatrix, settings);
                 log.debug("Generated {} reports", reports.size());
 
-                result = tableStructureBuilder.buildTableStructure(reports);
+                result = tableStructureBuilder.buildTableStructure(reports, settings);
                 tableStructure = result.tableStructure();
                 log.debug(tableStructure.toString());
                 log.debug(reports.toString());
