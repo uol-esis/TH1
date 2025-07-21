@@ -5,13 +5,11 @@ import de.uol.pgdoener.th1.application.converterchain.model.ConverterChain;
 import de.uol.pgdoener.th1.application.infrastructure.InputFile;
 import de.uol.pgdoener.th1.application.infrastructure.exceptions.TransformationException;
 import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class ConverterChainService {
 
     public String[][] performTransformation(

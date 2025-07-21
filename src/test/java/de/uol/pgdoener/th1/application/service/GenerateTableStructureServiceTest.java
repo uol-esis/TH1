@@ -1,15 +1,18 @@
 package de.uol.pgdoener.th1.application.service;
 
-import de.uol.pgdoener.th1.application.analyzeTable.finder.*;
-import de.uol.pgdoener.th1.application.dto.*;
-import de.uol.pgdoener.th1.application.infrastructure.InputFile;
 import de.uol.pgdoener.th1.application.analyzeTable.AnalyzeMatrixInfoService;
+import de.uol.pgdoener.th1.application.analyzeTable.factory.CellInfoFactory;
+import de.uol.pgdoener.th1.application.analyzeTable.factory.MatrixInfoFactory;
+import de.uol.pgdoener.th1.application.analyzeTable.finder.*;
 import de.uol.pgdoener.th1.application.analyzeTable.model.CellInfoService;
 import de.uol.pgdoener.th1.application.analyzeTable.model.ColumnInfoService;
 import de.uol.pgdoener.th1.application.analyzeTable.model.MatrixInfoService;
 import de.uol.pgdoener.th1.application.analyzeTable.model.RowInfoService;
-import de.uol.pgdoener.th1.application.analyzeTable.factory.CellInfoFactory;
-import de.uol.pgdoener.th1.application.analyzeTable.factory.MatrixInfoFactory;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterChainFactory;
+import de.uol.pgdoener.th1.application.converterchain.factory.ConverterFactory;
+import de.uol.pgdoener.th1.application.converterchain.service.ConverterChainService;
+import de.uol.pgdoener.th1.application.dto.*;
+import de.uol.pgdoener.th1.application.infrastructure.InputFile;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +46,9 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         FindColumnMismatchService.class,
         FindMergableColumnsService.class,
         AnalyzeMatrixInfoService.class,
+        ConverterFactory.class,
+        ConverterChainFactory.class,
+        ConverterChainService.class,
         GenerateTableStructureService.class,
 })
 class GenerateTableStructureServiceTest {

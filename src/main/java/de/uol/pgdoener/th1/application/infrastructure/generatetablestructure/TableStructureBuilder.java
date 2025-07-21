@@ -72,16 +72,6 @@ public class TableStructureBuilder {
                     reanalysisCause = ReportTypeDto.GROUPED_HEADER;
                     break reportsLoop;
                 }
-                case SumReportDto r -> {
-                    if (!r.getRowIndex().isEmpty())
-                        buildRemoveRowByIndexStructure(r.getRowIndex());
-                    if (!r.getColumnIndex().isEmpty())
-                        buildRemoveColumnByIndexStructure(r.getColumnIndex());
-                    // break since indices have shifted after those converters
-                    earlyBreak = true;
-                    reanalysisCause = ReportTypeDto.SUM;
-                    break reportsLoop;
-                }
                 case ColumnTypeMismatchReportDto r -> {
                     List<ColumnTypeMismatchDto> unresolvedMismatches = new ArrayList<>();
 
