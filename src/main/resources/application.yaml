@@ -21,8 +21,9 @@ server:
   port: 8080
 th1:
   mb:
-    key: <key>
-    general-key: <key>
+    api:
+      key: <key>
+      general-key: <key>
     base-path: http://example.com:3000/api
   security:
     allowed-origins:

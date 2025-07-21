@@ -38,8 +38,8 @@ public class MBClient {
         this.restClient = RestClient.builder()
                 .baseUrl(metabaseProperties.getBasePath())
                 .build();
-        this.notifyKey = metabaseProperties.getKey();
-        this.generalKey = metabaseProperties.getGeneralKey();
+        this.notifyKey = metabaseProperties.getApi().getKey();
+        this.generalKey = metabaseProperties.getApi().getGeneralKey();
     }
 
     /**
