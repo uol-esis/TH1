@@ -1,8 +1,8 @@
 package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.TableStructuresApiDelegate;
-import de.uol.pgdoener.th1.application.dto.*;
 import de.uol.pgdoener.th1.application.service.TableStructureService;
+import de.uol.pgdoener.th1.application.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;

@@ -1,13 +1,15 @@
 package de.uol.pgdoener.th1.application.service;
 
 import de.uol.pgdoener.th1.application.dto.*;
-import de.uol.pgdoener.th1.application.infrastructure.InputFile;
 import de.uol.pgdoener.th1.application.mapper.StructureMapper;
 import de.uol.pgdoener.th1.application.mapper.TableStructureMapper;
-import de.uol.pgdoener.th1.data.entity.Structure;
-import de.uol.pgdoener.th1.data.entity.TableStructure;
-import de.uol.pgdoener.th1.data.repository.StructureRepository;
-import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
+import de.uol.pgdoener.th1.domain.shared.model.InputFile;
+import de.uol.pgdoener.th1.domain.tablestructure.service.GenerateTableStructureService;
+import de.uol.pgdoener.th1.domain.tablestructure.service.TableStructureValidationService;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.Structure;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.TableStructure;
+import de.uol.pgdoener.th1.infastructure.persistence.repository.StructureRepository;
+import de.uol.pgdoener.th1.infastructure.persistence.repository.TableStructureRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -30,7 +32,7 @@ public class TableStructureService {
     private final TableStructureRepository tableStructureRepository;
     private final StructureRepository structureRepository;
     private final PlatformTransactionManager transactionManager;
-    private final ValidationService validationService;
+    private final TableStructureValidationService tableStructureValidationService;
     private final GenerateTableStructureService generateTableStructureService;
 
     public long create(TableStructureDto tableStructureDto) {
@@ -77,7 +79,7 @@ public class TableStructureService {
 
     @Transactional
     public TableStructureDto getById(Long id) {
-        validationService.validateTableStructureExists(id);
+        tableStructureValidationService.validateTableStructureExists(id);
         TableStructure tableStructure = tableStructureRepository.getReferenceById(id);
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructure.getId());
@@ -104,7 +106,7 @@ public class TableStructureService {
     @Transactional
     public void deleteById(long id) {
         log.debug("Deleting table structure with id {}", id);
-        validationService.validateTableStructureExists(id);
+        tableStructureValidationService.validateTableStructureExists(id);
 
         tableStructureRepository.deleteById(id);
         structureRepository.deleteByTableStructureId(id);

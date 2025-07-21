@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.application.mapper;
 
 import de.uol.pgdoener.th1.application.dto.ConverterTypeDto;
-import de.uol.pgdoener.th1.data.entity.*;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

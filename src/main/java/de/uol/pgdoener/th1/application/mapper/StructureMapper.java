@@ -1,15 +1,15 @@
 package de.uol.pgdoener.th1.application.mapper;
 
 import de.uol.pgdoener.th1.application.dto.*;
-import de.uol.pgdoener.th1.data.entity.*;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static de.uol.pgdoener.th1.data.entity.MatchType.CONTAINS;
-import static de.uol.pgdoener.th1.data.entity.MatchType.EQUALS;
+import static de.uol.pgdoener.th1.infastructure.persistence.entity.MatchType.CONTAINS;
+import static de.uol.pgdoener.th1.infastructure.persistence.entity.MatchType.EQUALS;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class StructureMapper {

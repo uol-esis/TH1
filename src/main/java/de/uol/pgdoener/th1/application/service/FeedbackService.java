@@ -1,9 +1,9 @@
 package de.uol.pgdoener.th1.application.service;
 
-import de.uol.pgdoener.th1.application.dto.FeedbackDto;
 import de.uol.pgdoener.th1.application.mapper.FeedbackMapper;
-import de.uol.pgdoener.th1.data.entity.Feedback;
-import de.uol.pgdoener.th1.data.repository.FeedbackRepository;
+import de.uol.pgdoener.th1.application.dto.FeedbackDto;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.Feedback;
+import de.uol.pgdoener.th1.infastructure.persistence.repository.FeedbackRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 

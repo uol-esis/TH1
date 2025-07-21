@@ -4,8 +4,8 @@ import de.uol.pgdoener.th1.application.dto.StructureDto;
 import de.uol.pgdoener.th1.application.dto.StructureSummaryDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureSummaryDto;
-import de.uol.pgdoener.th1.data.entity.Structure;
-import de.uol.pgdoener.th1.data.entity.TableStructure;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.Structure;
+import de.uol.pgdoener.th1.infastructure.persistence.entity.TableStructure;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
