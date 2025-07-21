@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,12 +25,14 @@ public class RemoveKeywordsConverter extends Converter {
     public String[][] handleRequest(String[][] inputMatrix) {
         String[][] resultMatrix = inputMatrix;
 
+        Pattern keywordPattern = buildPattern();
+
         if (structure.isRemoveColumns()) {
-            resultMatrix = removeColumnsWithHeaderKeywords(inputMatrix);
+            resultMatrix = removeColumnsWithHeaderKeywords(inputMatrix, keywordPattern);
         }
 
         if (structure.isRemoveRows()) {
-            resultMatrix = removeRowsContainingKeywords(resultMatrix);
+            resultMatrix = removeRowsContainingKeywords(resultMatrix, keywordPattern);
         }
 
         return super.handleRequest(resultMatrix);
@@ -45,11 +48,11 @@ public class RemoveKeywordsConverter extends Converter {
      * @param matrix the original input matrix
      * @return a new matrix with columns removed where the header matches a keyword
      */
-    private String[][] removeColumnsWithHeaderKeywords(String[][] matrix) {
+    private String[][] removeColumnsWithHeaderKeywords(String[][] matrix, Pattern keywordPattern) {
         int rowLength = matrix.length;
         int columnLength = matrix[0].length;
 
-        List<Integer> columnsToRemove = identifyColumnsToRemove(matrix[0]);
+        List<Integer> columnsToRemove = identifyColumnsToRemove(matrix[0], keywordPattern);
 
         int newColumnLength = columnLength - columnsToRemove.size();
         String[][] newMatrix = new String[rowLength][newColumnLength];
@@ -73,12 +76,12 @@ public class RemoveKeywordsConverter extends Converter {
      * @param headerRow the first row of the matrix, assumed to be the header
      * @return a list of column indices that should be removed
      */
-    private List<Integer> identifyColumnsToRemove(String[] headerRow) {
+    private List<Integer> identifyColumnsToRemove(String[] headerRow, Pattern keywordPattern) {
         List<Integer> columnsToRemove = new ArrayList<>();
 
         for (int col = 0; col < headerRow.length; col++) {
             String cell = headerRow[col];
-            if (matchesKeyword(cell)) {
+            if (matchesKeyword(cell, keywordPattern)) {
                 columnsToRemove.add(col);
             }
         }
@@ -92,7 +95,7 @@ public class RemoveKeywordsConverter extends Converter {
      * @param matrix the input matrix to be filtered
      * @return a new matrix with rows removed where any cell matches a keyword; header row is always retained
      */
-    private String[][] removeRowsContainingKeywords(String[][] matrix) {
+    private String[][] removeRowsContainingKeywords(String[][] matrix, Pattern keywordPattern) {
         List<String[]> filteredRows = new ArrayList<>();
 
         for (int i = 0; i < matrix.length; i++) {
@@ -101,7 +104,7 @@ public class RemoveKeywordsConverter extends Converter {
                 continue;
             }
 
-            if (!rowContainsKeyword(matrix[i])) {
+            if (!rowContainsKeyword(matrix[i], keywordPattern)) {
                 filteredRows.add(matrix[i]);
             }
         }
@@ -115,9 +118,9 @@ public class RemoveKeywordsConverter extends Converter {
      * @param row the row to be checked
      * @return true if any cell matches a keyword, false otherwise
      */
-    private boolean rowContainsKeyword(String[] row) {
+    private boolean rowContainsKeyword(String[] row, Pattern keywordPattern) {
         for (String cell : row) {
-            if (matchesKeyword(cell)) {
+            if (matchesKeyword(cell, keywordPattern)) {
                 return true;
             }
         }
@@ -132,27 +135,32 @@ public class RemoveKeywordsConverter extends Converter {
      * @param value the cell value to check
      * @return true if the value matches a keyword, false otherwise
      */
-    private boolean matchesKeyword(String value) {
+    private boolean matchesKeyword(String value, Pattern keywordPattern) {
         if (value == null) return false;
-
         String cellValue = structure.isIgnoreCase() ? value.toLowerCase() : value;
-        for (String keyword : structure.getKeywords()) {
-            if (keyword == null) continue;
-            String key = structure.isIgnoreCase() ? keyword.toLowerCase() : keyword;
+        return keywordPattern.matcher(cellValue).matches();
+    }
 
-            switch (structure.getMatchType()) {
-                case RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS:
-                    if (cellValue.contains(key)) return true;
-                    break;
-                case RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS:
-                    if (cellValue.equals(key)) return true;
-                    break;
-                default:
-                    log.warn("Unknown matchType '{}', defaulting to CONTAINS", structure.getMatchType());
-                    if (cellValue.contains(key)) return true;
-                    break;
+    private Pattern buildPattern() {
+        if (structure.getKeywords() == null || structure.getKeywords().isEmpty()) {
+            return Pattern.compile("a^"); // never matches
+        }
+        List<String> escapedKeywords = new ArrayList<>();
+        for (String kw : structure.getKeywords()) {
+            if (kw != null) {
+                escapedKeywords.add(Pattern.quote(kw));
             }
         }
-        return false;
+        String joined = String.join("|", escapedKeywords);
+        String regex = switch (structure.getMatchType()) {
+            case RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS -> ".*(" + joined + ").*";
+            case RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS -> "^(" + joined + ")$";
+            default -> {
+                log.warn("Unknown matchType '{}', defaulting to CONTAINS", structure.getMatchType());
+                yield ".*(" + joined + ").*";
+            }
+        };
+        int flags = structure.isIgnoreCase() ? Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE : 0;
+        return Pattern.compile(regex, flags);
     }
 }
