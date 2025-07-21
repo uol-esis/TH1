@@ -19,10 +19,14 @@ jobs:
     steps:
       - name: Perform deploy requests
         run: |
-          data=$(curl -s ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }}/file \
-            -H "X-API-KEY: ${{ secrets.API_KEY }}"  | jq '.StackFileContent')
-          wrapped=$(jq -n --argjson data "$data" '{Env:[],id:${{ secrets.STACK_ID }},Prune:false,PullImage:true,StackFileContent: $data}')
-          curl -X PUT ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }}?endpointId=${{ secrets.ENDPOINT_ID }} \
+          file=$(curl -s ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }}/file \
+            -H "X-API-KEY: ${{ secrets.API_KEY }}" | jq '.StackFileContent')
+          stackenv=$(curl -s ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }} \
+            -H "X-API-KEY:${{ secrets.API_KEY }}" | jq '.Env')
+
+          wrapped=$(jq -n --argjson file "$file" --argjson stackenv "$stackenv" --argjson id "${{ secrets.STACK_ID }}" '{Env:$stackenv,id:$id,Prune:false,PullImage:true,StackFileContent: $file}')
+
+          curl -X PUT -s ${{ secrets.API_HOST }}/api/stacks/${{ secrets.STACK_ID }}?endpointId=${{ secrets.ENDPOINT_ID }} \
             -H "Content-Type: application/json" \
             -H "X-API-KEY: ${{ secrets.API_KEY }}" \
-            -d "$wrapped"
+            -d "$wrapped" > /dev/null
