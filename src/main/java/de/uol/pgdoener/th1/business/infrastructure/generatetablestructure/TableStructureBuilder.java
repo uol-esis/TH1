@@ -45,16 +45,12 @@ public class TableStructureBuilder {
         if (removeInvalidRowsSettings.isEnabled()) {
             buildRemoveInvalidRowsStructure(removeInvalidRowsSettings);
         }
-        RemoveKeywordsSettingsDto removeKeywordsSettingsDto = settings.getRemoveKeywords().orElse(new RemoveKeywordsSettingsDto());
-        if (removeKeywordsSettingsDto.isEnabled()) {
-            buildRemoveKeywordStructure(removeKeywordsSettingsDto);
-        }
     }
 
     /**
      * This method iterates over the provided reports and adds structures to the table structure
      */
-    public BuildResult buildTableStructure(List<ReportDto> reports) {
+    public BuildResult buildTableStructure(List<ReportDto> reports, TableStructureGenerationSettingsDto settings) {
         List<ReportDto> unresolvedReports = new ArrayList<>();
         boolean earlyBreak = false;
         ReportTypeDto reanalysisCause = null;
@@ -97,7 +93,12 @@ public class TableStructureBuilder {
                     reanalysisCause = ReportTypeDto.MERGEABLE_COLUMNS;
                     break reportsLoop;
                 }
-                case SumReportDto r -> unresolvedReports.add(new SumReportDto());
+                case SumReportDto r -> {
+                    RemoveKeywordsSettingsDto removeKeywordsSettingsDto = settings.getRemoveKeywords().orElse(new RemoveKeywordsSettingsDto());
+                    if (removeKeywordsSettingsDto.isEnabled()) {
+                        buildRemoveKeywordStructure(removeKeywordsSettingsDto);
+                    } else unresolvedReports.add(r);
+                }
                 case EmptyColumnReportDto r -> unresolvedReports.add(r);
                 case EmptyRowReportDto r -> unresolvedReports.add(r);
                 case EmptyHeaderReportDto r -> unresolvedReports.add(r);

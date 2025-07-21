@@ -75,7 +75,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(7));
         assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
-        assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(8));
+        assertInstanceOf(RemoveKeywordsStructureDto.class, tableStructure.getStructures().get(8));
         assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(9));
         assertEquals("", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(9)).getSearch().orElseThrow());
         assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(9)).getReplacement());
@@ -94,6 +94,8 @@ class GenerateTableStructureServiceTest {
 
         TableStructureDto tableStructure = result.getFirst();
         List<ReportDto> unresolvedReports = result.getSecond();
+
+        System.out.println(tableStructure.getStructures());
 
         assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(4));
         assertInstanceOf(FillEmptyColumnStructureDto.class, tableStructure.getStructures().get(5));
@@ -197,7 +199,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
         assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
-        assertInstanceOf(RemoveRowByIndexStructureDto.class, tableStructure.getStructures().get(7));
+        assertInstanceOf(RemoveKeywordsStructureDto.class, tableStructure.getStructures().get(7));
         assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(8));
         assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(8)).getSearch().orElseThrow());
         assertEquals("*", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(8)).getReplacement());
