@@ -7,3 +7,8 @@ springdoc.swagger-ui.oauth.client-id=< id >
 # urls for auth server to be used in swagger ui
 security.authorizationUrl=https://auth.example.com/some/path
 security.tokenUrl=https://auth.example.com/some/path
+th1.s3.url=http://localhost:3900
+th1.s3.access-key= <Key ID>
+th1.s3.secret-key= <Secret key>
+th1.s3.region=garage
+th1.s3.bucket.name=th1-bucket
