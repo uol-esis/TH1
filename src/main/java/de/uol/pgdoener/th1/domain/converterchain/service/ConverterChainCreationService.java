@@ -1,18 +1,19 @@
-package de.uol.pgdoener.th1.domain.converterchain.factory;
+package de.uol.pgdoener.th1.domain.converterchain.service;
 
 import de.uol.pgdoener.th1.application.dto.StructureDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterFactory;
 import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 
-@Component
+@Service
 @RequiredArgsConstructor
-public class ConverterChainFactory {
+public class ConverterChainCreationService {
 
     private final ConverterFactory converterFactory;
 

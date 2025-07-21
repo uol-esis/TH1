@@ -9,8 +9,8 @@ import de.uol.pgdoener.th1.domain.analyzeTable.model.ColumnInfoService;
 import de.uol.pgdoener.th1.domain.analyzeTable.model.MatrixInfoService;
 import de.uol.pgdoener.th1.domain.analyzeTable.model.RowInfoService;
 import de.uol.pgdoener.th1.domain.analyzeTable.service.AnalyzeMatrixInfoService;
-import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterChainFactory;
 import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterFactory;
+import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.shared.model.InputFile;
 import de.uol.pgdoener.th1.domain.tablestructure.service.GenerateTableStructureService;
@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         FindMergableColumnsService.class,
         AnalyzeMatrixInfoService.class,
         ConverterFactory.class,
-        ConverterChainFactory.class,
+        ConverterChainCreationService.class,
         ConverterChainService.class,
         GenerateTableStructureService.class,
 })

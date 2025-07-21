@@ -2,8 +2,8 @@ package de.uol.pgdoener.th1.application.service;
 
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
 import de.uol.pgdoener.th1.application.mapper.TableStructureMapper;
-import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterChainFactory;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
+import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.domain.shared.model.ConverterResult;
@@ -29,7 +29,7 @@ public class ConvertFileService {
     private final MBService mbService;
     private final TableStructureRepository tableStructureRepository;
     private final StructureRepository structureRepository;
-    private final ConverterChainFactory converterChainFactory;
+    private final ConverterChainCreationService converterChainCreationService;
     private final CreateDatabaseService createDatabaseService;
     private final ConverterChainService converterChainService;
 
@@ -45,7 +45,7 @@ public class ConvertFileService {
 
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
         TableStructureDto tableStructureDto = TableStructureMapper.toDto(tableStructure.get(), structureList);
-        ConverterChain converterChain = converterChainFactory.create(tableStructureDto);
+        ConverterChain converterChain = converterChainCreationService.create(tableStructureDto);
         InputFile inputFile = new InputFile(file);
 
         String[][] transformedMatrix = converterChainService.performTransformation(inputFile, converterChain);
@@ -58,7 +58,7 @@ public class ConvertFileService {
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
         InputFile inputFile = new InputFile(file);
-        ConverterChain converterChain = converterChainFactory.create(tableStructureDto);
+        ConverterChain converterChain = converterChainCreationService.create(tableStructureDto);
         try {
             String[][] transformedMatrix = converterChainService.performTransformation(inputFile, converterChain);
             return new ConverterResult(tableStructureDto, transformedMatrix);

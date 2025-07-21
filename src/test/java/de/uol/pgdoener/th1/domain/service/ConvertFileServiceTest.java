@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.service;
 
 import de.uol.pgdoener.th1.application.service.ConvertFileService;
-import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterChainFactory;
+import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.infastructure.metabase.MBService;
@@ -38,7 +38,7 @@ class ConvertFileServiceTest {
     @Mock
     CreateDatabaseService createDatabaseService;
     @Mock
-    ConverterChainFactory converterChainFactory;
+    ConverterChainCreationService converterChainCreationService;
     @Mock
     ConverterChainService converterChainService;
 
@@ -50,7 +50,7 @@ class ConvertFileServiceTest {
                 mbService,
                 tableStructureRepository,
                 structureRepository,
-                converterChainFactory,
+                converterChainCreationService,
                 createDatabaseService,
                 converterChainService
         );

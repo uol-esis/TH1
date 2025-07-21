@@ -4,9 +4,9 @@ import de.uol.pgdoener.th1.application.dto.FillEmptyRowStructureDto;
 import de.uol.pgdoener.th1.application.dto.RemoveRowByIndexStructureDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
 import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
-import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterChainFactory;
 import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterFactory;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
+import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.shared.exceptions.InputFileException;
 import de.uol.pgdoener.th1.domain.shared.model.ConverterResult;
@@ -29,7 +29,7 @@ class ConverterChainServiceTest {
     InputFile inputFile;
 
     ConverterFactory converterFactory = new ConverterFactory();
-    ConverterChainFactory chainFactory = new ConverterChainFactory(converterFactory);
+    ConverterChainCreationService chainFactory = new ConverterChainCreationService(converterFactory);
     ConverterChainService converterChainService = new ConverterChainService();
 
     @Test

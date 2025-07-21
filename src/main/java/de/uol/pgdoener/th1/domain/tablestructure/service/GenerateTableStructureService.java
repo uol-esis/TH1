@@ -4,8 +4,8 @@ import de.uol.pgdoener.th1.application.dto.ReportDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureGenerationSettingsDto;
 import de.uol.pgdoener.th1.domain.analyzeTable.service.AnalyzeMatrixInfoService;
-import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterChainFactory;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
+import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.shared.model.BuildResult;
 import de.uol.pgdoener.th1.domain.shared.model.ConverterResult;
@@ -28,7 +28,7 @@ import java.util.List;
 public class GenerateTableStructureService {
 
     private final AnalyzeMatrixInfoService analyzeMatrixInfoService;
-    private final ConverterChainFactory converterChainFactory;
+    private final ConverterChainCreationService converterChainCreationService;
     private final ConverterChainService converterChainService;
 
     /**
@@ -93,7 +93,7 @@ public class GenerateTableStructureService {
 
     private String[][] runConverter(String[][] inputMatrix, TableStructureDto tableStructure) {
         if (tableStructure.getStructures().isEmpty()) return inputMatrix;
-        ConverterChain converterChain = converterChainFactory.create(tableStructure);
+        ConverterChain converterChain = converterChainCreationService.create(tableStructure);
         String[][] outputMatrix = converterChainService.performTransformation(inputMatrix, converterChain);
         ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
         return result.data();
