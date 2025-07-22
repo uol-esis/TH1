@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.infastructure.config;
+package de.uol.pgdoener.th1.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

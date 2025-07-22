@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.infastructure.metabase;
 
-import de.uol.pgdoener.th1.infastructure.config.properties.MetabaseProperties;
+import de.uol.pgdoener.th1.autoconfigure.MetabaseProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

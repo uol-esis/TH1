@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.infastructure.config.properties;
+package de.uol.pgdoener.th1.autoconfigure;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

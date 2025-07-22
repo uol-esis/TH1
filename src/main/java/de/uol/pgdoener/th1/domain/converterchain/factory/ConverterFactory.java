@@ -3,11 +3,9 @@ package de.uol.pgdoener.th1.domain.converterchain.factory;
 import de.uol.pgdoener.th1.application.dto.*;
 import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.domain.converterchain.model.converter.*;
-import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Component;
 
 @Component
-@NoArgsConstructor()
 public class ConverterFactory {
 
     public Converter create(StructureDto structure) {

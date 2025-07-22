@@ -1,6 +1,6 @@
-package de.uol.pgdoener.th1.infastructure.config;
+package de.uol.pgdoener.th1.config;
 
-import de.uol.pgdoener.th1.infastructure.config.properties.ObjectStorageProperties;
+import de.uol.pgdoener.th1.autoconfigure.ObjectStorageProperties;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

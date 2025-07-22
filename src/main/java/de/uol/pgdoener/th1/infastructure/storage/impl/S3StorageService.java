@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.infastructure.storage.impl;
 
-import de.uol.pgdoener.th1.infastructure.config.properties.ObjectStorageProperties;
+import de.uol.pgdoener.th1.autoconfigure.ObjectStorageProperties;
 import de.uol.pgdoener.th1.infastructure.storage.StorageService;
 import io.minio.GetObjectArgs;
 import io.minio.MinioClient;

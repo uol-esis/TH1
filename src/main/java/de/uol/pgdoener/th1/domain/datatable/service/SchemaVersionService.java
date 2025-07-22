@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.domain.datatable.service;
 
-import de.uol.pgdoener.th1.infastructure.config.properties.SnapshotProperties;
+import de.uol.pgdoener.th1.autoconfigure.SnapshotProperties;
 import de.uol.pgdoener.th1.infastructure.persistence.entity.SchemaVersion;
 import de.uol.pgdoener.th1.infastructure.persistence.repository.SchemaVersionRepository;
 import jakarta.transaction.Transactional;

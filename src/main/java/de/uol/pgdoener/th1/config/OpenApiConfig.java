@@ -1,6 +1,6 @@
-package de.uol.pgdoener.th1.infastructure.config;
+package de.uol.pgdoener.th1.config;
 
-import de.uol.pgdoener.th1.infastructure.config.properties.SecurityProperties;
+import de.uol.pgdoener.th1.autoconfigure.SecurityProperties;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.OAuthFlow;
 import io.swagger.v3.oas.models.security.OAuthFlows;

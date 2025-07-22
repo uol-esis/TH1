@@ -1,7 +1,7 @@
-package de.uol.pgdoener.th1.infastructure.config;
+package de.uol.pgdoener.th1.config;
 
 
-import de.uol.pgdoener.th1.infastructure.config.properties.SecurityProperties;
+import de.uol.pgdoener.th1.autoconfigure.SecurityProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
