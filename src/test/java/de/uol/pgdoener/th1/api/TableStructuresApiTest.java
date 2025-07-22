@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.api;
 
-import de.uol.pgdoener.th1.data.repository.TableStructureRepository;
+import de.uol.pgdoener.th1.infastructure.persistence.repository.TableStructureRepository;
 import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.jupiter.api.*;

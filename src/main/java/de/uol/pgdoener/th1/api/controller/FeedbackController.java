@@ -1,8 +1,8 @@
 package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.FeedbackApiDelegate;
-import de.uol.pgdoener.th1.business.dto.FeedbackDto;
-import de.uol.pgdoener.th1.business.service.FeedbackService;
+import de.uol.pgdoener.th1.application.service.FeedbackService;
+import de.uol.pgdoener.th1.application.dto.FeedbackDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
