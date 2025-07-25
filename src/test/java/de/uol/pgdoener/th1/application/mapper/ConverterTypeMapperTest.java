@@ -15,7 +15,7 @@ class ConverterTypeMapperTest {
 
     @Test
     void testToDtoExhaustiveness() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        List<Class<?>> structureClasses = TestHelper.listStructureClasses();
+        List<Class<?>> structureClasses = TestHelper.listEntityStructureClasses();
         for (Class<?> structureClass : structureClasses) {
             Structure structureInstance = (Structure) structureClass.getDeclaredConstructor().newInstance();
             assertDoesNotThrow(() -> ConverterTypeMapper.toDto(structureInstance),
@@ -33,7 +33,7 @@ class ConverterTypeMapperTest {
 
     @Test
     void testOneConverterTypePerStructure() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        List<Class<?>> structureClasses = TestHelper.listStructureClasses();
+        List<Class<?>> structureClasses = TestHelper.listEntityStructureClasses();
         Set<ConverterTypeDto> converterTypeDtos = EnumSet.noneOf(ConverterTypeDto.class);
         for (Class<?> structureClass : structureClasses) {
             Structure structureInstance = (Structure) structureClass.getDeclaredConstructor().newInstance();
