@@ -138,6 +138,7 @@ public class TableStructureBuilder {
         log.debug("Start buildMergeableColumnsStructure for column index");
         MergeColumnsStructureDto structure = new MergeColumnsStructureDto()
                 .converterType(ConverterTypeDto.MERGE_COLUMNS)
+                .headerName("undefined")
                 .columnIndex(report.getMergeables());
         log.debug("Finish buildMergeableColumnsStructure for column index");
         tableStructure.addStructuresItem(structure);
