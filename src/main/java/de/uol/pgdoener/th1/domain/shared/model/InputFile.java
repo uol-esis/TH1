@@ -6,18 +6,22 @@ import de.uol.pgdoener.th1.domain.shared.exceptions.InputFileException;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.*;
-import java.util.stream.StreamSupport;
+import java.io.*;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This class takes a {@link MultipartFile} and provides the file as a 2D-String Array.
@@ -55,13 +59,13 @@ public class InputFile {
      */
     public String[][] asStringArray() throws InputFileException {
         try {
-            String[][] contentWithNulls = switch (fileType) {
-                case CSV -> readCsvToMatrix();
-                case EXCEL_OLE2 -> readExcelOLE2ToMatrix();
-                case EXCEL_OOXML -> readExcelOOXMLToMatrix();
+            String[][] matrix = switch (fileType) {
+                case CSV -> csvToMatrix(file.getInputStream());
+                case EXCEL_OLE2 -> excelToMatrix(file.getInputStream(), HSSFWorkbook::new);
+                case EXCEL_OOXML -> excelToMatrix(file.getInputStream(), XSSFWorkbook::new);
             };
-            String[][] content = mapNulls(contentWithNulls);
-            return ensureSameLengths(content);
+            System.out.println(Arrays.deepToString(matrix));
+            return matrix;
         } catch (IOException e) {
             throw new InputFileException("Could not read file", e);
         }
@@ -72,157 +76,175 @@ public class InputFile {
         int dotIndex = originalFilename.lastIndexOf('.');
         String filenameWithoutExtension = (dotIndex == -1) ? originalFilename : originalFilename.substring(0, dotIndex);
 
-        // Alle Zahlen entfernen (inkl. mögliche Datumsmuster)
         String cleaned = filenameWithoutExtension.replaceAll("\\d+", "");
 
-        // Optional: Leerzeichen trimmen und evtl. doppelte Unterstriche oder Bindestriche bereinigen
         cleaned = cleaned.replaceAll("[_\\-]{2,}", "_").replaceAll("^[_\\-]+|[_\\-]+$", "").trim();
         return cleaned;
-
     }
 
-    // #################
-    // Internal Methods
-    // #################
+    // -----------------------------
+    // Private Helper Methods Below
+    // -----------------------------
 
-    // https://stackoverflow.com/questions/49235863/how-to-determine-the-delimiter-in-csv-file
-    private String getDelimiter() throws IOException {
+    private String[][] csvToMatrix(InputStream inputStream) throws IOException {
+        char delimiter = detectDelimiter(inputStream);
+        CSVFormat format = CSVFormat.DEFAULT.builder()
+                .setDelimiter(delimiter)
+                .setQuote('"')
+                .setIgnoreEmptyLines(true)
+                .setTrim(true).get();
+        try (
+                Reader reader = new InputStreamReader(inputStream);
+                CSVParser parser = format.parse(reader)
+        ) {
+            List<String[]> rows = new ArrayList<>();
+            for (CSVRecord record : parser) {
+                int size = record.size();
+                String[] row = new String[size];
+                for (int i = 0; i < size; i++) {
+                    row[i] = record.get(i);
+                }
+                rows.add(row);
+            }
+            return rows.toArray(new String[0][0]);
+        }
+    }
+
+    private String[][] excelToMatrix(InputStream inputStream, WorkbookFactory workbookFactory) throws IOException {
+        Workbook workbook = workbookFactory.create(inputStream);
+        Sheet sheet = workbook.getSheetAt(0);
+        FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+
+        int rowHeight = sheet.getLastRowNum() + 1;
+        int columnWidth = getColumnWidth(sheet);
+
+        String[][] matrix = new String[rowHeight][columnWidth];
+
+        for (int i = 0; i < rowHeight; i++) {
+            Row row = sheet.getRow(i);
+            if (row == null) {
+                Arrays.fill(matrix[i] = new String[columnWidth], "");
+                continue;
+            }
+            for (int j = 0; j < columnWidth; j++) {
+                Cell cell = row.getCell(j);
+                if (cell == null) {
+                    matrix[i][j] = "";
+                    continue;
+                }
+                matrix[i][j] = getValueForType(cell, evaluator);
+            }
+        }
+
+        System.out.println(Arrays.deepToString(matrix));
+
+        return matrix;
+    }
+
+    private int getColumnWidth(Sheet sheet) {
+        int maxColumnWidth = 0;
+        for (Row row : sheet) {
+            int columnLength = sheet.getRow(row.getRowNum()).getLastCellNum();
+
+            if (columnLength > maxColumnWidth) {
+                maxColumnWidth = columnLength;
+            } else {
+                break;
+            }
+        }
+        return maxColumnWidth;
+    }
+
+    private String getValueForType(Cell cell, FormulaEvaluator evaluator) {
+        if (cell == null) return "";
+
+        CellType cellType = cell.getCellType();
+
+        return switch (cellType) {
+            case STRING -> {
+                String value = cell.getStringCellValue();
+                String maybeDate = tryParseDate(value);
+                yield maybeDate != null ? maybeDate : value;
+            }
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield formatDate(cell.getDateCellValue());
+                }
+                yield formatNumeric(cell.getNumericCellValue());
+            }
+            case FORMULA -> getValueForEvaluated(cell, evaluator);
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case BLANK -> "";
+            case ERROR -> "ERROR";
+            default -> "UNKNOWN";
+        };
+    }
+
+    private String tryParseDate(String value) {
+        String[] patterns = {
+                "dd.MM.yyyy", "dd/MM/yyyy", "yyyy-MM-dd", "MM/dd/yyyy"
+        };
+
+        for (String pattern : patterns) {
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+                LocalDate date = LocalDate.parse(value, formatter);
+                return date.toString(); // oder formatDate(Date) falls du Konsistenz willst
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        return null;
+    }
+
+    private String getValueForEvaluated(Cell cell, FormulaEvaluator evaluator) {
+        CellValue evaluated = evaluator.evaluate(cell);
+        if (evaluated == null) return "";
+        return switch (evaluated.getCellType()) {
+            case BOOLEAN -> String.valueOf(evaluated.getBooleanValue());
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield formatDate(cell.getDateCellValue());
+                }
+                yield formatNumeric(evaluated.getNumberValue());
+            }
+            case STRING -> evaluated.getStringValue();
+            case BLANK -> "";
+            case ERROR -> "ERROR";
+            default -> "UNKNOWN";
+        };
+    }
+
+    private String formatDate(java.util.Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date);
+    }
+
+    private String formatNumeric(double number) {
+        if (number == (long) number) {
+            return String.format("%d", (long) number);
+        } else {
+            return String.format("%.10f", number).replaceAll("0+$", "").replaceAll("\\.$", "");
+        }
+    }
+
+    private char detectDelimiter(InputStream input) throws IOException {
+        input.mark(10 * 1024 * 1024);
+
         CsvParserSettings settings = new CsvParserSettings();
         settings.detectFormatAutomatically();
 
         CsvParser parser = new CsvParser(settings);
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(input))) {
             parser.parseAll(reader);
         }
-        return parser.getDetectedFormat().getDelimiterString();
-    }
 
-    private String[][] readCsvToMatrix() throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String delimiter = getDelimiter();
-            log.debug("Detected delimiter: {}", delimiter);
+        input.reset();
 
-            CSVFormat format = CSVFormat.DEFAULT
-                    .withDelimiter(delimiter.charAt(0))
-                    .withQuote('"')
-                    .withIgnoreEmptyLines(true)
-                    .withTrim();
-
-            List<String[]> rows = new ArrayList<>();
-
-            for (CSVRecord record : format.parse(reader)) {
-                String[] row = StreamSupport.stream(record.spliterator(), false)
-                        .toArray(String[]::new);
-                rows.add(row);
-            }
-
-            if (rows.isEmpty()) {
-                return new String[0][0];
-            }
-
-            return rows.toArray(new String[rows.size()][]);
-        }
-    }
-
-    private String[][] readExcelOLE2ToMatrix() throws IOException {
-        return readExcelToMatrix(HSSFWorkbook::new);
-    }
-
-    private String[][] readExcelOOXMLToMatrix() throws IOException {
-        return readExcelToMatrix(XSSFWorkbook::new);
-    }
-
-    private String[][] readExcelToMatrix(WorkbookFactory workbookFactory) throws IOException {
-        try (Workbook workbook = workbookFactory.create(file.getInputStream())) {
-            FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
-
-            Iterator<Sheet> sheetIterator = workbook.sheetIterator();
-            //TODO handle multiple sheets
-            Sheet sheet = sheetIterator.next();
-            int endRow = sheet.getLastRowNum() + 1;
-            if (endRow == 0 || sheet.getRow(0) == null || sheet.getRow(0).getLastCellNum() == -1) {
-                return new String[0][0];
-            }
-            int endColumn = sheet.getRow(0).getLastCellNum();
-            String[][] matrix = new String[endRow][endColumn];
-            for (Row row : sheet) {
-                int rowNum = row.getRowNum();
-
-                if (rowNum >= endRow) return matrix;
-
-                for (int i = 0; i < endColumn; i++) {
-                    if (row.getCell(i) == null) {
-                        matrix[rowNum][i] = "";
-                        continue;
-                    }
-                    matrix[rowNum][i] = getCellValueAsString(row.getCell(i), evaluator);
-                }
-            }
-            return matrix;
-        }
-    }
-
-    private String getCellValueAsString(Cell cell, FormulaEvaluator evaluator) {
-        if (cell == null) return "";
-        switch (cell.getCellType()) {
-            case STRING:
-                return cell.getStringCellValue();
-            case NUMERIC:
-                return String.valueOf(cell.getNumericCellValue());
-            case BOOLEAN:
-                return String.valueOf(cell.getBooleanCellValue());
-            case FORMULA:
-                CellValue cellValue = evaluator.evaluate(cell);
-                if (cellValue == null) return "";
-                return switch (cellValue.getCellType()) {
-                    case STRING -> cellValue.getStringValue();
-                    case NUMERIC -> String.valueOf(cellValue.getNumberValue());
-                    case BOOLEAN -> String.valueOf(cellValue.getBooleanValue());
-                    case ERROR -> "ERROR";
-                    default -> "UNKNOWN";
-                };
-            case BLANK:
-                return "";
-            case ERROR:
-                return "ERROR";
-            default:
-                return "UNKNOWN";
-        }
+        return parser.getDetectedFormat().getDelimiter();
     }
 
     private interface WorkbookFactory {
         Workbook create(InputStream inputStream) throws IOException;
     }
-
-    // ################
-    // Post Processing
-    // ################
-
-    private String[][] mapNulls(String[][] raw) {
-        for (int i = 0; i < raw.length; i++) {
-            for (int j = 0; j < raw[i].length; j++) {
-                if (raw[i][j] == null) {
-                    raw[i][j] = "";
-                }
-            }
-        }
-        return raw;
-    }
-
-    private String[][] ensureSameLengths(String[][] raw) {
-        int maxLength = Arrays.stream(raw)
-                .mapToInt(row -> row.length)
-                .max()
-                .orElse(0);
-
-        String[][] result = new String[raw.length][maxLength];
-        for (int i = 0; i < raw.length; i++) {
-            System.arraycopy(raw[i], 0, result[i], 0, raw[i].length);
-            for (int j = raw[i].length; j < maxLength; j++) {
-                result[i][j] = "";
-            }
-        }
-        return result;
-    }
-
 }
