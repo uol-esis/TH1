@@ -133,6 +133,14 @@ public abstract class StructureMapper {
                     .name(structure.getName())
                     .description(structure.getDescription())
                     .keywords(Arrays.asList(structure.getKeywords()));
+            case HashKeywordsStructure structure -> new HashKeywordStructureDto(
+                    ConverterTypeDto.HASH_KEYWORD,
+                    Arrays.asList(structure.getKeywords()),
+                    structure.getIgnoreCase(),
+                    convertMatchTypeToDto(structure.getMatchType())
+            )
+                    .name(structure.getName())
+                    .description(structure.getDescription());
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
     }
@@ -296,10 +304,20 @@ public abstract class StructureMapper {
                     structure.isIgnoreCase(),
                     convertMatchTypeToEntity(structure.getMatchType())
             );
+            case HashKeywordStructureDto structure -> new HashKeywordsStructure(
+                    null,
+                    position,
+                    tableStructureId,
+                    structure.getName().orElse(null),
+                    structure.getDescription().orElse(null),
+                    structure.getKeywords().toArray(new String[0]),
+                    structure.isIgnoreCase(),
+                    convertMatchTypeToEntity(structure.getMatchType())
+            );
         };
     }
 
-    private static MatchType convertMatchTypeToEntity(RemoveKeywordsStructureDto.MatchTypeEnum dtoEnum) {
+    private static MatchType convertMatchTypeToEntity(MatchTypeDto dtoEnum) {
         if (dtoEnum == null) {
             return EQUALS; // Default oder null-behandlung
         }
@@ -311,13 +329,13 @@ public abstract class StructureMapper {
     }
 
 
-    private static RemoveKeywordsStructureDto.MatchTypeEnum convertMatchTypeToDto(MatchType matchType) {
+    private static MatchTypeDto convertMatchTypeToDto(MatchType matchType) {
         if (matchType == null) {
-            return RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS;
+            return MatchTypeDto.EQUALS;
         }
         return switch (matchType) {
-            case CONTAINS -> RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS;
-            case EQUALS -> RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS;
+            case CONTAINS -> MatchTypeDto.CONTAINS;
+            case EQUALS -> MatchTypeDto.EQUALS;
         };
     }
 

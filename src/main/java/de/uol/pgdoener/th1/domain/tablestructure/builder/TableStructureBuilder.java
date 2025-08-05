@@ -282,8 +282,7 @@ public class TableStructureBuilder {
                 .removeRows(removeKeywordsSettingsDto.isRemoveRows())
                 .removeColumns(removeKeywordsSettingsDto.isRemoveColumns())
                 .ignoreCase(removeKeywordsSettingsDto.isIgnoreCase())
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.
-                        valueOf(removeKeywordsSettingsDto.getMatchType().getValue()));
+                .matchType(MatchTypeDto.valueOf(removeKeywordsSettingsDto.getMatchType().getValue()));
         log.debug("Finish buildRemoveKeywordStructure");
         tableStructure.addStructuresItem(removeKeywordsStructure);
     }
