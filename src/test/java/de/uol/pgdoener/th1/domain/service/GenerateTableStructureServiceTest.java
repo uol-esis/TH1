@@ -12,7 +12,6 @@ import de.uol.pgdoener.th1.domain.analyzeTable.service.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterFactory;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
-import de.uol.pgdoener.th1.domain.shared.model.InputFile;
 import de.uol.pgdoener.th1.domain.tablestructure.service.GenerateTableStructureService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,8 +58,9 @@ class GenerateTableStructureServiceTest {
 
     @Test
     void testGenerationGroupedHeader() throws IOException {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeader.csv"));
-        InputFile inputFile = new InputFile(file);
+        MockMultipartFile inputFile = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeader.csv"));
+        //InputFile inputFile = new InputFile(file);
+
         TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
 
         Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
@@ -93,8 +93,8 @@ class GenerateTableStructureServiceTest {
 
     @Test
     void testGenerationGroupedHeaderI() throws IOException {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderI.csv"));
-        InputFile inputFile = new InputFile(file);
+        MockMultipartFile inputFile = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderI.csv"));
+        //InputFile inputFile = new InputFile(file);
         TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
 
         Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
@@ -140,8 +140,8 @@ class GenerateTableStructureServiceTest {
 
     @Test
     void testGenerationGroupedHeaderII() throws IOException {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderII.csv"));
-        InputFile inputFile = new InputFile(file);
+        MockMultipartFile inputFile = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderII.csv"));
+        //InputFile inputFile = new InputFile(file);
         TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
 
         Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
@@ -182,8 +182,8 @@ class GenerateTableStructureServiceTest {
 
     @Test
     void testGenerationGroupedHeaderTwoHeader() throws IOException {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderTwoHeader.csv"));
-        InputFile inputFile = new InputFile(file);
+        MockMultipartFile inputFile = new MockMultipartFile("file", "test.csv", "", getInputStream("/unit/groupedHeaderTwoHeader.csv"));
+        //InputFile inputFile = new InputFile(file);
         TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
 
         Pair<TableStructureDto, List<ReportDto>> result = service.generateTableStructure(inputFile, settings);
@@ -214,8 +214,8 @@ class GenerateTableStructureServiceTest {
 
     @Test
     void testLargeFile() {
-        MockMultipartFile file = new MockMultipartFile("file", "test.csv", "", generateLargeCSV().getBytes());
-        InputFile inputFile = new InputFile(file);
+        MockMultipartFile inputFile = new MockMultipartFile("file", "test.csv", "", generateLargeCSV().getBytes());
+        //InputFile inputFile = new InputFile(file);
         TableStructureGenerationSettingsDto settings = new TableStructureGenerationSettingsDto();
 
         for (int i = 0; i < 1; i++) {

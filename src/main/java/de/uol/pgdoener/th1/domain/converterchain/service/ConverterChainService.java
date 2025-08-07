@@ -1,21 +1,32 @@
 package de.uol.pgdoener.th1.domain.converterchain.service;
 
-import de.uol.pgdoener.th1.domain.shared.model.InputFile;
 import de.uol.pgdoener.th1.domain.converterchain.exception.TransformationException;
 import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
+import de.uol.pgdoener.th1.domain.fileprocessing.service.FileProcessingService;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class ConverterChainService {
+    private final FileProcessingService fileProcessingService;
 
     public String[][] performTransformation(
-            @NonNull InputFile inputFile, ConverterChain converterChain
+            @NonNull MultipartFile file, ConverterChain converterChain
     ) throws TransformationException {
-        String[][] inputMatrix = inputFile.asStringArray();
+        String[][] inputMatrix;
+        try {
+            inputMatrix = fileProcessingService.process(file);
+        } catch (IOException e) {
+            throw new TransformationException("Could not process file", e);
+        }
         return performTransformation(inputMatrix, converterChain);
     }
 
