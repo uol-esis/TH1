@@ -10,7 +10,7 @@
     </parent>
     <groupId>de.uol.pg-doener</groupId>
     <artifactId>TH1</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.3.0</version>
     <name>TH1</name>
     <description>TH1</description>
 
