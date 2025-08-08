@@ -1,4 +1,4 @@
-package de.uol.pgdoener.th1.domain.fileprocessing.service;
+package de.uol.pgdoener.th1.domain.fileprocessing.helper;
 
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
