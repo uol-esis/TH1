@@ -20,6 +20,17 @@ public class FileProcessingService {
     private final ExcelParsingService excelParsingService;
     private final DetectDelimiterService detectDelimiterService;
 
+    /**
+     * Service responsible for processing uploaded files (CSV and Excel formats).
+     * <p>
+     * - Detects the file type (CSV, Excel OLE2, Excel OOXML) using {@link FileType} <br>
+     * - Delegates parsing to the corresponding service:
+     *   <ul>
+     *     <li>{@link CsvParsingService} for CSV files (delimiter automatically detected via {@link DetectDelimiterService})</li>
+     *     <li>{@link ExcelParsingService} for Excel files (HSSF or XSSF)</li>
+     *   </ul>
+     * - Returns the parsed data as a 2D String array.
+     */
     public String[][] process(MultipartFile file) throws IOException, InputFileException {
         FileType fileType = FileType.getType(file);
 

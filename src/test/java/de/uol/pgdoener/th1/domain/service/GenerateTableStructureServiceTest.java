@@ -54,7 +54,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         FileProcessingService.class,
         CsvParsingService.class,
         ExcelParsingService.class,
-        NumberNormalizer.class,
+        NumberNormalizerService.class,
         DateNormalizerService.class,
         DetectDelimiterService.class,
 })

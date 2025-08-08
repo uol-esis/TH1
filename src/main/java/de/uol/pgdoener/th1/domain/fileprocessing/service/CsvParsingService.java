@@ -17,9 +17,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CsvParsingService {
 
-    private final NumberNormalizer numberNormalizer;
+    private final NumberNormalizerService numberNormalizerService;
     private final DateNormalizerService dateNormalizerService;
 
+    /**
+     * Parses a CSV file from an InputStream into a 2D String array.
+     * Automatically trims values, ignores empty lines, and normalizes dates and numbers.
+     *
+     * @param originalInputStream the InputStream of the CSV file
+     * @param delimiter           the CSV delimiter character (e.g. "," or ";")
+     * @return a 2D array of Strings containing the CSV data
+     * @throws IOException if an error occurs while reading the stream
+     */
     public String[][] parseCsv(InputStream originalInputStream, String delimiter) throws IOException {
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setDelimiter(delimiter.charAt(0))
@@ -46,8 +55,18 @@ public class CsvParsingService {
         }
     }
 
-    // ----------------- Private helper methods ----------------- //
+    // ----------------- Private Helper Methods ----------------- //
 
+    /**
+     * Cleans and normalizes a single CSV field value.
+     * Tries to:
+     * - Normalize dates if detected
+     * - Normalize numbers if no letters are present
+     * - Convert percentages to decimal values
+     *
+     * @param raw the original field value
+     * @return the cleaned and normalized value
+     */
     private String getValue(String raw) {
         if (raw == null || raw.isBlank()) return "";
         raw = raw.trim();
@@ -56,14 +75,14 @@ public class CsvParsingService {
         if (maybeDate != null) return maybeDate;
 
         if (raw.matches(".*[a-zA-Z].*")) return raw;
-        String normalizedNumber = numberNormalizer.normalizeFormat(raw);
+        String normalizedNumber = numberNormalizerService.normalizeFormat(raw);
         if (normalizedNumber == null) return raw;
 
         try {
             double value = Double.parseDouble(normalizedNumber);
             /// TODO: Better Solution ??
             if (raw.contains("%")) value /= 100.0;
-            return numberNormalizer.formatNumeric(value);
+            return numberNormalizerService.formatNumeric(value);
         } catch (NumberFormatException ignored) {
         }
 
