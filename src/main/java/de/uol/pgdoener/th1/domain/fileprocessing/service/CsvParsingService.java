@@ -51,12 +51,13 @@ public class CsvParsingService {
     private String getValue(String raw) {
         if (raw == null || raw.isBlank()) return "";
         raw = raw.trim();
-        if (raw.matches(".*[a-zA-Z].*")) return raw;
 
         String maybeDate = dateNormalizerService.tryNormalize(raw);
         if (maybeDate != null) return maybeDate;
 
+        if (raw.matches(".*[a-zA-Z].*")) return raw;
         String normalizedNumber = numberNormalizer.normalizeFormat(raw);
+        if (normalizedNumber == null) return raw;
 
         try {
             double value = Double.parseDouble(normalizedNumber);

@@ -4,11 +4,9 @@ import de.uol.pgdoener.th1.application.dto.FillEmptyRowStructureDto;
 import de.uol.pgdoener.th1.application.dto.RemoveRowByIndexStructureDto;
 import de.uol.pgdoener.th1.application.dto.TableStructureDto;
 import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
-import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterFactory;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
-import de.uol.pgdoener.th1.domain.fileprocessing.service.FileProcessingService;
 import de.uol.pgdoener.th1.domain.shared.model.ConverterResult;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,11 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ConverterChainServiceTest {
 
     @Autowired
-    private FileProcessingService fileProcessingService;
+    private ConverterChainCreationService chainFactory;
 
-    ConverterFactory converterFactory = new ConverterFactory();
-    ConverterChainCreationService chainFactory = new ConverterChainCreationService(converterFactory);
-    ConverterChainService converterChainService = new ConverterChainService(fileProcessingService);
+    @Autowired
+    private ConverterChainService converterChainService;
+
 
     public MultipartFile toCsvMultipartFile(String[][] matrix, String filename) {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -88,7 +86,7 @@ class ConverterChainServiceTest {
         String[][] outputMatrix = converterChainService.performTransformation(inputFile, converterChain);
         ConverterResult result = new ConverterResult(tableStructure, outputMatrix);
 
-        assertEquals(List.of(List.of()), result.dataAsListOfLists());
+        assertEquals(List.of(), result.dataAsListOfLists());
         assertEquals(tableStructure, result.tableStructure());
     }
 

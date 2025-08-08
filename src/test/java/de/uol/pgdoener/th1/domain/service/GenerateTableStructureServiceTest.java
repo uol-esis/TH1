@@ -12,6 +12,7 @@ import de.uol.pgdoener.th1.domain.analyzeTable.service.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.domain.converterchain.factory.ConverterFactory;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
+import de.uol.pgdoener.th1.domain.fileprocessing.service.*;
 import de.uol.pgdoener.th1.domain.tablestructure.service.GenerateTableStructureService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -50,6 +51,12 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         ConverterChainCreationService.class,
         ConverterChainService.class,
         GenerateTableStructureService.class,
+        FileProcessingService.class,
+        CsvParsingService.class,
+        ExcelParsingService.class,
+        NumberNormalizer.class,
+        DateNormalizerService.class,
+        DetectDelimiterService.class,
 })
 class GenerateTableStructureServiceTest {
 

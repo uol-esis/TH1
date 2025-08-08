@@ -35,16 +35,16 @@ public class FileProcessingServiceTest {
 
         String[][] expected = {
                 {"id", "amount", "date"},
-                {"1.00", "1234.56", "2025-08-07"},
-                {"2.00", "1234.56", "2025-07-08"},
-                {"3.00", "1234.56", "2025-08-07"},
-                {"4.00", "1234.56", "2025-08-07"},
-                {"5.00", "1234.56", "2025-08-07"},
-                {"6.00", "1234.00", "07-Aug-2025"},// nooo
-                {"7.00", "1234.56", "2025-07-08"},
-                {"8.00", "1234.56", "2007-08-25"},
-                {"9.00", "1234.56", "2025-07-08"},
-                {"10.00", "1234.00", "2025-08-07"},
+                {"1", "1234.56", "2025-08-07"},
+                {"2", "1234.56", "2025-07-08"},
+                {"3", "1234.56", "2025-08-07"},
+                {"4", "1234.56", "2025-08-07"},
+                {"5", "1234.56", "2025-08-07"},
+                {"6", "1234", "2025-08-07"},
+                {"7", "1234.56", "2025-07-08"},
+                {"8", "1234.56", "2007-08-25"},
+                {"9", "1234.56", "2025-07-08"},
+                {"10", "1234", "2025-08-07"},
         };
 
         assertThat(result).isEqualTo(expected);
@@ -67,16 +67,130 @@ public class FileProcessingServiceTest {
 
         String[][] expected = {
                 {"id", "amount", "date"},
-                {"1.00", "1234.56", "2025-08-07"},
-                {"2.00", "1234.56", "2025-07-08"},
-                {"3.00", "1234.56", "2025-08-07"},
-                {"4.00", "1234.56", "2025-08-07"},
-                {"5.00", "1234.56", "2025-08-07"},
-                {"6.00", "1234.00", "2025-08-07"},
-                {"7.00", "1234.56", "2025-07-08"},
-                {"8.00", "1234.56", "2007-08-25"},
-                {"9.00", "1234.56", "2025-07-08"},
-                {"10.00", "1234.00", "2025-08-07"},
+                {"1", "1234.56", "2025-08-07"},
+                {"2", "1234.56", "2025-07-08"},
+                {"3", "1234.56", "2025-08-07"},
+                {"4", "1234.56", "2025-08-07"},
+                {"5", "1234.56", "2025-08-07"},
+                {"6", "1234", "2025-08-07"},
+                {"7", "1234.56", "2025-07-08"},
+                {"8", "1234.56", "2007-08-25"},
+                {"9", "1234.56", "2025-07-08"},
+                {"10", "1234", "2025-08-07"},
+        };
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void testCsvFile1() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/file_process_service_test_file_1.csv");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "file_process_service_test_file_1.csv",
+                "text/csv",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile);
+
+        String[][] expected = {
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "Annual Returns on Investments in", "", "", "", "", ""},
+                {"Year", "Stocks", "T.Bills", "T.Bonds", "", "", ""},
+                {"1928", "0.4381", "0.0308", "0.0084", "", "", ""},
+                {"1929", "-0.083", "0.0316", "0.042", "", "", ""},
+                {"1930", "-0.2512", "0.0455", "0.0454", "", "", ""},
+                {"", "stocks", "tbills", "bonds", "", "", ""},
+                {"averages", "", "", "", "", "", ""}
+        };
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void testCsvFile2() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/file_process_service_test_file_2.csv");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "file_process_service_test_file_1.csv",
+                "text/csv",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile);
+
+        String[][] expected = {
+                {"Text", "123", "TRUE", "2020-01-01", "", "", "#DIV/0!"},
+                {"String mit \"Quote\"", "456.789", "FALSE", "2024-12-31", "", "", "Fehler"},
+                {"Leer", "", "TRUE", "", "456.889", "", ""}
+        };
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void testXlsxFile1() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/file_process_service_test_file_1.csv");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "file_process_service_test_file_1.csv",
+                ".xlsx",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile);
+
+        String[][] expected = {
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "", "", "", "", "", ""},
+                {"", "Annual Returns on Investments in", "", "", "", "", ""},
+                {"Year", "Stocks", "T.Bills", "T.Bonds", "", "", ""},
+                {"1928", "0.4381", "0.0308", "0.0084", "", "", ""},
+                {"1929", "-0.083", "0.0316", "0.042", "", "", ""},
+                {"1930", "-0.2512", "0.0455", "0.0454", "", "", ""},
+                {"", "stocks", "tbills", "bonds", "", "", ""},
+                {"averages", "", "", "", "", "", ""}
+        };
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void testXlsxFile2() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/file_process_service_test_file_2.csv");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "file_process_service_test_file_1.csv",
+                ".xlsx",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile);
+
+        String[][] expected = {
+                {"Text", "123", "TRUE", "2020-01-01", "", "", "#DIV/0!"},
+                {"String mit \"Quote\"", "456.789", "FALSE", "2024-12-31", "", "", "Fehler"},
+                {"Leer", "", "TRUE", "", "456.889", "", ""}
         };
 
         assertThat(result).isEqualTo(expected);

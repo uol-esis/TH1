@@ -9,7 +9,7 @@ public class NumberNormalizer {
 
     public String formatNumeric(double number) {
         if (number == (long) number) {
-            return String.format(Locale.US, "%.2f", number);
+            return String.format(Locale.US, "%d", (long) number);
         } else {
             return String.format(Locale.US, "%.10f", number)
                     .replaceAll("0+$", "")
