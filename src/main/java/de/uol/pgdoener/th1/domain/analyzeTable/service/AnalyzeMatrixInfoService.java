@@ -1,10 +1,9 @@
 package de.uol.pgdoener.th1.domain.analyzeTable.service;
 
-import de.uol.pgdoener.th1.domain.analyzeTable.finder.*;
 import de.uol.pgdoener.th1.application.dto.*;
-import de.uol.pgdoener.th1.domain.analyzeTable.model.MatrixInfo;
 import de.uol.pgdoener.th1.domain.analyzeTable.factory.MatrixInfoFactory;
-
+import de.uol.pgdoener.th1.domain.analyzeTable.finder.*;
+import de.uol.pgdoener.th1.domain.analyzeTable.model.MatrixInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -52,7 +51,7 @@ public class AnalyzeMatrixInfoService {
             return reports;
         }
         findColumnMismatchService.find(matrixInfo, matrix).ifPresent(reports::add);
-        findMergableColumnsService.find(matrixInfo).ifPresent(reports::addAll);
+        //findMergableColumnsService.find(matrixInfo).ifPresent(reports::addAll);
         findEmptyRowService.find(matrixInfo).ifPresent(reports::add);
         findEmptyColumnService.find(matrixInfo).ifPresent(reports::add);
         findEmptyHeaderService.find(matrixInfo).ifPresent(reports::add);

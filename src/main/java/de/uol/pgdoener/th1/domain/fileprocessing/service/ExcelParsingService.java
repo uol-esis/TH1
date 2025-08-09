@@ -116,7 +116,12 @@ public class ExcelParsingService {
 
                     yield value;
                 }
-                case NUMERIC -> numberNormalizerService.formatNumeric(cell.getNumericCellValue());
+                case NUMERIC -> {
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        yield dateNormalizerService.tryNormalize(cell.getDateCellValue());
+                    }
+                    yield numberNormalizerService.formatNumeric(cell.getNumericCellValue());
+                }
                 case FORMULA -> {
                     CellType cached = cell.getCachedFormulaResultType();
                     yield cached != null ? getValueForType(cell, cached) : "UNRESOLVED FORMULA";
