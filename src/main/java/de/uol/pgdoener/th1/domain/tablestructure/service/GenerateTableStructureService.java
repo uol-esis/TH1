@@ -7,15 +7,16 @@ import de.uol.pgdoener.th1.domain.analyzeTable.service.AnalyzeMatrixInfoService;
 import de.uol.pgdoener.th1.domain.converterchain.model.ConverterChain;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationService;
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
+import de.uol.pgdoener.th1.domain.fileprocessing.service.FileProcessingService;
 import de.uol.pgdoener.th1.domain.shared.model.BuildResult;
 import de.uol.pgdoener.th1.domain.shared.model.ConverterResult;
-import de.uol.pgdoener.th1.domain.shared.model.InputFile;
 import de.uol.pgdoener.th1.domain.tablestructure.builder.TableStructureBuilder;
 import de.uol.pgdoener.th1.domain.tablestructure.exception.TableStructureGenerationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class GenerateTableStructureService {
     private final AnalyzeMatrixInfoService analyzeMatrixInfoService;
     private final ConverterChainCreationService converterChainCreationService;
     private final ConverterChainService converterChainService;
+    private final FileProcessingService fileProcessingService;
 
     /**
      * Main entry point to generate a table structure from the input file.
@@ -37,12 +39,13 @@ public class GenerateTableStructureService {
      * @return the generated table structure DTO.
      */
     public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
-            InputFile inputFile, TableStructureGenerationSettingsDto settings
+            MultipartFile file, TableStructureGenerationSettingsDto settings
     ) {
         try {
-            log.debug("Start generating table structure for file: {}", inputFile.getFileName());
+            log.debug("Start generating table structure for file: {}", file.getOriginalFilename());
             // read file
-            String[][] matrix = inputFile.asStringArray();
+            //String[][] matrix = inputFile.asStringArray();
+            String[][] matrix = fileProcessingService.process(file);
 
             // setup defaults
             TableStructureBuilder tableStructureBuilder = new TableStructureBuilder(settings);

@@ -3,7 +3,6 @@ package de.uol.pgdoener.th1.application.service;
 import de.uol.pgdoener.th1.application.dto.*;
 import de.uol.pgdoener.th1.application.mapper.StructureMapper;
 import de.uol.pgdoener.th1.application.mapper.TableStructureMapper;
-import de.uol.pgdoener.th1.domain.shared.model.InputFile;
 import de.uol.pgdoener.th1.domain.tablestructure.service.GenerateTableStructureService;
 import de.uol.pgdoener.th1.domain.tablestructure.service.TableStructureValidationService;
 import de.uol.pgdoener.th1.infastructure.persistence.entity.Structure;
@@ -99,8 +98,8 @@ public class TableStructureService {
             MultipartFile file,
             TableStructureGenerationSettingsDto optionalSettings
     ) {
-        InputFile inputFile = new InputFile(file);
-        return generateTableStructureService.generateTableStructure(inputFile, optionalSettings);
+        //InputFile inputFile = new InputFile(file);
+        return generateTableStructureService.generateTableStructure(file, optionalSettings);
     }
 
     @Transactional
