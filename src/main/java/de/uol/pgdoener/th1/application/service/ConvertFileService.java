@@ -7,7 +7,6 @@ import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainCreationS
 import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.datatable.service.CreateDatabaseService;
 import de.uol.pgdoener.th1.domain.shared.model.ConverterResult;
-import de.uol.pgdoener.th1.domain.shared.model.InputFile;
 import de.uol.pgdoener.th1.infastructure.metabase.MBService;
 import de.uol.pgdoener.th1.infastructure.persistence.entity.Structure;
 import de.uol.pgdoener.th1.infastructure.persistence.entity.TableStructure;
@@ -46,9 +45,8 @@ public class ConvertFileService {
         List<Structure> structureList = structureRepository.findByTableStructureId(tableStructureId);
         TableStructureDto tableStructureDto = TableStructureMapper.toDto(tableStructure.get(), structureList);
         ConverterChain converterChain = converterChainCreationService.create(tableStructureDto);
-        InputFile inputFile = new InputFile(file);
 
-        String[][] transformedMatrix = converterChainService.performTransformation(inputFile, converterChain);
+        String[][] transformedMatrix = converterChainService.performTransformation(file, converterChain);
 
         String originalName = file.getOriginalFilename();
         createDatabaseService.create(mode, originalName, transformedMatrix);
@@ -57,10 +55,9 @@ public class ConvertFileService {
     }
 
     public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
-        InputFile inputFile = new InputFile(file);
         ConverterChain converterChain = converterChainCreationService.create(tableStructureDto);
         try {
-            String[][] transformedMatrix = converterChainService.performTransformation(inputFile, converterChain);
+            String[][] transformedMatrix = converterChainService.performTransformation(file, converterChain);
             return new ConverterResult(tableStructureDto, transformedMatrix);
         } catch (Exception e) {
             throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);
