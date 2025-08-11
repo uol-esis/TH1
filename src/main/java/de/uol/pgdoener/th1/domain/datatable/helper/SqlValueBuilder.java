@@ -8,9 +8,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 @Component
 public class SqlValueBuilder {
+
+    private static final Pattern DATE_PATTERN_1 = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+    private static final Pattern DATE_PATTERN_2 = Pattern.compile("\\d{2}\\.\\d{2}\\.\\d{4}");
 
     public List<Object[]> build(Map<String, String> columns, String[][] transformedMatrix) {
         String[] headers = columns.keySet().stream().filter(key -> !key.equals("id")).toArray(String[]::new);
@@ -53,32 +57,27 @@ public class SqlValueBuilder {
             return null;
         }
 
-        switch (columnType.toUpperCase()) {
-            case "INTEGER":
-                return Integer.parseInt(value);
-            case "NUMERIC":
-                return Double.valueOf(value);
-            case "BOOLEAN":
-                return Boolean.parseBoolean(value);
-            case "TEXT":
-            case "VARCHAR":
-            case "CHAR":
-                return value;
-            case "DATE":
+        return switch (columnType.toUpperCase()) {
+            case "INTEGER" -> Integer.parseInt(value);
+            case "NUMERIC" -> Double.valueOf(value);
+            case "BOOLEAN" -> Boolean.parseBoolean(value);
+            case "TEXT", "VARCHAR", "CHAR" -> value;
+            case "DATE" -> {
                 try {
-                    if (value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                        return java.sql.Date.valueOf(value); // Bereits im richtigen Format
-                    } else if (value.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
+                    if (DATE_PATTERN_1.matcher(value).matches()) {
+                        yield java.sql.Date.valueOf(value);
+                    } else if (DATE_PATTERN_2.matcher(value).matches()) {
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
                         LocalDate date = LocalDate.parse(value, formatter);
-                        return java.sql.Date.valueOf(date);
+                        yield java.sql.Date.valueOf(date);
                     }
                 } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid date format for value: " + value);
+                    throw new IllegalArgumentException("Invalid date format for value: " + value, e);
                 }
-            default:
-                throw new IllegalArgumentException("Unknown column type: " + columnType);
-        }
+                throw new IllegalArgumentException("Invalid date format for value: " + value);
+            }
+            default -> throw new IllegalArgumentException("Unknown column type: " + columnType);
+        };
     }
 
 }
