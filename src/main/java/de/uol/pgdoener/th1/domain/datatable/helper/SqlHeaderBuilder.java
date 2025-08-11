@@ -6,9 +6,18 @@ import java.text.Normalizer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 @Component
 public class SqlHeaderBuilder {
+
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
+    private static final Pattern DECIMAL_PATTERN = Pattern.compile("\\d+\\.\\d+");
+    private static final Pattern BOOLEAN_PATTERN = Pattern.compile("true|false");
+    private static final Pattern DATE_PATTERN_1 = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+    private static final Pattern DATE_PATTERN_2 = Pattern.compile("\\d{2}\\.\\d{2}\\.\\d{4}");
+    private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*");
+    private static final Pattern UUID_PATTERN = Pattern.compile("[A-Fa-f0-9]{32}");
 
     /**
      * Extracts the header from the first row of the matrix and infers SQL types based on the first data row.
@@ -63,13 +72,13 @@ public class SqlHeaderBuilder {
     }
 
     private String guessType(String value) {
-        if (value.matches("\\d+")) return "INTEGER"; // Ganzzahlen
-        if (value.matches("\\d+\\.\\d+")) return "NUMERIC"; // Dezimalzahlen
-        if (value.matches("true|false")) return "BOOLEAN"; // Wahrheitswerte
-        if (value.matches("\\d{4}-\\d{2}-\\d{2}")) return "DATE"; // Datumsangaben im Format YYYY-MM-DD
-        if (value.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) return "DATE"; // Datumsangaben im Format dd.MM.yyyy
-        if (value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*")) return "TIMESTAMP"; // ISO-8601-Timestamp
-        if (value.matches("[A-Fa-f0-9]{32}")) return "UUID"; // UUIDs (hexadezimale 32-Zeichen-Strings)
+        if (INTEGER_PATTERN.matcher(value).matches()) return "INTEGER"; // Ganzzahlen
+        if (DECIMAL_PATTERN.matcher(value).matches()) return "NUMERIC"; // Dezimalzahlen
+        if (BOOLEAN_PATTERN.matcher(value).matches()) return "BOOLEAN"; // Wahrheitswerte
+        if (DATE_PATTERN_1.matcher(value).matches()) return "DATE"; // Datumsangaben im Format YYYY-MM-DD
+        if (DATE_PATTERN_2.matcher(value).matches()) return "DATE"; // Datumsangaben im Format dd.MM.yyyy
+        if (TIMESTAMP_PATTERN.matcher(value).matches()) return "TIMESTAMP"; // ISO-8601-Timestamp
+        if (UUID_PATTERN.matcher(value).matches()) return "UUID"; // UUIDs (hexadezimale 32-Zeichen-Strings)
         return "TEXT"; // Standard-Texttyp
     }
 
