@@ -5,9 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 @Slf4j
 @Component
 public class SqlTableNameBuilder {
+
+    private static final Pattern STARTS_WITH_NUMBER_PATTERN = Pattern.compile("^\\d.*");
 
     public String build(String originalName) {
 
@@ -28,7 +32,7 @@ public class SqlTableNameBuilder {
                 .replaceAll("[^a-z0-9]+", "_")
                 .replaceAll("^_+|_+$", "");
 
-        if (tableName.matches("\\d.*")) {
+        if (STARTS_WITH_NUMBER_PATTERN.matcher(tableName).matches()) {
             tableName = "d" + tableName;
         }
 
