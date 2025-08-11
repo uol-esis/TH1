@@ -14,7 +14,7 @@ import java.util.regex.Pattern;
 @Service
 public class DateNormalizerService {
 
-    private final Pattern DATE_PATTERN = Pattern.compile("\\d{1,4}[-./\\s][a-zA-Z0-9]{1,4}[-./\\s][a-zA-Z0-9]{1,4}");
+    private static final Pattern DATE_PATTERN = Pattern.compile("\\d{1,4}[-./\\s][a-zA-Z0-9]{1,4}[-./\\s][a-zA-Z0-9]{1,4}");
 
     private static final List<DateTimeFormatter> DATE_FORMATTERS = List.of(
             DateTimeFormatter.ofPattern("dd.MM.yyyy"),
