@@ -11,6 +11,7 @@ import java.util.regex.Pattern;
 @Component
 public class SqlTableNameBuilder {
 
+    private static final Pattern REMOVE_FILE_EXTENSION_PATTERN = Pattern.compile("\\.[^.]+$");
     private static final Pattern STARTS_WITH_NUMBER_PATTERN = Pattern.compile("^\\d.*");
 
     public String build(String originalName) {
@@ -24,7 +25,7 @@ public class SqlTableNameBuilder {
             );
         }
 
-        String nameWithoutExtension = originalName.replaceFirst("\\.[^.]+$", "");
+        String nameWithoutExtension = REMOVE_FILE_EXTENSION_PATTERN.matcher(originalName).replaceFirst("");
 
         String tableName = nameWithoutExtension
                 .toLowerCase()
