@@ -11,6 +11,10 @@ import java.util.regex.Pattern;
 @Component
 public class SqlHeaderBuilder {
 
+    private static final Pattern REMOVE_NON_ASCII_PATTERN = Pattern.compile("\\p{M}");
+    private static final Pattern REPLACE_INVALID_CHARS_PATTERN = Pattern.compile("[^a-z0-9_]");
+    private static final Pattern REPLACE_MULTIPLE_UNDERSCORES_PATTERN = Pattern.compile("_+");
+
     private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
     private static final Pattern DECIMAL_PATTERN = Pattern.compile("\\d+\\.\\d+");
     private static final Pattern BOOLEAN_PATTERN = Pattern.compile("true|false");
@@ -57,11 +61,11 @@ public class SqlHeaderBuilder {
         // Trim und Kleinschreibung
         String normalized = input.trim().toLowerCase();
         // Entfernt alle nicht-ASCII-Zeichen (z. B. Umlaute → ue)
-        normalized = Normalizer.normalize(normalized, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+        normalized = REMOVE_NON_ASCII_PATTERN.matcher(Normalizer.normalize(normalized, Normalizer.Form.NFD)).replaceAll("");
         // Ersetzt ungültige Zeichen durch Unterstrich
-        normalized = normalized.replaceAll("[^a-z0-9_]", "_");
+        normalized = REPLACE_INVALID_CHARS_PATTERN.matcher(normalized).replaceAll("_");
         // Entfernt doppelte Unterstriche
-        normalized = normalized.replaceAll("_+", "_");
+        normalized = REPLACE_MULTIPLE_UNDERSCORES_PATTERN.matcher(normalized).replaceAll("_");
 
         // Stellt sicher, dass der Name mit einem Buchstaben beginnt
         if (!Character.isLetter(normalized.charAt(0))) {
