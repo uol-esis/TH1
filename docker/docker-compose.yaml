@@ -8,19 +8,36 @@ services:
   backend:
     build: ..
     environment:
+      APP_SECURITY_ENABLED: true
       SPRING_DATASOURCE_USERNAME: example
       SPRING_DATASOURCE_PASSWORD: example
-      SECURITY_ALLOWED-ORIGINS: http://localhost:5173,http://locahost:8080
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/example
-      SECURITY_AUTHORIZATIONURL: http://localhost:8085/realms/th1/protocol/openid-connect/auth
-      SECURITY_TOKENURL: http://localhost:8085/realms/th1/protocol/openid-connect/token
-      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8085/realms/th1
       SPRINGDOC_SWAGGER-UI_OAUTH_CLIENT-ID: th1
+      TH1_MB_API_KEY: key
+      TH1_MB_API_GENERAL_KEY: ${MB_GENERATED_KEY}
+      TH1_MB_BASEPATH: http://localhost:3000/api
+      TH1_SECURITY_ALLOWEDORIGINS: http://localhost:5173,http://locahost:8080,http://localhost
+      TH1_SECURITY_AUTHORIZATIONURL: http://localhost:8085/realms/th1/protocol/openid-connect/auth
+      TH1_SECURITY_TOKENURL: http://localhost:8085/realms/th1/protocol/openid-connect/token
+      SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8085/realms/th1
       LOGGING_LEVEL_DE_UOL_PGDOENER_TH1: DEBUG
     network_mode: host # host mode for token verification with keycloak
     depends_on:
       db:
         condition: service_healthy
+
+  # WIP
+  frontend:
+    build:
+      context: https://github.com/uol-esis/Frontend.git
+      args:
+        OAUTH_URL: http://localhost:8085
+        OAUTH_REALM: th1
+        OAUTH_CLIENT_ID: th1
+    environment:
+      API_HOST: http://127.0.0.1:8080/api/v1/
+      METABASE_HOST: http://localhost:3000
+    network_mode: host
 
   db:
     image: postgres:17-alpine
@@ -49,6 +66,17 @@ services:
     command: [ "start-dev" , "--import-realm" ]
     volumes:
       - "./data/realms:/opt/keycloak/data/import"
+
+  metabase:
+    image: metabase/metabase
+    container_name: metabase
+    environment:
+      MB_API_KEY: key
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
 
   garage:
     image: dxflrs/garage:v2.0.0
@@ -83,7 +111,3 @@ services:
       echo 'Garage is available. Running initialization...';
       /scripts/configure.sh;
       "
-
-
-# volumes:
-#  db-data:
