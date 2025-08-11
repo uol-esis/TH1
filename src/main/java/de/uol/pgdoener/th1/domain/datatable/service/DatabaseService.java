@@ -4,7 +4,6 @@ import de.uol.pgdoener.th1.domain.datatable.helper.SqlHeaderBuilder;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlQueryBuilder;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlValidator;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlValueBuilder;
-import de.uol.pgdoener.th1.infastructure.persistence.entity.SchemaVersion;
 import de.uol.pgdoener.th1.infastructure.persistence.repository.DynamicTableRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -37,10 +36,11 @@ public class DatabaseService {
         sqlValidator.validateTableName(tableName);
         sqlValidator.validateHeaders(columns);
 
+        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
         String sql = queryBuilder.buildCreateTableQuery(tableName, columns);
-        dynamicTableRepository.executeRawSql(sql);
 
-        insertValuesIntoTable(tableName, columns, matrix);
+        dynamicTableRepository.executeRawSql(sql);
+        insertValuesIntoTable(tableName, columns, values);
 
         schemaVersionService.saveVersion(tableName, "CREATED", sql, matrix);
     }
@@ -52,7 +52,8 @@ public class DatabaseService {
         sqlValidator.validateTableName(tableName);
         sqlValidator.validateHeaders(columns);
 
-        insertValuesIntoTable(tableName, columns, matrix);
+        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
+        insertValuesIntoTable(tableName, columns, values);
 
         schemaVersionService.saveVersion(tableName, "EXTEND", "", matrix);
     }
@@ -65,9 +66,10 @@ public class DatabaseService {
         sqlValidator.validateHeaders(columns);
 
         String deleteSql = "DELETE FROM " + tableName;
-        dynamicTableRepository.executeRawSql(deleteSql);
+        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
 
-        insertValuesIntoTable(tableName, columns, matrix);
+        dynamicTableRepository.executeRawSql(deleteSql);
+        insertValuesIntoTable(tableName, columns, values);
 
         schemaVersionService.saveVersion(tableName, "REPLACE", deleteSql, matrix);
     }
@@ -93,17 +95,17 @@ public class DatabaseService {
         //insertValuesIntoTable(tableName, columns, matrix);
     }
 
-    public void rollbackToVersion(String tableName, int version) throws IOException {
-
-        SchemaVersion versionMeta = schemaVersionService.getVersion(tableName, version);
-
-        dynamicTableRepository.executeRawSql("DROP TABLE IF EXISTS " + tableName);
-        dynamicTableRepository.executeRawSql(versionMeta.getChangeSql());
-
-        List<String[]> matrix = loadMatrixFromCsv(versionMeta.getSnapshotPath());
-        Map<String, String> columns = headerBuilder.build(matrix.toArray(new String[0][0]));
-        insertValuesIntoTable(tableName, columns, matrix.toArray(new String[0][0]));
-    }
+//    public void rollbackToVersion(String tableName, int version) throws IOException {
+//
+//        SchemaVersion versionMeta = schemaVersionService.getVersion(tableName, version);
+//
+//        dynamicTableRepository.executeRawSql("DROP TABLE IF EXISTS " + tableName);
+//        dynamicTableRepository.executeRawSql(versionMeta.getChangeSql());
+//
+//        List<String[]> matrix = loadMatrixFromCsv(versionMeta.getSnapshotPath());
+//        Map<String, String> columns = headerBuilder.build(matrix.toArray(new String[0][0]));
+//        insertValuesIntoTable(tableName, columns, matrix.toArray(new String[0][0]));
+//    }
 
     private List<String[]> loadMatrixFromCsv(String path) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(path));
@@ -112,7 +114,7 @@ public class DatabaseService {
                 .toList();
     }
 
-    private void insertValuesIntoTable(String tableName, Map<String, String> columns, String[][] matrix) {
+    private void insertValuesIntoTable(String tableName, Map<String, String> columns, List<Object[]> values) {
         /// TODO: auslagern ?
         int maxParams = 65535;
         int columnsCount = columns.size();
@@ -120,7 +122,6 @@ public class DatabaseService {
 
         String insertSql = queryBuilder.buildInsertQuery(tableName, columns);
 
-        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
 
         for (int i = 0; i < values.size(); i += batchSize) {
             int end = Math.min(i + batchSize, values.size());
