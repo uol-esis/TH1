@@ -1,12 +1,13 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.SplitRowStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class SplitRowConverter extends Converter {
@@ -17,6 +18,7 @@ public class SplitRowConverter extends Converter {
     public String[][] handleRequest(String[][] matrix) {
         int columnIndex = structure.getColumnIndex();
         String delimiter = structure.getDelimiter().orElse("\n");
+        Pattern delimiterPattern = Pattern.compile(delimiter);
         int startRow = structure.getStartRow().orElse(0);
         int endRow = structure.getEndRow().orElse(matrix.length);
 
@@ -39,7 +41,7 @@ public class SplitRowConverter extends Converter {
         for (int i = startRow; i < endRow; i++) {
             String[] row = matrix[i];
             String multiValue = row[columnIndex];
-            String[] splitValues = multiValue.split(delimiter);
+            String[] splitValues = delimiterPattern.split(multiValue);
             for (String splitValue : splitValues) {
                 String[] newRow = new String[row.length];
                 System.arraycopy(row, 0, newRow, 0, row.length);
