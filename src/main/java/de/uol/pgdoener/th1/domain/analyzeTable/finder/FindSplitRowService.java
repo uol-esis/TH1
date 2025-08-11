@@ -12,11 +12,27 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Pattern;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class FindSplitRowService {
+
+    /**
+     * List of possible delimiters to check against cell content.
+     */
+    private static final String[] POSSIBLE_DELIMITERS = {
+            "\\r?\\n",   // Line break (Unix or Windows)
+    };
+    private static final Pattern[] POSSIBLE_DELIMITER_PATTERNS;
+
+    static {
+        POSSIBLE_DELIMITER_PATTERNS = new Pattern[POSSIBLE_DELIMITERS.length];
+        for (int i = 0; i < POSSIBLE_DELIMITERS.length; i++) {
+            POSSIBLE_DELIMITER_PATTERNS[i] = Pattern.compile(POSSIBLE_DELIMITERS[i]);
+        }
+    }
 
     /**
      * Analyzes the provided matrix to detect columns containing cells with multiple logical values.
@@ -84,13 +100,14 @@ public class FindSplitRowService {
 
         if (content == null || content.isBlank()) return bestDelimiter;
 
-        for (String delimiter : POSSIBLE_DELIMITERS) {
-            String[] parts = content.split(delimiter);
+        for (int i = 0; i < POSSIBLE_DELIMITER_PATTERNS.length; i++) {
+            Pattern delimiterPattern = POSSIBLE_DELIMITER_PATTERNS[i];
+            String[] parts = delimiterPattern.split(content, -1);
             int itemCount = countNonEmptyItems(parts);
 
             if (itemCount > maxItems) {
                 maxItems = itemCount;
-                bestDelimiter = delimiter;
+                bestDelimiter = POSSIBLE_DELIMITERS[i];
             }
         }
 
@@ -112,12 +129,5 @@ public class FindSplitRowService {
         }
         return count;
     }
-
-    /**
-     * List of possible delimiters to check against cell content.
-     */
-    private static final String[] POSSIBLE_DELIMITERS = {
-            "\\r?\\n",   // Line break (Unix or Windows)
-    };
 
 }
