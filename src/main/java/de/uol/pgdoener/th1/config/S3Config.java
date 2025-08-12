@@ -1,30 +1,25 @@
 package de.uol.pgdoener.th1.config;
 
+import de.uol.pgdoener.th1.autoconfigure.ObjectStorageProperties;
 import io.minio.MinioClient;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(value = "th1.objectstorage.type", havingValue = "s3")
 public class S3Config {
 
-    @Value("${th1.s3.url}")
-    private String url;
-    @Value("${th1.s3.access-key}")
-    private String accessKey;
-    @Value("${th1.s3.secret-key}")
-    private String secretKey;
-    @Value("${th1.s3.region}")
-    private String region;
+    private final ObjectStorageProperties osProperties;
 
     @Bean
     public MinioClient minioClient() {
         return MinioClient.builder()
-                .endpoint(url)
-                .credentials(accessKey, secretKey)
-                .region(region)
+                .endpoint(osProperties.getS3().getUrl())
+                .credentials(osProperties.getS3().getAccessKey(), osProperties.getS3().getSecretKey())
+                .region(osProperties.getS3().getRegion())
                 .build();
     }
 }
