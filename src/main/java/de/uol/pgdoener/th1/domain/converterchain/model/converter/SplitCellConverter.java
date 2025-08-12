@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.application.dto.SplitRowStructureDto;
+import de.uol.pgdoener.th1.application.dto.SplitCellStructureDto;
 import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,9 +10,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
-public class SplitRowConverter extends Converter {
+public class SplitCellConverter extends Converter {
 
-    private final SplitRowStructureDto structure;
+    private final SplitCellStructureDto structure;
 
     @Override
     public String[][] handleRequest(String[][] matrix) {

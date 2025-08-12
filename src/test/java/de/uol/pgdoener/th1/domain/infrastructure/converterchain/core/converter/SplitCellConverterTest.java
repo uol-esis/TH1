@@ -1,23 +1,23 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
-import de.uol.pgdoener.th1.application.dto.SplitRowStructureDto;
-import de.uol.pgdoener.th1.domain.converterchain.model.converter.SplitRowConverter;
+import de.uol.pgdoener.th1.application.dto.SplitCellStructureDto;
 import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
+import de.uol.pgdoener.th1.domain.converterchain.model.converter.SplitCellConverter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class SplitRowConverterTest {
+class SplitCellConverterTest {
 
     @Test
     void testHandleRequest() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(1)
                 .endRow(3);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -40,12 +40,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithoutHeaderFooter() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(0)
                 .endRow(2);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Row1", "Value1\nValue2"},
                 {"Row2", "Value3\nValue4"}
@@ -64,12 +64,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithEmptyMatrix() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(0)
                 .endRow(0);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {{}};
 
         assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
@@ -77,12 +77,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithInvalidStartRow() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(5)
                 .endRow(10);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -94,12 +94,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithInvalidEndRow() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(1)
                 .endRow(5);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -111,12 +111,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithInvalidColumnIndex() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(5)
                 .delimiter("\n")
                 .startRow(1)
                 .endRow(3);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -128,12 +128,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithNegativeStartRow() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(-1)
                 .endRow(3);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -145,12 +145,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithNegativeEndRow() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(1)
                 .endRow(-1);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -162,12 +162,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithNegativeColumnIndex() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(-1)
                 .delimiter("\n")
                 .startRow(1)
                 .endRow(3);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1\nValue2"},
@@ -179,12 +179,12 @@ class SplitRowConverterTest {
 
     @Test
     void testHandleRequestWithNothingToSplit() {
-        SplitRowStructureDto structure = new SplitRowStructureDto()
+        SplitCellStructureDto structure = new SplitCellStructureDto()
                 .columnIndex(1)
                 .delimiter("\n")
                 .startRow(1)
                 .endRow(3);
-        SplitRowConverter converter = new SplitRowConverter(structure);
+        SplitCellConverter converter = new SplitCellConverter(structure);
         String[][] matrix = {
                 {"Header1", "Header2"},
                 {"Row1", "Value1"},

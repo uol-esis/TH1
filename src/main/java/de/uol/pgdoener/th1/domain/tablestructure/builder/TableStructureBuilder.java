@@ -149,12 +149,12 @@ public class TableStructureBuilder {
      */
     private void buildSplitRowReportDto(SplitRowReportDto report) {
         log.debug("Start buildSplitRowStructure");
-        SplitRowStructureDto SplitRowStructure = new SplitRowStructureDto();
-        SplitRowStructure.converterType(ConverterTypeDto.SPLIT_ROW)
+        SplitCellStructureDto splitCellStructure = new SplitCellStructureDto();
+        splitCellStructure.converterType(ConverterTypeDto.SPLIT_CELL)
                 .columnIndex(report.getColumnIndex())
                 .delimiter(report.getDelimiter());
         log.debug("Finish buildSplitRowStructure");
-        tableStructure.addStructuresItem(SplitRowStructure);
+        tableStructure.addStructuresItem(splitCellStructure);
     }
 
     /**
