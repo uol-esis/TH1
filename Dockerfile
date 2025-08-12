@@ -25,7 +25,11 @@ RUN addgroup -S pg && \
     adduser -S -G pg pg && \
     chown -R pg:pg /opt/pg
 
-# Copy the JAR fromRequest the build stage
+# Create /app folder for files
+RUN  mkdir /app && \
+    chown -R pg:pg /app
+
+# Copy the JAR from the build stage
 COPY --from=build /app/target/th1.jar app.jar
 
 # Change to 'pg' user
