@@ -56,20 +56,29 @@ public class FindSumService {
 
     private List<Integer> getRowsSum(MatrixInfo matrixInfo, String[][] matrix, List<Predicate<String>> patterns) {
         return matrixInfo.rowInfos().stream()
-                .parallel()
-                .filter(rowInfo -> rowInfo.cellInfos().stream()
-                        .anyMatch(cellInfo -> {
-                            String entry = matrix[cellInfo.rowIndex()][cellInfo.columnIndex()];
-                            entry = entry.toLowerCase();
-                            return isInBlockList(entry, patterns);
-                        })
+                .parallel() // Remove to handle longer burst loads
+                .filter(rowInfo -> {
+                            for (CellInfo cellInfo : rowInfo.cellInfos()) {
+                                String entry = matrix[cellInfo.rowIndex()][cellInfo.columnIndex()];
+                                entry = entry.toLowerCase();
+                                if (isInBlockList(entry, patterns)) {
+                                    return true; // Found a cell that matches the block list
+                                }
+                            }
+                            return false; // No matching cell found in this row
+                        }
                 )
                 .map(RowInfo::rowIndex)
                 .toList();
     }
 
     private boolean isInBlockList(String entry, List<Predicate<String>> patterns) {
-        return patterns.stream().anyMatch(pattern -> pattern.test(entry));
+        for (Predicate<String> pattern : patterns) {
+            if (pattern.test(entry)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
