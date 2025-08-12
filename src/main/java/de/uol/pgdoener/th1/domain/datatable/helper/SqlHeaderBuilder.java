@@ -6,9 +6,22 @@ import java.text.Normalizer;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 @Component
 public class SqlHeaderBuilder {
+
+    private static final Pattern REMOVE_NON_ASCII_PATTERN = Pattern.compile("\\p{M}");
+    private static final Pattern REPLACE_INVALID_CHARS_PATTERN = Pattern.compile("[^a-z0-9_]");
+    private static final Pattern REPLACE_MULTIPLE_UNDERSCORES_PATTERN = Pattern.compile("_+");
+
+    private static final Pattern INTEGER_PATTERN = Pattern.compile("\\d+");
+    private static final Pattern DECIMAL_PATTERN = Pattern.compile("\\d+\\.\\d+");
+    private static final Pattern BOOLEAN_PATTERN = Pattern.compile("true|false");
+    private static final Pattern DATE_PATTERN_1 = Pattern.compile("\\d{4}-\\d{2}-\\d{2}");
+    private static final Pattern DATE_PATTERN_2 = Pattern.compile("\\d{2}\\.\\d{2}\\.\\d{4}");
+    private static final Pattern TIMESTAMP_PATTERN = Pattern.compile("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*");
+    private static final Pattern UUID_PATTERN = Pattern.compile("[A-Fa-f0-9]{32}");
 
     /**
      * Extracts the header from the first row of the matrix and infers SQL types based on the first data row.
@@ -48,11 +61,11 @@ public class SqlHeaderBuilder {
         // Trim und Kleinschreibung
         String normalized = input.trim().toLowerCase();
         // Entfernt alle nicht-ASCII-Zeichen (z. B. Umlaute → ue)
-        normalized = Normalizer.normalize(normalized, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
+        normalized = REMOVE_NON_ASCII_PATTERN.matcher(Normalizer.normalize(normalized, Normalizer.Form.NFD)).replaceAll("");
         // Ersetzt ungültige Zeichen durch Unterstrich
-        normalized = normalized.replaceAll("[^a-z0-9_]", "_");
+        normalized = REPLACE_INVALID_CHARS_PATTERN.matcher(normalized).replaceAll("_");
         // Entfernt doppelte Unterstriche
-        normalized = normalized.replaceAll("_+", "_");
+        normalized = REPLACE_MULTIPLE_UNDERSCORES_PATTERN.matcher(normalized).replaceAll("_");
 
         // Stellt sicher, dass der Name mit einem Buchstaben beginnt
         if (!Character.isLetter(normalized.charAt(0))) {
@@ -63,13 +76,13 @@ public class SqlHeaderBuilder {
     }
 
     private String guessType(String value) {
-        if (value.matches("\\d+")) return "INTEGER"; // Ganzzahlen
-        if (value.matches("\\d+\\.\\d+")) return "NUMERIC"; // Dezimalzahlen
-        if (value.matches("true|false")) return "BOOLEAN"; // Wahrheitswerte
-        if (value.matches("\\d{4}-\\d{2}-\\d{2}")) return "DATE"; // Datumsangaben im Format YYYY-MM-DD
-        if (value.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) return "DATE"; // Datumsangaben im Format dd.MM.yyyy
-        if (value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*")) return "TIMESTAMP"; // ISO-8601-Timestamp
-        if (value.matches("[A-Fa-f0-9]{32}")) return "UUID"; // UUIDs (hexadezimale 32-Zeichen-Strings)
+        if (INTEGER_PATTERN.matcher(value).matches()) return "INTEGER"; // Ganzzahlen
+        if (DECIMAL_PATTERN.matcher(value).matches()) return "NUMERIC"; // Dezimalzahlen
+        if (BOOLEAN_PATTERN.matcher(value).matches()) return "BOOLEAN"; // Wahrheitswerte
+        if (DATE_PATTERN_1.matcher(value).matches()) return "DATE"; // Datumsangaben im Format YYYY-MM-DD
+        if (DATE_PATTERN_2.matcher(value).matches()) return "DATE"; // Datumsangaben im Format dd.MM.yyyy
+        if (TIMESTAMP_PATTERN.matcher(value).matches()) return "TIMESTAMP"; // ISO-8601-Timestamp
+        if (UUID_PATTERN.matcher(value).matches()) return "UUID"; // UUIDs (hexadezimale 32-Zeichen-Strings)
         return "TEXT"; // Standard-Texttyp
     }
 

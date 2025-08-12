@@ -14,10 +14,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class CsvParsingService {
+
+    private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
 
     private final NumberNormalizerService numberNormalizerService;
     private final DateNormalizerService dateNormalizerService;
@@ -76,7 +79,7 @@ public class CsvParsingService {
         String maybeDate = dateNormalizerService.tryNormalize(raw);
         if (maybeDate != null) return maybeDate;
 
-        if (raw.matches(".*[a-zA-Z].*")) return raw;
+        if (TEXT_PATTERN.matcher(raw).matches()) return raw;
         String normalizedNumber = numberNormalizerService.normalizeFormat(raw);
         if (normalizedNumber == null) return raw;
 

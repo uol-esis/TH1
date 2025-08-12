@@ -3,9 +3,12 @@ package de.uol.pgdoener.th1.domain.fileprocessing.helper;
 import org.springframework.stereotype.Service;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 @Service
 public class NumberNormalizerService {
+
+    private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
 
     /**
      * Formats a numeric value into a string using US locale.
@@ -40,7 +43,7 @@ public class NumberNormalizerService {
      * @return a normalized numeric string, or {@code null} if the input contains letters or is invalid
      */
     public String normalizeFormat(String raw) {
-        if (raw == null || raw.matches(".*[a-zA-Z].*")) {
+        if (raw == null || TEXT_PATTERN.matcher(raw).matches()) {
             return null;
         }
 
