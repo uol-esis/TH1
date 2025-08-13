@@ -23,7 +23,7 @@ public abstract class ConverterTypeMapper {
             case ReplaceEntriesStructure ignored -> ConverterTypeDto.REPLACE_ENTRIES;
             case RemoveInvalidRowStructure ignored -> ConverterTypeDto.REMOVE_INVALID_ROWS;
             case MergeColumnsStructure ignored -> ConverterTypeDto.MERGE_COLUMNS;
-            case SplitRowStructure ignored -> ConverterTypeDto.SPLIT_ROW;
+            case SplitCellStructure ignored -> ConverterTypeDto.SPLIT_CELL;
             case TransposeMatrixStructure ignored -> ConverterTypeDto.TRANSPOSE_MATRIX;
             case PivotMatrixStructure ignored -> ConverterTypeDto.PIVOT_MATRIX;
             case RemoveKeywordsStructure ignored -> ConverterTypeDto.REMOVE_KEYWORD;

@@ -93,8 +93,8 @@ public abstract class StructureMapper {
                     .startRow(structure.getStartRow())
                     .endRow(structure.getEndRow())
                     .columnIndex(structure.getColumns());
-            case SplitRowStructure structure -> new SplitRowStructureDto(
-                    ConverterTypeDto.SPLIT_ROW,
+            case SplitCellStructure structure -> new SplitCellStructureDto(
+                    ConverterTypeDto.SPLIT_CELL,
                     structure.getColumnIndex()
             )
                     .name(structure.getName())
@@ -237,7 +237,7 @@ public abstract class StructureMapper {
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
             );
-            case SplitRowStructureDto structure -> new SplitRowStructure(
+            case SplitCellStructureDto structure -> new SplitCellStructure(
                     null, // ID wird von der Datenbank generiert
                     position,
                     tableStructureId,
