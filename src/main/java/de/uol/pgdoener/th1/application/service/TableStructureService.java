@@ -22,6 +22,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Slf4j
 @Service
@@ -67,8 +70,10 @@ public class TableStructureService {
         Iterable<TableStructure> tableStructures = tableStructureRepository.findAll();
 
         List<TableStructureSummaryDto> tableStructuresDto = new ArrayList<>();
+        Map<Long, List<Structure>> structureMap = StreamSupport.stream(structureRepository.findAll().spliterator(), false)
+                .collect(Collectors.groupingBy(Structure::getTableStructureId));
         tableStructures.forEach(tableStructure -> {
-            List<Structure> structureList = structureRepository.findByTableStructureId(tableStructure.getId());
+            List<Structure> structureList = structureMap.getOrDefault(tableStructure.getId(), List.of());
             TableStructureSummaryDto tableStructureSummaryDto = TableStructureMapper.toSummaryDto(tableStructure, structureList);
             tableStructuresDto.add(tableStructureSummaryDto);
         });
