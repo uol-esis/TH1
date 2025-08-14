@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -18,12 +19,49 @@ import java.io.IOException;
 public class ConverterChainService {
     private final FileProcessingService fileProcessingService;
 
+    /**
+     * Performs a transformation on the contents of an uploaded file using the specified converter chain.
+     * <p>
+     * This method is a convenience overload that delegates to
+     * {@link #performTransformation(MultipartFile, ConverterChain, Optional)}
+     * with no specific page number (processes the default or entire file).
+     *
+     * @param file           The uploaded file to transform (e.g., PDF, image, spreadsheet).
+     * @param converterChain The chain of converters that will be applied to the extracted matrix.
+     * @return A two-dimensional {@code String} array representing the transformed table data.
+     * The first dimension corresponds to rows, and the second to columns.
+     * @throws TransformationException If the file cannot be processed or the transformation fails.
+     */
     public String[][] performTransformation(
             @NonNull MultipartFile file, ConverterChain converterChain
     ) throws TransformationException {
+        return performTransformation(file, converterChain, Optional.empty());
+    }
+
+    /**
+     * Performs a transformation on the contents of an uploaded file using the specified converter chain,
+     * optionally targeting a specific page.
+     * <p>
+     * Steps:
+     * <ol>
+     *     <li>Processes the uploaded file into a 2D string matrix (rows × columns), optionally restricted to a page.</li>
+     *     <li>Executes the provided {@link ConverterChain} on the extracted matrix.</li>
+     *     <li>Returns the transformed matrix as a {@code String[][]}.</li>
+     * </ol>
+     *
+     * @param file           The uploaded file to transform.
+     * @param converterChain The chain of converters that will be applied to the extracted matrix.
+     * @param page           The optional page number to process (empty = first page).
+     * @return A two-dimensional {@code String} array representing the transformed table data.
+     * The first dimension corresponds to rows, and the second to columns.
+     * @throws TransformationException If the file cannot be processed or the transformation fails.
+     */
+    public String[][] performTransformation(
+            @NonNull MultipartFile file, ConverterChain converterChain, Optional<Integer> page
+    ) throws TransformationException {
         String[][] inputMatrix;
         try {
-            inputMatrix = fileProcessingService.process(file);
+            inputMatrix = fileProcessingService.process(file, page);
         } catch (IOException e) {
             throw new TransformationException("Could not process file", e);
         }

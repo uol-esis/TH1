@@ -22,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -92,14 +93,15 @@ public class TableStructureService {
      *
      * @param file             the file to create the table structure for
      * @param optionalSettings setting for the generation
+     * @param page             the excel sheet page
      * @return the generated table structure and unresolved reports
      */
     public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
             MultipartFile file,
-            TableStructureGenerationSettingsDto optionalSettings
+            TableStructureGenerationSettingsDto optionalSettings,
+            Optional<Integer> page
     ) {
-        //InputFile inputFile = new InputFile(file);
-        return generateTableStructureService.generateTableStructure(file, optionalSettings);
+        return generateTableStructureService.generateTableStructure(file, optionalSettings, page);
     }
 
     @Transactional
