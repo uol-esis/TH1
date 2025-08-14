@@ -31,7 +31,7 @@ public class SqlValueBuilder {
                         String value = row[i];
                         formattedRow[i] = formatValue(value, columnType, columnName, columns);
                     }
-                    System.out.println(Arrays.toString(formattedRow));
+                    //System.out.println(Arrays.toString(formattedRow));
                     return formattedRow;
                 })
                 .toList();

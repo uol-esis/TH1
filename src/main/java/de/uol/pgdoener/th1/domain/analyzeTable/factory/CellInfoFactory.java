@@ -5,9 +5,13 @@ import de.uol.pgdoener.th1.domain.analyzeTable.model.ValueType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
+import java.util.regex.Pattern;
+
 @Slf4j
 @Component
 public class CellInfoFactory {
+
+    private static final Pattern DOUBLE_PATTERN = Pattern.compile("^-?\\d+(\\.\\d+)?$");
 
     public CellInfo create(int rowIndex, int colIndex, String entry) {
         ValueType valueType = detectType(entry);
@@ -26,6 +30,9 @@ public class CellInfoFactory {
     }
 
     private boolean isDouble(String s) {
+        if (!DOUBLE_PATTERN.matcher(s).matches()) {
+            return false;
+        }
         try {
             Double.parseDouble(s);
             return true;

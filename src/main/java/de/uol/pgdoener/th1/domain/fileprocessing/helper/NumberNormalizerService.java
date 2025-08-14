@@ -8,7 +8,10 @@ import java.util.regex.Pattern;
 @Service
 public class NumberNormalizerService {
 
+    private static final Pattern ZEROS_PATTERN = Pattern.compile("0+$");
+    private static final Pattern TRAILING_DECIMAL_PATTERN = Pattern.compile("\\.$");
     private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
+    private static final Pattern NON_NUMERIC_PATTERN = Pattern.compile("[^\\d.,-]");
 
     /**
      * Formats a numeric value into a string using US locale.
@@ -22,11 +25,11 @@ public class NumberNormalizerService {
      */
     public String formatNumeric(double number) {
         if (number == (long) number) {
-            return String.format(Locale.US, "%d", (long) number);
+            return Long.toString((long) number);
         } else {
-            return String.format(Locale.US, "%.10f", number)
-                    .replaceAll("0+$", "")
-                    .replaceAll("\\.$", "");
+            String result = String.format(Locale.US, "%.10f", number);
+            result = ZEROS_PATTERN.matcher(result).replaceAll(""); // FIXME relevant?
+            return TRAILING_DECIMAL_PATTERN.matcher(result).replaceAll(""); // FIXME relevant?
         }
     }
 
@@ -47,7 +50,7 @@ public class NumberNormalizerService {
             return null;
         }
 
-        String input = raw.replaceAll("[^\\d.,-]", ""); // nur Ziffern, Punkt, Komma und Minuszeichen bleiben
+        String input = NON_NUMERIC_PATTERN.matcher(raw).replaceAll(""); // nur Ziffern, Punkt, Komma und Minuszeichen bleiben
 
         boolean hasComma = input.contains(",");
         boolean hasDot = input.contains(".");
