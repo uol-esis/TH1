@@ -3,10 +3,10 @@ spring:
     name: th1
   threads:
     virtual:
-      enabled: true
+      enabled: false
   datasource:
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 50
   jpa:
     hibernate:
       ddl-auto: update
