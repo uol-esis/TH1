@@ -5,15 +5,12 @@ import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.regex.Pattern;
 
 @Service
@@ -47,16 +44,16 @@ public class CsvParsingService {
                 Reader reader = new InputStreamReader(originalInputStream);
                 CSVParser parser = format.parse(reader)
         ) {
-            List<String[]> rows = new ArrayList<>();
-            for (CSVRecord record : parser) {
-                int size = record.size();
-                String[] row = new String[size];
-                for (int i = 0; i < size; i++) {
-                    row[i] = getValue(record.get(i));
-                }
-                rows.add(row);
-            }
-            return rows.toArray(new String[0][0]);
+            return parser.stream()
+                    .map(r -> {
+                        int size = r.size();
+                        String[] row = new String[size];
+                        for (int i = 0; i < size; i++) {
+                            row[i] = getValue(r.get(i));
+                        }
+                        return row;
+                    })
+                    .toArray(String[][]::new);
         }
     }
 
