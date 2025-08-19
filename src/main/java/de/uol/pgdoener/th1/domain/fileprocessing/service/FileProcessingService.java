@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Optional;
 
 
 @Service
@@ -32,7 +33,7 @@ public class FileProcessingService {
      *   </ul>
      * - Returns the parsed data as a 2D String array.
      */
-    public String[][] process(MultipartFile file) throws IOException, InputFileException {
+    public String[][] process(MultipartFile file, Optional<Integer> page) throws IOException, InputFileException {
         FileType fileType = FileType.getType(file);
 
         switch (fileType) {
@@ -48,12 +49,12 @@ public class FileProcessingService {
             }
             case EXCEL_OLE2 -> {
                 try (InputStream stream = file.getInputStream()) {
-                    return excelParsingService.parseExcel(stream, HSSFWorkbook::new);
+                    return excelParsingService.parseExcel(stream, HSSFWorkbook::new, page);
                 }
             }
             case EXCEL_OOXML -> {
                 try (InputStream stream = file.getInputStream()) {
-                    return excelParsingService.parseExcel(stream, XSSFWorkbook::new);
+                    return excelParsingService.parseExcel(stream, XSSFWorkbook::new, page);
                 }
             }
             default -> throw new InputFileException("Unsupported file type");

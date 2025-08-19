@@ -1,8 +1,8 @@
 package de.uol.pgdoener.th1.api.controller;
 
 import de.uol.pgdoener.th1.api.TableStructuresApiDelegate;
-import de.uol.pgdoener.th1.application.service.TableStructureService;
 import de.uol.pgdoener.th1.application.dto.*;
+import de.uol.pgdoener.th1.application.service.TableStructureService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -60,10 +61,11 @@ public class TableStructureController implements TableStructuresApiDelegate {
     @PreAuthorize("hasAuthority('read:tablestructure')")
     public ResponseEntity<TableStructureGenerationResponseDto> generateTableStructure(
             MultipartFile file,
-            TableStructureGenerationSettingsDto settings
+            TableStructureGenerationSettingsDto settings,
+            Optional<Integer> page
     ) {
         log.debug("Generating Table structure for file {} with settings {}", file.getOriginalFilename(), settings);
-        Pair<TableStructureDto, List<ReportDto>> result = tableStructureService.generateTableStructure(file, settings);
+        Pair<TableStructureDto, List<ReportDto>> result = tableStructureService.generateTableStructure(file, settings, page);
         log.debug("Table structure generated");
         TableStructureGenerationResponseDto responseDto = new TableStructureGenerationResponseDto();
         responseDto.setTableStructure(result.getFirst());

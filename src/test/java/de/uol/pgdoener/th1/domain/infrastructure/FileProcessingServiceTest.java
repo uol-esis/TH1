@@ -8,6 +8,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.TestPropertySource;
 
 import java.io.InputStream;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -31,7 +32,7 @@ public class FileProcessingServiceTest {
                 csvInputStream
         );
 
-        String[][] result = fileProcessingService.process(mockFile);
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
 
         String[][] expected = {
                 {"id", "amount", "date"},
@@ -63,7 +64,7 @@ public class FileProcessingServiceTest {
                 csvInputStream
         );
 
-        String[][] result = fileProcessingService.process(mockFile);
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
 
         String[][] expected = {
                 {"id", "amount", "date"},
@@ -95,7 +96,7 @@ public class FileProcessingServiceTest {
                 csvInputStream
         );
 
-        String[][] result = fileProcessingService.process(mockFile);
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
 
         String[][] expected = {
                 {"", "", "", "", "", "", ""},
@@ -128,7 +129,7 @@ public class FileProcessingServiceTest {
                 csvInputStream
         );
 
-        String[][] result = fileProcessingService.process(mockFile);
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
 
         String[][] expected = {
                 {"Text", "123", "TRUE", "2020-01-01", "", "", "#DIV/0!"},
@@ -152,7 +153,7 @@ public class FileProcessingServiceTest {
                 csvInputStream
         );
 
-        String[][] result = fileProcessingService.process(mockFile);
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
 
         String[][] expected = {
                 {"", "", "", "", "", "", ""},
@@ -185,7 +186,7 @@ public class FileProcessingServiceTest {
                 csvInputStream
         );
 
-        String[][] result = fileProcessingService.process(mockFile);
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
 
         String[][] expected = {
                 {"Text", "123", "TRUE", "2020-01-01", "", "", "#DIV/0!"},

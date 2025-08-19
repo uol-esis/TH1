@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -35,9 +36,9 @@ public class ExcelParsingService {
      * @return a 2D String array containing the parsed and normalized sheet data
      * @throws IOException if the file cannot be read or parsed
      */
-    public String[][] parseExcel(InputStream inputStream, WorkbookFactory workbookFactory) throws IOException {
+    public String[][] parseExcel(InputStream inputStream, WorkbookFactory workbookFactory, Optional<Integer> page) throws IOException {
         try (Workbook workbook = workbookFactory.create(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(page.orElse(0));
 
             int rowCount = sheet.getLastRowNum() + 1;
             int colCount = getColumnWidth(sheet);
