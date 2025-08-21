@@ -2,13 +2,13 @@ package de.uol.pgdoener.th1.domain.fileprocessing.helper;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
 import java.util.regex.Pattern;
 
 @Service
 public class NumberNormalizerService {
 
     private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
+    private static final Pattern CLEAN_PATTERN = Pattern.compile("[^\\d.,-]");
 
     /**
      * Formats a numeric value into a string using US locale.
@@ -22,11 +22,9 @@ public class NumberNormalizerService {
      */
     public String formatNumeric(double number) {
         if (number == (long) number) {
-            return String.format(Locale.US, "%d", (long) number);
+            return String.valueOf((long) number);
         } else {
-            return String.format(Locale.US, "%.10f", number)
-                    .replaceAll("0+$", "")
-                    .replaceAll("\\.$", "");
+            return String.valueOf(number);
         }
     }
 
@@ -47,7 +45,7 @@ public class NumberNormalizerService {
             return null;
         }
 
-        String input = raw.replaceAll("[^\\d.,-]", ""); // nur Ziffern, Punkt, Komma und Minuszeichen bleiben
+        String input = raw.replaceAll(CLEAN_PATTERN.pattern(), "");
 
         boolean hasComma = input.contains(",");
         boolean hasDot = input.contains(".");
@@ -71,7 +69,6 @@ public class NumberNormalizerService {
                 input = input.replace(".", "");
             }
         }
-
         return input;
     }
 }

@@ -13,6 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -21,6 +22,7 @@ import java.util.regex.Pattern;
 public class CsvParsingService {
 
     private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
+    private static final Pattern NUMBER = Pattern.compile("[-+]?\\d{1,3}([.,' ]\\d{3})*([.,]\\d+)?$");
 
     private final NumberNormalizerService numberNormalizerService;
     private final DateNormalizerService dateNormalizerService;
@@ -51,6 +53,7 @@ public class CsvParsingService {
             for (CSVRecord record : parser) {
                 int size = record.size();
                 String[] row = new String[size];
+
                 for (int i = 0; i < size; i++) {
                     row[i] = getValue(record.get(i));
                 }
@@ -81,15 +84,7 @@ public class CsvParsingService {
 
         if (TEXT_PATTERN.matcher(raw).matches()) return raw;
         String normalizedNumber = numberNormalizerService.normalizeFormat(raw);
-        if (normalizedNumber == null) return raw;
-
-        try {
-            double value = Double.parseDouble(normalizedNumber);
-            /// TODO: Better Solution ??
-            if (raw.contains("%")) value /= 100.0;
-            return numberNormalizerService.formatNumeric(value);
-        } catch (NumberFormatException ignored) {
-        }
+        if (normalizedNumber != null) return normalizedNumber;
 
         return raw;
     }
