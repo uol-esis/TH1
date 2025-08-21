@@ -13,7 +13,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -22,7 +21,6 @@ import java.util.regex.Pattern;
 public class CsvParsingService {
 
     private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
-    private static final Pattern NUMBER = Pattern.compile("[-+]?\\d{1,3}([.,' ]\\d{3})*([.,]\\d+)?$");
 
     private final NumberNormalizerService numberNormalizerService;
     private final DateNormalizerService dateNormalizerService;

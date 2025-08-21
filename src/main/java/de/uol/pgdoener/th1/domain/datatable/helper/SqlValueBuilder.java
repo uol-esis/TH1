@@ -18,7 +18,6 @@ public class SqlValueBuilder {
     private final SqlTypeGuesser sqlTypeGuesser;
     private final SqlValueFormatter sqlValueFormatter;
 
-
     public List<Object[]> build(List<SqlColumn> columns, String[][] transformedMatrix) {
         String[][] valueMatrix = Arrays.copyOfRange(transformedMatrix, 1, transformedMatrix.length);
         List<Object[]> result = new ArrayList<>();

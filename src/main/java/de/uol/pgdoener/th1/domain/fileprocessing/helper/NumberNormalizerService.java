@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 public class NumberNormalizerService {
 
     private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
-    private static final Pattern CLEAN_PATTERN = Pattern.compile("[^\\d.,-]");
+    private static final Pattern NON_NUMERIC_PATTERN = Pattern.compile("[^\\d.,-]");
 
     /**
      * Formats a numeric value into a string using US locale.
@@ -45,7 +45,7 @@ public class NumberNormalizerService {
             return null;
         }
 
-        String input = raw.replaceAll(CLEAN_PATTERN.pattern(), "");
+        String input = raw.replaceAll(NON_NUMERIC_PATTERN.pattern(), "");
 
         boolean hasComma = input.contains(",");
         boolean hasDot = input.contains(".");
@@ -69,6 +69,7 @@ public class NumberNormalizerService {
                 input = input.replace(".", "");
             }
         }
+
         return input;
     }
 }
