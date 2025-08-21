@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import java.util.Arrays;
 import java.util.List;
 
+import static de.uol.pgdoener.th1.application.dto.AddHeaderNameStructureDto.HeaderPlacementTypeEnum.INSERT_AT_TOP;
+import static de.uol.pgdoener.th1.application.dto.AddHeaderNameStructureDto.HeaderPlacementTypeEnum.REPLACE_FIRST_ROW;
 import static de.uol.pgdoener.th1.infastructure.persistence.entity.MatchType.CONTAINS;
 import static de.uol.pgdoener.th1.infastructure.persistence.entity.MatchType.EQUALS;
 
@@ -51,7 +53,8 @@ public abstract class StructureMapper {
                     .description(structure.getDescription());
             case HeaderRowStructure structure -> new AddHeaderNameStructureDto(
                     ConverterTypeDto.ADD_HEADER_NAME,
-                    List.of(structure.getHeaderNames())
+                    List.of(structure.getHeaderNames()),
+                    headerPlacementTypeToEntity(structure.getHeaderPlacementType())
             )
                     .name(structure.getName())
                     .description(structure.getDescription());
@@ -188,7 +191,8 @@ public abstract class StructureMapper {
                     tableStructureId,
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
-                    structure.getHeaderNames().toArray(new String[0])
+                    structure.getHeaderNames().toArray(new String[0]),
+                    headerPlacementTypeToDto(structure.getHeaderPlacementType())
             );
             case RemoveHeaderStructureDto structure -> new RemoveHeaderStructure(
                     null, // ID wird von der Datenbank generiert
@@ -296,6 +300,27 @@ public abstract class StructureMapper {
                     structure.isIgnoreCase(),
                     convertMatchTypeToEntity(structure.getMatchType())
             );
+        };
+    }
+
+    private static HeaderPlacementType headerPlacementTypeToDto(AddHeaderNameStructureDto.HeaderPlacementTypeEnum headerType) {
+        if (headerType == null) {
+            return HeaderPlacementType.REPLACE_FIRST_ROW;
+        }
+        return switch (headerType) {
+            case REPLACE_FIRST_ROW -> HeaderPlacementType.REPLACE_FIRST_ROW;
+            case INSERT_AT_TOP -> HeaderPlacementType.INSERT_AT_TOP;
+            default -> throw new IllegalArgumentException("Unknown matchType: " + headerType);
+        };
+    }
+
+    private static AddHeaderNameStructureDto.HeaderPlacementTypeEnum headerPlacementTypeToEntity(HeaderPlacementType headerPlacementType) {
+        if (headerPlacementType == null) {
+            return REPLACE_FIRST_ROW;
+        }
+        return switch (headerPlacementType) {
+            case REPLACE_FIRST_ROW -> REPLACE_FIRST_ROW;
+            case INSERT_AT_TOP -> INSERT_AT_TOP;
         };
     }
 
