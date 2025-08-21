@@ -114,8 +114,6 @@ class GenerateTableStructureServiceTest {
         TableStructureDto tableStructure = result.getFirst();
         List<ReportDto> unresolvedReports = result.getSecond();
 
-        System.out.println(tableStructure.getStructures());
-
         assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(4));
         assertInstanceOf(FillEmptyColumnStructureDto.class, tableStructure.getStructures().get(5));
         assertInstanceOf(RemoveGroupedHeaderStructureDto.class, tableStructure.getStructures().get(6));
