@@ -20,7 +20,7 @@ public class SqlValueBuilder {
 
     public List<Object[]> build(List<SqlColumn> columns, String[][] transformedMatrix) {
         String[][] valueMatrix = Arrays.copyOfRange(transformedMatrix, 1, transformedMatrix.length);
-        List<Object[]> result = new ArrayList<>();
+        List<Object[]> result = new ArrayList<>(transformedMatrix[0].length);
 
         for (String[] row : valueMatrix) {
             Object[] formattedRow = new Object[columns.size()];

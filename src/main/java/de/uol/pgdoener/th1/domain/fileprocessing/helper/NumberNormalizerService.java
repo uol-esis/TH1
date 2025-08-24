@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 @Service
 public class NumberNormalizerService {
 
-    private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
     private static final Pattern NON_NUMERIC_PATTERN = Pattern.compile("[^\\d.,-]");
 
     /**
@@ -41,11 +40,11 @@ public class NumberNormalizerService {
      * @return a normalized numeric string, or {@code null} if the input contains letters or is invalid
      */
     public String normalizeFormat(String raw) {
-        if (raw == null || TEXT_PATTERN.matcher(raw).matches()) {
+        if (raw == null || raw.isBlank()) {
             return null;
         }
 
-        String input = raw.replaceAll(NON_NUMERIC_PATTERN.pattern(), "");
+        String input = NON_NUMERIC_PATTERN.matcher(raw).replaceAll("");
 
         boolean hasComma = input.contains(",");
         boolean hasDot = input.contains(".");

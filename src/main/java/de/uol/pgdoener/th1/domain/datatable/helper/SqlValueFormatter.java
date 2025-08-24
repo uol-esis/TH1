@@ -4,6 +4,8 @@ import de.uol.pgdoener.th1.domain.datatable.model.SqlType;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.UUID;
 
 import static de.uol.pgdoener.th1.domain.datatable.helper.SqlTypePattern.DATE;
 
@@ -27,7 +29,8 @@ public class SqlValueFormatter {
                     }
                     yield value;
                 }
-                default -> throw new IllegalArgumentException("Unknown column type: " + columnType.getSqlName());
+                case UUID -> UUID.fromString(value);
+                case TIMESTAMP -> Timestamp.valueOf(value);
             };
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Could not parse value: " + value, e);

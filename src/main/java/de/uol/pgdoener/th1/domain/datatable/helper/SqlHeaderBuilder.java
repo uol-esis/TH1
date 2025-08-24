@@ -21,7 +21,7 @@ public class SqlHeaderBuilder {
      */
     public List<SqlColumn> build(String[][] matrix) {
         String[] headers = matrix[0];
-        List<SqlColumn> columnHeaders = new ArrayList<>();
+        List<SqlColumn> columnHeaders = new ArrayList<>(headers.length + 1);
 
         columnHeaders.add(new SqlColumn("id",  SqlType.SERIAL_PRIMARY_KEY));
 
