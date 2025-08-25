@@ -2,6 +2,8 @@ package de.uol.pgdoener.th1.domain.fileprocessing.service;
 
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DateNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.TypeDetector;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.ValueType;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -11,16 +13,14 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
 public class CsvParsingService {
 
-    private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
-
     private final NumberNormalizerService numberNormalizerService;
     private final DateNormalizerService dateNormalizerService;
+    private final TypeDetector typeDetector;
 
     /**
      * Parses a CSV file from an InputStream into a 2D String array.
@@ -71,23 +71,15 @@ public class CsvParsingService {
      */
     private String getValue(String raw) {
         if (raw == null || raw.isBlank()) return "";
-        raw = raw.trim();
+        ValueType valueType = typeDetector.detect(raw);
 
-        String maybeDate = dateNormalizerService.tryNormalize(raw);
-        if (maybeDate != null) return maybeDate;
-
-        if (TEXT_PATTERN.matcher(raw).matches()) return raw;
-        String normalizedNumber = numberNormalizerService.normalizeFormat(raw);
-        if (normalizedNumber == null) return raw;
-
-        try {
-            double value = Double.parseDouble(normalizedNumber);
-            /// TODO: Better Solution ??
-            if (raw.contains("%")) value /= 100.0;
-            return numberNormalizerService.formatNumeric(value);
-        } catch (NumberFormatException ignored) {
-        }
-
-        return raw;
+        return switch (valueType) {
+            case NUMBER:
+                yield numberNormalizerService.normalizeFormat(raw);
+            case DATE:
+                yield dateNormalizerService.tryNormalize(raw);
+            case TEXT, TIMESTAMP, BOOLEAN, UUID:
+                yield raw;
+        };
     }
 }

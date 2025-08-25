@@ -15,6 +15,7 @@ import de.uol.pgdoener.th1.domain.converterchain.service.ConverterChainService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DateNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DetectDelimiterService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.TypeDetector;
 import de.uol.pgdoener.th1.domain.fileprocessing.service.CsvParsingService;
 import de.uol.pgdoener.th1.domain.fileprocessing.service.ExcelParsingService;
 import de.uol.pgdoener.th1.domain.fileprocessing.service.FileProcessingService;
@@ -62,6 +63,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         NumberNormalizerService.class,
         DateNormalizerService.class,
         DetectDelimiterService.class,
+        TypeDetector.class,
 })
 class GenerateTableStructureServiceTest {
 
@@ -113,8 +115,6 @@ class GenerateTableStructureServiceTest {
 
         TableStructureDto tableStructure = result.getFirst();
         List<ReportDto> unresolvedReports = result.getSecond();
-
-        System.out.println(tableStructure.getStructures());
 
         assertInstanceOf(FillEmptyRowStructureDto.class, tableStructure.getStructures().get(4));
         assertInstanceOf(FillEmptyColumnStructureDto.class, tableStructure.getStructures().get(5));

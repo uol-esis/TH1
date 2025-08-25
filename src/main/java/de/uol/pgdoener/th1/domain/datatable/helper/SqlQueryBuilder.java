@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.domain.datatable.helper;
 
+import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -7,16 +8,24 @@ import java.util.*;
 @Component
 public class SqlQueryBuilder {
 
-    public String buildCreateTableQuery(String tableName, Map<String, String> columns) {
+    public String buildCreateTableQuery(String tableName, List<SqlColumn> columns) {
         StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS \"" + tableName + "\" (");
-        columns.forEach((col, type) -> query.append("\"").append(col).append("\" ").append(type).append(", "));
+
+        for (SqlColumn column : columns) {
+            query.append("\"")
+                    .append(column.getName())
+                    .append("\" ")
+                    .append(column.getType().getSqlName()) // Enum zu String
+                    .append(", ");
+        }
+
         query.setLength(query.length() - 2);
         query.append(")");
         return query.toString();
     }
 
-    public String buildInsertQuery(String tableName, Map<String, String> columns) {
-        String[] headers = columns.keySet().stream().filter(key -> !key.equals("id")).toArray(String[]::new);
+    public String buildInsertQuery(String tableName, List<SqlColumn> columns, List<Object[]> values) {
+        String[] headers = getInsertableHeaders(columns, values.getFirst().length);
 
         StringBuilder insertQuery = new StringBuilder("INSERT INTO ")
                 .append(tableName)
@@ -30,27 +39,6 @@ public class SqlQueryBuilder {
             String placeholders = String.join(", ", Collections.nCopies(headers.length, "?"));
             valuesSql.add("(" + placeholders + ")");
             break;
-        }
-
-        insertQuery.append(valuesSql);
-
-        return insertQuery.toString();
-    }
-
-    public String buildInsertQueryNew(String tableName, Map<String, String> columns, int batchSize) {
-        String[] headers = columns.keySet().stream().filter(key -> !key.equals("id")).toArray(String[]::new);
-
-        StringBuilder insertQuery = new StringBuilder("INSERT INTO ")
-                .append(tableName)
-                .append(" (")
-                .append(String.join(", ", headers))
-                .append(") VALUES ");
-
-        StringJoiner valuesSql = new StringJoiner(", ");
-
-        String placeholders = "(" + String.join(", ", Collections.nCopies(headers.length, "?")) + ")";
-        for (int i = 0; i < batchSize; i++) {
-            valuesSql.add(placeholders);
         }
 
         insertQuery.append(valuesSql);
@@ -76,6 +64,13 @@ public class SqlQueryBuilder {
         }
 
         return alterStatements;
+    }
+
+    private String[] getInsertableHeaders(List<SqlColumn> columns, int firstRowLength) {
+        return columns.stream()
+                .map(SqlColumn::getName)
+                .filter(name -> !"id".equals(name) || firstRowLength == columns.size())
+                .toArray(String[]::new);
     }
 
 }
