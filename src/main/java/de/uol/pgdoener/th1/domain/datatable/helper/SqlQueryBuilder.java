@@ -11,6 +11,11 @@ public class SqlQueryBuilder {
     public String buildCreateTableQuery(String tableName, List<SqlColumn> columns) {
         StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS \"" + tableName + "\" (");
 
+        boolean hasId = columns.stream().anyMatch(c -> "id".equalsIgnoreCase(c.getName()));
+        if (!hasId) {
+            query.append("\"id\" SERIAL PRIMARY KEY, ");
+        }
+
         for (SqlColumn column : columns) {
             query.append("\"")
                     .append(column.getName())
@@ -25,7 +30,7 @@ public class SqlQueryBuilder {
     }
 
     public String buildInsertQuery(String tableName, List<SqlColumn> columns, List<Object[]> values) {
-        String[] headers = getInsertableHeaders(columns, values.getFirst().length);
+        String[] headers = columns.stream().map(SqlColumn::getName).toArray(String[]::new);
 
         StringBuilder insertQuery = new StringBuilder("INSERT INTO ")
                 .append(tableName)
@@ -65,12 +70,4 @@ public class SqlQueryBuilder {
 
         return alterStatements;
     }
-
-    private String[] getInsertableHeaders(List<SqlColumn> columns, int firstRowLength) {
-        return columns.stream()
-                .map(SqlColumn::getName)
-                .filter(name -> !"id".equals(name) || firstRowLength == columns.size())
-                .toArray(String[]::new);
-    }
-
 }

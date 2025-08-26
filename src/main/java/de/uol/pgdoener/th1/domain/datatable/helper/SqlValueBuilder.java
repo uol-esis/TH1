@@ -27,7 +27,6 @@ public class SqlValueBuilder {
             int j = 0;
             for (int i = 0; i < columns.size(); i++) {
                 SqlColumn column = columns.get(i);
-                if ("id".equals(column.getName()) && row.length < columns.size()) continue;
 
                 String value = row[j++];
                 SqlType detectedType = sqlTypeGuesser.guessType(value);
