@@ -1,6 +1,5 @@
 package de.uol.pgdoener.th1.infastructure.persistence.entity;
 
-import de.uol.pgdoener.th1.application.dto.HeaderPlacementTypeDto;
 import io.hypersistence.utils.hibernate.type.array.StringArrayType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +23,7 @@ public class HeaderRowStructure extends Structure {
             String name,
             String description,
             String[] headerNames,
-            HeaderPlacementTypeDto headerPlacementType
+            HeaderPlacementType headerPlacementType
     ) {
         super(id, position, tableStructureId, name, description);
         this.headerNames = headerNames;

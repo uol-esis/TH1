@@ -1,8 +1,9 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.application.dto.AddHeaderNameStructureDto;
-import de.uol.pgdoener.th1.domain.converterchain.model.converter.AddHeaderRowConverter;
+import de.uol.pgdoener.th1.application.dto.HeaderPlacementTypeDto;
 import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
+import de.uol.pgdoener.th1.domain.converterchain.model.converter.AddHeaderRowConverter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -14,7 +15,8 @@ class AddHeaderRowConverterTest {
 
     @Test
     void testHandleRequest() {
-        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(null, List.of("t", "e", "s", "t"));
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s", "t"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
@@ -24,8 +26,21 @@ class AddHeaderRowConverterTest {
     }
 
     @Test
+    void testHandleRequestOnTop() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s", "t"), HeaderPlacementTypeDto.INSERT_AT_TOP);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t", "e", "s", "t"}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, result);
+    }
+
+    @Test
     void testHandleRequestEmptyMatrix() {
-        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(null, List.of("t", "e", "s", "t"));
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s", "t"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{};
 
@@ -34,7 +49,8 @@ class AddHeaderRowConverterTest {
 
     @Test
     void testHandleRequestEmptyHeaderRow() {
-        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(null, List.of());
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of(), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
@@ -45,7 +61,8 @@ class AddHeaderRowConverterTest {
 
     @Test
     void testHandleRequestHeaderRowLongerThanMatrix() {
-        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(null, List.of("t", "e", "s", "t", "extra"));
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s", "t", "extra"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
@@ -54,7 +71,8 @@ class AddHeaderRowConverterTest {
 
     @Test
     void testHandleRequestMinimalMatrix() {
-        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(null, List.of("t"));
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w"}};
 

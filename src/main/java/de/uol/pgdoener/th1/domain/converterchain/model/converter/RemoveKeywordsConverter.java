@@ -1,7 +1,8 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
+import de.uol.pgdoener.th1.application.dto.MatchTypeDto;
 import de.uol.pgdoener.th1.application.dto.RemoveKeywordsStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,8 +62,8 @@ public class RemoveKeywordsConverter extends Converter {
         }
         String joined = String.join("|", escapedKeywords);
         String regex = switch (structure.getMatchType()) {
-            case RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS -> ".*(" + joined + ").*";
-            case RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS -> "^(" + joined + ")$";
+            case MatchTypeDto.CONTAINS -> ".*(" + joined + ").*";
+            case MatchTypeDto.EQUALS -> "^(" + joined + ")$";
             default -> {
                 log.warn("Unknown matchType '{}', defaulting to CONTAINS", structure.getMatchType());
                 yield ".*(" + joined + ").*";

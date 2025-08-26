@@ -48,10 +48,8 @@ public class AddHeaderRowConverter extends Converter {
         String[][] newMatrix = new String[matrix.length + 1][matrix[0].length];
         newMatrix[0] = newHeader;
 
-        for (int i = 0; i < matrix.length; i++) {
-            System.arraycopy(matrix[i], 0, newMatrix[i], 0, matrix[i].length);
-        }
+        System.arraycopy(matrix, 0, newMatrix, 1, matrix.length);
 
-        return super.handleRequest(matrix);
+        return super.handleRequest(newMatrix);
     }
 }
