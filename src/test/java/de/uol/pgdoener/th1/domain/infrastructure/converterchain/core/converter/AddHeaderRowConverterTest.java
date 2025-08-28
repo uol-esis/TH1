@@ -38,9 +38,43 @@ class AddHeaderRowConverterTest {
     }
 
     @Test
+    void testHandleRequestDifferentHeaderLength() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t", "e", "s", "d"}, {"a", "b", "c", "d"}}, result);
+    }
+
+    @Test
+    void testHandleRequestOnTopDifferentHeaderLength() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s"), HeaderPlacementTypeDto.INSERT_AT_TOP);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t", "e", "s", ""}, {"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, result);
+    }
+
+    @Test
     void testHandleRequestEmptyMatrix() {
         AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
                 null, List.of("t", "e", "s", "t"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{};
+
+        assertThrows(ArrayIndexOutOfBoundsException.class, () -> converter.handleRequest(matrix));
+    }
+
+    @Test
+    void testHandleRequestEmptyMatrixOnTop() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s", "t"), HeaderPlacementTypeDto.INSERT_AT_TOP);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{};
 
@@ -60,9 +94,31 @@ class AddHeaderRowConverterTest {
     }
 
     @Test
+    void testHandleRequestEmptyHeaderRowOnTop() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of(), HeaderPlacementTypeDto.INSERT_AT_TOP);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}}, result);
+    }
+
+    @Test
     void testHandleRequestHeaderRowLongerThanMatrix() {
         AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
                 null, List.of("t", "e", "s", "t", "extra"), HeaderPlacementTypeDto.REPLACE_FIRST_ROW);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
+
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
+    }
+
+    @Test
+    void testHandleRequestHeaderRowLongerThanMatrixOnTop() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t", "e", "s", "t", "extra"), HeaderPlacementTypeDto.INSERT_AT_TOP);
         AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
         String[][] matrix = new String[][]{{"w", "o", "r", "d"}, {"a", "b", "c", "d"}};
 
@@ -79,6 +135,18 @@ class AddHeaderRowConverterTest {
         String[][] result = converter.handleRequest(matrix);
 
         assertArrayEquals(new String[][]{{"t"}}, result);
+    }
+
+    @Test
+    void testHandleRequestMinimalMatrixOnTop() {
+        AddHeaderNameStructureDto structure = new AddHeaderNameStructureDto(
+                null, List.of("t"), HeaderPlacementTypeDto.INSERT_AT_TOP);
+        AddHeaderRowConverter converter = new AddHeaderRowConverter(structure);
+        String[][] matrix = new String[][]{{"w"}};
+
+        String[][] result = converter.handleRequest(matrix);
+
+        assertArrayEquals(new String[][]{{"t"}, {"w"}}, result);
     }
 
 }
