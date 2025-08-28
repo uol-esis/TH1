@@ -4,6 +4,7 @@ import de.uol.pgdoener.th1.domain.datatable.helper.SqlHeaderBuilder;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlQueryBuilder;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlValidator;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlValueBuilder;
+import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
 import de.uol.pgdoener.th1.infastructure.persistence.repository.DynamicTableRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +14,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class DatabaseService {
-    private final int BATCH_SIZE = 1000;
 
     final DynamicTableRepository dynamicTableRepository;
 
@@ -31,36 +30,36 @@ public class DatabaseService {
 
     @Transactional
     public void createDatabaseTableWithValues(String tableName, String[][] matrix) {
-        Map<String, String> columns = headerBuilder.build(matrix);
+        List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(columns);
+        sqlValidator.validateHeaders(header);
 
-        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
-        String sql = queryBuilder.buildCreateTableQuery(tableName, columns);
+        List<Object[]> values = sqlValueBuilder.build(header, matrix);
+        String sql = queryBuilder.buildCreateTableQuery(tableName, header);
 
         dynamicTableRepository.executeRawSql(sql);
-        insertValuesIntoTable(tableName, columns, values);
+        insertValuesIntoTable(tableName, header, values);
 
         schemaVersionService.saveVersion(tableName, "CREATED", sql, matrix);
     }
 
     @Transactional
     public void extendDatabaseTableWithValues(String tableName, String[][] matrix) {
-        Map<String, String> columns = headerBuilder.build(matrix);
+        List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(columns);
+        sqlValidator.validateHeaders(header);
 
-        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
-        insertValuesIntoTable(tableName, columns, values);
+        List<Object[]> values = sqlValueBuilder.build(header, matrix);
+        insertValuesIntoTable(tableName, header, values);
 
         schemaVersionService.saveVersion(tableName, "EXTEND", "", matrix);
     }
 
     @Transactional
     public void replaceDatabaseTableWithValues(String tableName, String[][] matrix) {
-        Map<String, String> columns = headerBuilder.build(matrix);
+        List<SqlColumn> columns = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
         sqlValidator.validateHeaders(columns);
@@ -114,14 +113,14 @@ public class DatabaseService {
                 .toList();
     }
 
-    private void insertValuesIntoTable(String tableName, Map<String, String> columns, List<Object[]> values) {
+    private void insertValuesIntoTable(String tableName, List<SqlColumn> columns, List<Object[]> values) {
         /// TODO: auslagern ?
         int maxParams = 65535;
         int columnsCount = columns.size();
+        int BATCH_SIZE = 1000;
         int batchSize = Math.min(BATCH_SIZE, maxParams / columnsCount);
 
-        String insertSql = queryBuilder.buildInsertQuery(tableName, columns);
-
+        String insertSql = queryBuilder.buildInsertQuery(tableName, columns, values);
 
         for (int i = 0; i < values.size(); i += batchSize) {
             int end = Math.min(i + batchSize, values.size());

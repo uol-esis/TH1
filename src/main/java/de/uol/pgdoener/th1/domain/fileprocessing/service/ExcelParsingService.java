@@ -3,6 +3,8 @@ package de.uol.pgdoener.th1.domain.fileprocessing.service;
 import de.uol.pgdoener.th1.domain.fileprocessing.WorkbookFactory;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DateNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.TypeDetector;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.ValueType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -20,6 +22,7 @@ public class ExcelParsingService {
 
     private final DateNormalizerService dateNormalizerService;
     private final NumberNormalizerService numberNormalizerService;
+    private final TypeDetector typeDetector;
 
     /**
      * Parses the first sheet of an Excel file into a 2D String array.
@@ -108,14 +111,16 @@ public class ExcelParsingService {
             return switch (cellType) {
                 case STRING -> {
                     String value = cell.getStringCellValue();
+                    ValueType valueType = typeDetector.detect(value);
 
-                    String maybeDate = dateNormalizerService.tryNormalize(value);
-                    if (maybeDate != null) yield maybeDate;
-
-                    String maybeNumber = numberNormalizerService.normalizeFormat(value);
-                    if (maybeNumber != null) yield maybeNumber;
-
-                    yield value;
+                    yield switch (valueType) {
+                        case NUMBER:
+                            yield numberNormalizerService.normalizeFormat(value);
+                        case DATE:
+                            yield dateNormalizerService.tryNormalize(value);
+                        case TEXT, TIMESTAMP, BOOLEAN, UUID:
+                            yield value;
+                    };
                 }
                 case NUMERIC -> {
                     if (DateUtil.isCellDateFormatted(cell)) {

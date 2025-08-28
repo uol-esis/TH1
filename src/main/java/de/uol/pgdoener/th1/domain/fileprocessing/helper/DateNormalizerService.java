@@ -9,12 +9,9 @@ import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Pattern;
 
 @Service
 public class DateNormalizerService {
-
-    private static final Pattern DATE_PATTERN = Pattern.compile("\\d{1,4}[-./\\s][a-zA-Z0-9]{1,4}[-./\\s][a-zA-Z0-9]{1,4}");
 
     private static final List<DateTimeFormatter> DATE_FORMATTERS = List.of(
             DateTimeFormatter.ofPattern("dd.MM.yyyy"),
@@ -47,7 +44,6 @@ public class DateNormalizerService {
      */
     public String tryNormalize(String value) {
         if (value == null) return null;
-        if (!DATE_PATTERN.matcher(value).matches()) return null;
 
         for (DateTimeFormatter formatter : DATE_FORMATTERS) {
             try {
