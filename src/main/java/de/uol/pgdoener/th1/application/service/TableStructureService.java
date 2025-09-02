@@ -61,7 +61,7 @@ public class TableStructureService {
         tableStructureValidationService.validateTableStructureExists(id);
         TableStructure tableStructure = tableStructureRepository.getReferenceById(id);
         if (!tableStructure.getName().equals(tableStructureDto.getName())) {
-            tableStructureValidationService.validateName(tableStructure.getName());
+            tableStructureValidationService.validateName(tableStructureDto.getName());
         }
 
         TableStructure updatedTableStructure = TableStructureMapper.toEntity(tableStructureDto);

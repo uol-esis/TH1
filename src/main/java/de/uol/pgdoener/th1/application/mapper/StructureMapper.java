@@ -137,7 +137,7 @@ public abstract class StructureMapper {
     }
 
     public static List<Structure> toEntity(List<StructureDto> structures, Long tableStructureId) {
-        List<Structure> structureList = new ArrayList<>();
+        List<Structure> structureList = new ArrayList<>(structures.size());
         for (int i = 0; i < structures.size(); i++) {
             StructureDto structure = structures.get(i);
             structureList.add(toEntity(structure, i, tableStructureId));
