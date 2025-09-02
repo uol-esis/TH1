@@ -12,4 +12,5 @@ public interface TableStructureRepository extends
         JpaRepository<TableStructure, Long>,
         JpaSpecificationExecutor<TableStructure> {
     boolean existsById(Long id);
+    boolean existsByName(String name);
 }

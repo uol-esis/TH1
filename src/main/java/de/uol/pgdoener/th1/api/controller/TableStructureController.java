@@ -50,6 +50,15 @@ public class TableStructureController implements TableStructuresApiDelegate {
 
     @Override
     @PreAuthorize("hasAuthority('write:tablestructure')")
+    public ResponseEntity<Void> updateTableStructure(Long id, TableStructureDto request) {
+        log.debug("Updating table structure with id {}", id);
+        tableStructureService.updateById(request, id);
+        log.debug("Table structure updated");
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('write:tablestructure')")
     public ResponseEntity<Void> deleteTableStructure(Long id) {
         log.debug("Deleting table structure with id {}", id);
         tableStructureService.deleteById(id);

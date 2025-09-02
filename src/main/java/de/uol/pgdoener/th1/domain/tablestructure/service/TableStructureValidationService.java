@@ -33,4 +33,22 @@ public class TableStructureValidationService {
         }
     }
 
+    /**
+     * Validates if the new shorthand already exists.
+     *
+     * @param name New name for TableStructure
+     * @throws ServiceException if the name already exists
+     */
+    public void validateName(String name) throws ServiceException {
+        if (tableStructureRepository.existsByName(name)) {
+            throw new ServiceException(
+                    "Name already exists",
+                    HttpStatus.CONFLICT,
+                    "A TableStructure named " + name + " already exists.",
+                    "Choose a different name that is not yet used."
+
+            );
+        }
+    }
+
 }
