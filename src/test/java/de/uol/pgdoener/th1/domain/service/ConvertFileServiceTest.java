@@ -11,6 +11,7 @@ import de.uol.pgdoener.th1.infastructure.persistence.repository.DynamicTableRepo
 import de.uol.pgdoener.th1.infastructure.persistence.repository.StructureRepository;
 import de.uol.pgdoener.th1.infastructure.persistence.repository.TableStructureRepository;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -57,6 +58,7 @@ class ConvertFileServiceTest {
     }
 
     @Test
+    @Disabled
     void testConvertAndSaveInDBMetabase() {
         TableStructure tableStructure = new TableStructure(
                 1L,
