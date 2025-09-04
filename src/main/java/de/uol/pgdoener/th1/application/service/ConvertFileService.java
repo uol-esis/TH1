@@ -50,9 +50,9 @@ public class ConvertFileService {
         String[][] transformedMatrix = converterChainService.performTransformation(file, converterChain);
 
         String originalName = file.getOriginalFilename();
-        createDatabaseService.create(mode, originalName, transformedMatrix);
+        //createDatabaseService.create(mode, originalName, transformedMatrix);
 
-        mbService.updateAllDatabases();
+        //mbService.updateAllDatabases();
     }
 
     public ConverterResult convertTest(

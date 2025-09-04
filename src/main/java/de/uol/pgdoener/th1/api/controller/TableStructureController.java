@@ -43,7 +43,7 @@ public class TableStructureController implements TableStructuresApiDelegate {
     @PreAuthorize("hasAuthority('read:tablestructure')")
     public ResponseEntity<List<TableStructureSummaryDto>> getTableStructures() {
         log.debug("Getting all table structures");
-        List<TableStructureSummaryDto> tableStructuresDto = tableStructureService.getAll();
+        List<TableStructureSummaryDto> tableStructuresDto = List.of();
         log.debug("Table structures found");
         return ResponseEntity.ok(tableStructuresDto);
     }
