@@ -1,73 +1,80 @@
 package de.uol.pgdoener.th1.domain.datatable.helper;
 
 import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
+import de.uol.pgdoener.th1.domain.datatable.model.SqlType;
+import lombok.RequiredArgsConstructor;
+import org.jooq.*;
+import org.jooq.impl.DSL;
+import org.jooq.impl.SQLDataType;
 import org.springframework.stereotype.Component;
 
-import java.util.*;
+import java.util.List;
+
+import static org.jooq.impl.DSL.table;
 
 @Component
+@RequiredArgsConstructor
 public class SqlQueryBuilder {
 
-    public String buildCreateTableQuery(String tableName, List<SqlColumn> columns) {
-        StringBuilder query = new StringBuilder("CREATE TABLE IF NOT EXISTS \"" + tableName + "\" (");
+    private final DSLContext dsl;
 
-        boolean hasId = columns.stream().anyMatch(c -> "id".equalsIgnoreCase(c.getName()));
-        if (!hasId) {
-            query.append("\"id\" SERIAL PRIMARY KEY, ");
+    public void buildDataTable(String tableName, List<SqlColumn> columns) {
+        Name tbName = DSL.name(tableName);
+        CreateTableElementListStep step = dsl.createTableIfNotExists(tbName);
+
+        for (SqlColumn col : columns) {
+            Name colName = DSL.name(col.getName());
+            DataType<?> type = toSqlDatatype(col.getType());
+            step = step.column(colName, type);
         }
 
-        for (SqlColumn column : columns) {
-            query.append("\"")
-                    .append(column.getName())
-                    .append("\" ")
-                    .append(column.getType().getSqlName()) // Enum zu String
-                    .append(", ");
-        }
-
-        query.setLength(query.length() - 2);
-        query.append(")");
-        return query.toString();
+        step.execute();
     }
 
-    public String buildInsertQuery(String tableName, List<SqlColumn> columns, List<Object[]> values) {
-        String[] headers = columns.stream().map(SqlColumn::getName).toArray(String[]::new);
+    public void insertValuesIntoTable(String tableName, List<SqlColumn> columns, List<Object[]> values) {
+        final int MAX_PARAMS = 65535;
+        final int BATCH_SIZE = Math.min(1000, MAX_PARAMS / columns.size());
 
-        StringBuilder insertQuery = new StringBuilder("INSERT INTO ")
-                .append(tableName)
-                .append(" (")
-                .append(String.join(", ", headers))
-                .append(") VALUES ");
+        Table<?> table = table(DSL.name(tableName));
+        Field<?>[] fields = new Field<?>[columns.size()];
 
-        StringJoiner valuesSql = new StringJoiner(", ");
-
-        for (String row : headers) {
-            String placeholders = String.join(", ", Collections.nCopies(headers.length, "?"));
-            valuesSql.add("(" + placeholders + ")");
-            break;
+        for (int i = 0; i < columns.size(); i++) {
+            fields[i] = DSL.field(DSL.name(columns.get(i).getName()));
         }
 
-        insertQuery.append(valuesSql);
+        // Batching
+        for (int i = 0; i < values.size(); i += BATCH_SIZE) {
+            int end = Math.min(i + BATCH_SIZE, values.size());
+            List<Object[]> batch = values.subList(i, end);
 
-        return insertQuery.toString();
-    }
+            Query[] inserts = batch.stream()
+                    .map(row -> DSL.insertInto(table)
+                            .columns(fields)
+                            .values(row))
+                    .toArray(Query[]::new);
 
-
-    public List<String> buildAlterTableQueries(String tableName, Set<String> existingColumns, Map<String, String> newColumns) {
-        List<String> alterStatements = new ArrayList<>();
-
-        // 2. Prüfe jede Spalte aus dem neuen Datensatz
-        for (Map.Entry<String, String> entry : newColumns.entrySet()) {
-            String columnName = entry.getKey();
-            String columnType = entry.getValue();
-
-            // 3. Wenn die Spalte noch nicht existiert → füge sie hinzu
-            if (!existingColumns.contains(columnName.toLowerCase())) {
-                String alterSql = String.format("ALTER TABLE %s ADD COLUMN %s %s",
-                        tableName, columnName, columnType);
-                alterStatements.add(alterSql);
-            }
+            dsl.batch(inserts).execute();
         }
-
-        return alterStatements;
     }
+
+    public void deleteTable(String tableName) {
+        Table<?> table = table(DSL.name(tableName));
+        dsl.deleteFrom(table)
+                .execute();
+    }
+
+    private DataType<?> toSqlDatatype(SqlType columnType) {
+        return switch (columnType) {
+            case TEXT -> SQLDataType.CLOB;
+            case SERIAL_PRIMARY_KEY -> SQLDataType.BIGINT;
+            case INTEGER -> SQLDataType.INTEGER;
+            case NUMERIC -> SQLDataType.NUMERIC;
+            case BOOLEAN -> SQLDataType.BOOLEAN;
+            case DATE -> SQLDataType.DATE;
+            case TIMESTAMP -> SQLDataType.TIMESTAMP;
+            case UUID -> SQLDataType.UUID;
+            case UNDEFINED -> SQLDataType.VARCHAR;
+        };
+    }
+
 }

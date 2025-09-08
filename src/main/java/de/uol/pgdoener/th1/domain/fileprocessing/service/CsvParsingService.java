@@ -37,7 +37,6 @@ public class CsvParsingService {
                 .setQuote('"')
                 .setIgnoreEmptyLines(true)
                 .setTrim(true)
-                .setAllowMissingColumnNames(true)
                 .get();
 
         try (
@@ -74,12 +73,9 @@ public class CsvParsingService {
         ValueType valueType = typeDetector.detect(raw);
 
         return switch (valueType) {
-            case NUMBER:
-                yield numberNormalizerService.normalizeFormat(raw);
-            case DATE:
-                yield dateNormalizerService.tryNormalize(raw);
-            case TEXT, TIMESTAMP, BOOLEAN, UUID:
-                yield raw;
+            case NUMBER -> numberNormalizerService.normalizeFormat(raw);
+            case DATE -> dateNormalizerService.tryNormalize(raw);
+            case TEXT, TIMESTAMP, BOOLEAN, UUID -> raw;
         };
     }
 }

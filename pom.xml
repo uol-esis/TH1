@@ -72,6 +72,11 @@
             <artifactId>poi-ooxml-full</artifactId>
             <version>${apache.poi.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.jooq</groupId>
+            <artifactId>jooq</artifactId>
+            <version>3.20.6</version>
+        </dependency>
 
         <!--SpringDoc dependencies -->
         <dependency>

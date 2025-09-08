@@ -11,7 +11,6 @@ public class TypeDetector {
             Pattern.compile("^[a-fA-F0-9]{8}-([a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}$");
     private static final Pattern TIMESTAMP_PATTERN =
             Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}|\\d{14})$");
-    private static final Pattern NUMBER_PATTERN = Pattern.compile("^-?\\d+(\\.\\d+)?(%|€|CHF)?$");
     private static final Pattern TEXT_PATTERN = Pattern.compile(".*[a-zA-Z].*");
     private static final Pattern DATE_PATTERN = Pattern.compile(
             "^(" +
@@ -36,7 +35,7 @@ public class TypeDetector {
 
         if (isTimestamp(raw, length)) return ValueType.TIMESTAMP;
 
-        if (isText(raw, length)) return ValueType.TEXT;
+        if (isText(raw)) return ValueType.TEXT;
 
         return ValueType.NUMBER;
     }
@@ -61,7 +60,7 @@ public class TypeDetector {
         return TIMESTAMP_PATTERN.matcher(s).matches();
     }
 
-    private boolean isText(String s, int length) {
+    private boolean isText(String s) {
         return TEXT_PATTERN.matcher(s).matches();
     }
 

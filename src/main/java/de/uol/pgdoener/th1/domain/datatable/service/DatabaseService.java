@@ -20,7 +20,6 @@ import java.util.List;
 public class DatabaseService {
 
     final DynamicTableRepository dynamicTableRepository;
-
     final SqlHeaderBuilder headerBuilder;
     final SqlValidator sqlValidator;
     final SqlQueryBuilder queryBuilder;
@@ -33,15 +32,12 @@ public class DatabaseService {
         List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(header);
 
         List<Object[]> values = sqlValueBuilder.build(header, matrix);
-        String sql = queryBuilder.buildCreateTableQuery(tableName, header);
+        queryBuilder.buildDataTable(tableName, header);
+        queryBuilder.insertValuesIntoTable(tableName, header, values);
 
-        dynamicTableRepository.executeRawSql(sql);
-        insertValuesIntoTable(tableName, header, values);
-
-        schemaVersionService.saveVersion(tableName, "CREATED", sql, matrix);
+        //schemaVersionService.saveVersion(tableName, "CREATED", sql, matrix);
     }
 
     @Transactional
@@ -49,32 +45,32 @@ public class DatabaseService {
         List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(header);
 
         List<Object[]> values = sqlValueBuilder.build(header, matrix);
-        insertValuesIntoTable(tableName, header, values);
+        queryBuilder.insertValuesIntoTable(tableName, header, values);
 
-        schemaVersionService.saveVersion(tableName, "EXTEND", "", matrix);
+        //schemaVersionService.saveVersion(tableName, "EXTEND", "", matrix);
     }
 
     @Transactional
     public void replaceDatabaseTableWithValues(String tableName, String[][] matrix) {
-        List<SqlColumn> columns = headerBuilder.build(matrix);
+        List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(columns);
 
-        String deleteSql = "DELETE FROM " + tableName;
-        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
+        List<Object[]> values = sqlValueBuilder.build(header, matrix);
+        queryBuilder.deleteTable(tableName);
+        queryBuilder.insertValuesIntoTable(tableName, header, values);
 
-        dynamicTableRepository.executeRawSql(deleteSql);
-        insertValuesIntoTable(tableName, columns, values);
-
-        schemaVersionService.saveVersion(tableName, "REPLACE", deleteSql, matrix);
+        //schemaVersionService.saveVersion(tableName, "REPLACE", deleteSql, matrix);
     }
 
     public List<String> getTableNames() {
         return dynamicTableRepository.getAllTableNames();
+    }
+
+    public boolean tableExists(String tableName) {
+        return dynamicTableRepository.tableExists(tableName);
     }
 
     @Transactional
@@ -111,22 +107,6 @@ public class DatabaseService {
         return lines.stream()
                 .map(line -> line.split(","))
                 .toList();
-    }
-
-    private void insertValuesIntoTable(String tableName, List<SqlColumn> columns, List<Object[]> values) {
-        /// TODO: auslagern ?
-        int maxParams = 65535;
-        int columnsCount = columns.size();
-        int BATCH_SIZE = 1000;
-        int batchSize = Math.min(BATCH_SIZE, maxParams / columnsCount);
-
-        String insertSql = queryBuilder.buildInsertQuery(tableName, columns, values);
-
-        for (int i = 0; i < values.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, values.size());
-            List<Object[]> batch = values.subList(i, end);
-            dynamicTableRepository.executeRawSqlWithBatch(insertSql, batch);
-        }
     }
 
 }

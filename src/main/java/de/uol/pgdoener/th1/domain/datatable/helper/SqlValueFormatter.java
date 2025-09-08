@@ -23,12 +23,7 @@ public class SqlValueFormatter {
                 case NUMERIC -> Double.valueOf(value);
                 case BOOLEAN -> Boolean.parseBoolean(value);
                 case TEXT, UNDEFINED -> value;
-                case DATE -> {
-                    if (DATE.matcher(value).matches()) {
-                        yield Date.valueOf(value);
-                    }
-                    yield value;
-                }
+                case DATE -> Date.valueOf(value);
                 case UUID -> UUID.fromString(value);
                 case TIMESTAMP -> Timestamp.valueOf(value);
             };

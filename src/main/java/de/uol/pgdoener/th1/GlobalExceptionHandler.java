@@ -9,6 +9,7 @@ import de.uol.pgdoener.th1.infastructure.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.exception.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,6 +56,33 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(ex.getHttpStatus()).body(body);
     }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<Object> handleDataAccessException(DataAccessException ex, HttpServletRequest request) {
+        String rootMessage = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+        String userMessage = "A database error occurred while processing your request.";
+        String suggestion = "Please contact support if the problem persists.";
+
+        if (rootMessage != null && rootMessage.contains("specified more than once")) {
+            userMessage = "A database table definition contains duplicate column names.";
+            suggestion = "Check the table schema for duplicate column definitions.";
+        }
+
+        Map<String, Object> errorBody = new LinkedHashMap<>();
+        errorBody.put("message", userMessage);
+        errorBody.put("details", rootMessage);
+        errorBody.put("timestamp", Instant.now().toString());
+        errorBody.put("path", request.getRequestURI());
+        errorBody.put("suggestion", suggestion);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", "error");
+        body.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", errorBody);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
 
     @ExceptionHandler(MetabaseException.class)
     public ResponseEntity<Object> handleMetabaseException(MetabaseException ex) {

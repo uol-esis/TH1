@@ -27,7 +27,7 @@ public class SqlValidator {
     }
 
     public void validateTableName(String tableName) {
-        validateIdentifier(tableName, "File");
+        validateIdentifier(tableName, "table");
     }
 
     //private methods//

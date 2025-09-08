@@ -4,15 +4,14 @@ import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
 import de.uol.pgdoener.th1.domain.datatable.model.SqlType;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 @Component
 public class SqlHeaderBuilder {
 
-    private static final Pattern REMOVE_NON_ASCII_PATTERN = Pattern.compile("\\p{M}");
     private static final Pattern REPLACE_INVALID_CHARS_PATTERN = Pattern.compile("[^a-z0-9_]");
     private static final Pattern REPLACE_MULTIPLE_UNDERSCORES_PATTERN = Pattern.compile("_+");
 
@@ -20,37 +19,61 @@ public class SqlHeaderBuilder {
      * Extracts the header from the first row of the matrix and infers SQL types based on the first data row.
      */
     public List<SqlColumn> build(String[][] matrix) {
-        String[] headers = matrix[0];
-        List<SqlColumn> columnHeaders = new ArrayList<>(headers.length);
-
-        for (String s : headers) {
-            String header = prepareForSQLColumnName(s);
-            columnHeaders.add(new SqlColumn(header, SqlType.UNDEFINED));
-        }
-        return columnHeaders;
+        return Arrays.stream(matrix[0])
+                .map(this::normalizeHeader)
+                .map(h -> new SqlColumn(h, SqlType.UNDEFINED))
+                .toList();
     }
 
-    // private methods //
+    private String normalizeHeader(String s) {
+        if (s == null || s.isBlank() || "*".equals(s)) {
+            return "col_unknown";
+        }
+        return prepareForSQLColumnName(s);
+    }
 
     private String prepareForSQLColumnName(String input) {
-        if (input == null || input.isEmpty()) {
-            return "_";
-        }
-
-        // Trim und Kleinschreibung
         String normalized = input.trim().toLowerCase();
-        // Entfernt alle nicht-ASCII-Zeichen (z. B. Umlaute → ue)
-        normalized = REMOVE_NON_ASCII_PATTERN.matcher(Normalizer.normalize(normalized, Normalizer.Form.NFD)).replaceAll("");
-        // Ersetzt ungültige Zeichen durch Unterstrich
+        normalized = replaceUmlauts(normalized);
         normalized = REPLACE_INVALID_CHARS_PATTERN.matcher(normalized).replaceAll("_");
-        // Entfernt doppelte Unterstriche
         normalized = REPLACE_MULTIPLE_UNDERSCORES_PATTERN.matcher(normalized).replaceAll("_");
 
-        // Stellt sicher, dass der Name mit einem Buchstaben beginnt
-        if (!Character.isLetter(normalized.charAt(0))) {
-            normalized = "_" + normalized;
+        //first character: must be a letter or underscore
+        if (!Character.isLetter(normalized.charAt(0)) && normalized.charAt(0) != '_') {
+            normalized = "col_" + normalized;
+        }
+
+        // Maximum length 63 (PG-Ident limit)
+        if (normalized.length() > 63) {
+            String hash = Integer.toHexString(normalized.hashCode());
+            normalized = normalized.substring(0, 63 - hash.length() - 1) + "_" + hash;
         }
 
         return normalized;
+    }
+
+    private String ensureUnique(String name, Map<String, Integer> seen) {
+        int count = seen.getOrDefault(name, 0);
+        if (count == 0) {
+            seen.put(name, 1);
+            return name;
+        }
+        String uniqueName = name + "_" + (count + 1);
+        seen.put(name, count + 1);
+        return uniqueName;
+    }
+
+    private String replaceUmlauts(String input) {
+        StringBuilder sb = new StringBuilder(input.length());
+        for (char c : input.toCharArray()) {
+            switch (c) {
+                case 'ä' -> sb.append("ae");
+                case 'ö' -> sb.append("oe");
+                case 'ü' -> sb.append("ue");
+                case 'ß' -> sb.append("ss");
+                default -> sb.append(c);
+            }
+        }
+        return sb.toString();
     }
 }

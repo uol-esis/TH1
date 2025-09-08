@@ -114,12 +114,9 @@ public class ExcelParsingService {
                     ValueType valueType = typeDetector.detect(value);
 
                     yield switch (valueType) {
-                        case NUMBER:
-                            yield numberNormalizerService.normalizeFormat(value);
-                        case DATE:
-                            yield dateNormalizerService.tryNormalize(value);
-                        case TEXT, TIMESTAMP, BOOLEAN, UUID:
-                            yield value;
+                        case NUMBER -> numberNormalizerService.normalizeFormat(value);
+                        case DATE -> dateNormalizerService.tryNormalize(value);
+                        case TEXT, TIMESTAMP, BOOLEAN, UUID -> value;
                     };
                 }
                 case NUMERIC -> {
