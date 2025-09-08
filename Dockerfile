@@ -30,12 +30,15 @@ RUN  mkdir /app && \
     chown -R pg:pg /app
 
 # Copy the JAR from the build stage
-COPY --from=build /app/target/th1.jar app.jar
+COPY --from=build /app/target/th1.jar th1nk.jar
 
 # Change to 'pg' user
 USER pg
 
 EXPOSE 8080
 
+# Set JVM settings
+ENV JAVA_OPTS="-Xmx6g -XX:+UseCompressedOops -XX:+UseParallelGC -XX:+UseTLAB -XX:+PrintCommandLineFlags"
+
 # Run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT exec java ${JAVA_OPTS} -jar th1nk.jar

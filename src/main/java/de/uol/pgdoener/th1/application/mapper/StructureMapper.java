@@ -5,6 +5,7 @@ import de.uol.pgdoener.th1.infastructure.persistence.entity.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -133,6 +134,15 @@ public abstract class StructureMapper {
                     .keywords(Arrays.asList(structure.getKeywords()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
+    }
+
+    public static List<Structure> toEntity(List<StructureDto> structures, Long tableStructureId) {
+        List<Structure> structureList = new ArrayList<>(structures.size());
+        for (int i = 0; i < structures.size(); i++) {
+            StructureDto structure = structures.get(i);
+            structureList.add(toEntity(structure, i, tableStructureId));
+        }
+        return structureList;
     }
 
     public static Structure toEntity(StructureDto dto, int position, Long tableStructureId) {

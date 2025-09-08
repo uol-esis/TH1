@@ -29,7 +29,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Profile("!dev")
+@Profile("!noSecurity")
 @Configuration
 @EnableMethodSecurity
 @RequiredArgsConstructor
