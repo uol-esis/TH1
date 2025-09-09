@@ -48,8 +48,7 @@ public class GlobalExceptionHandler {
         errorBody.put("suggestion", ex.getSuggestion());
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", ex.getHttpStatus().isError() ? "error" : "success");
-        body.put("statusCode", ex.getHttpStatus().value());
+        body.put("status", ex.getHttpStatus().value());
         body.put("error", errorBody);
         //body.put("documentation_url", "https://example.com/docs/errors#" + ex.getHttpStatus().value());
 
