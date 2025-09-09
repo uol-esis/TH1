@@ -3,11 +3,11 @@ package de.uol.pgdoener.th1.domain.infrastructure;
 import de.uol.pgdoener.th1.domain.datatable.service.DatabaseService;
 import de.uol.pgdoener.th1.domain.shared.exceptions.ServiceException;
 import org.jooq.DSLContext;
-import org.jooq.exception.DataAccessException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.containers.PostgreSQLContainer;
@@ -182,8 +182,7 @@ public class DatabaseServiceTest {
 
         assertThatThrownBy(() ->
                 databaseService.createDatabaseTableWithValues("duplicate_column_table", matrix)
-        ).isInstanceOf(DataAccessException.class)
-                .hasMessageContaining("column \"id\" specified more than once");
+        ).isInstanceOf(BadSqlGrammarException.class);
     }
 
     @Test

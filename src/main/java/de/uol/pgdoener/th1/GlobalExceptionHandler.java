@@ -14,6 +14,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -49,8 +50,7 @@ public class GlobalExceptionHandler {
         errorBody.put("suggestion", ex.getSuggestion());
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", ex.getHttpStatus().isError() ? "error" : "success");
-        body.put("statusCode", ex.getHttpStatus().value());
+        body.put("status", ex.getHttpStatus().value());
         body.put("error", errorBody);
         //body.put("documentation_url", "https://example.com/docs/errors#" + ex.getHttpStatus().value());
 
@@ -76,13 +76,44 @@ public class GlobalExceptionHandler {
         errorBody.put("suggestion", suggestion);
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", "error");
-        body.put("statusCode", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         body.put("error", errorBody);
 
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
+    @ExceptionHandler(BadSqlGrammarException.class)
+    public ResponseEntity<Object> handleBadSqlGrammar(BadSqlGrammarException ex, HttpServletRequest request) {
+        Throwable rootCause = ex.getRootCause();
+        String rootMessage = rootCause != null ? rootCause.getMessage() : ex.getMessage();
+
+        String userMessage = "A database query could not be executed due to invalid SQL syntax.";
+        String suggestion = "Please contact support if the issue persists.";
+
+        if (rootMessage != null && rootMessage.contains("specified more than once")) {
+            userMessage = "The database table definition contains duplicate column names.";
+            suggestion = "Check the table schema and remove duplicate column definitions.";
+        }
+
+        if (rootMessage != null && rootMessage.toLowerCase().contains("syntax error")) {
+            userMessage = "There is a syntax error in the database query.";
+            suggestion = "Verify that the SQL statements are correct.";
+        }
+
+        Map<String, Object> errorBody = new LinkedHashMap<>();
+        errorBody.put("message", userMessage);
+        errorBody.put("details", rootMessage);
+        errorBody.put("sql", ex.getSql()); // jOOQ SQL Statement
+        errorBody.put("timestamp", Instant.now().toString());
+        errorBody.put("path", request.getRequestURI());
+        errorBody.put("suggestion", suggestion);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", errorBody);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
 
     @ExceptionHandler(MetabaseException.class)
     public ResponseEntity<Object> handleMetabaseException(MetabaseException ex) {
