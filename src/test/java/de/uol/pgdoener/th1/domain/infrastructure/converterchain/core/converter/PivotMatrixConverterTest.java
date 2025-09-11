@@ -72,7 +72,7 @@ public class PivotMatrixConverterTest {
     void testWithMultipleCategoryRequest() {
         Map<String, List<Integer>> map = new LinkedHashMap<>();
         List<Integer> blockIndices = List.of(0);
-        map.put("Kategorie", List.of(1, 8, 21));
+        map.put("Indikator", List.of(1, 8, 21));
         map.put("Altersgruppen", List.of(2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14));
         map.put("Geschlecht", List.of(15, 16));
         map.put("Versorgungsart", List.of(17, 18, 19, 20, 22, 23));
