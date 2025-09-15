@@ -4,8 +4,6 @@ import de.uol.pgdoener.th1.domain.fileprocessing.helper.DetectDelimiterService;
 import de.uol.pgdoener.th1.domain.shared.exceptions.InputFileException;
 import de.uol.pgdoener.th1.domain.shared.model.FileType;
 import lombok.RequiredArgsConstructor;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,15 +45,16 @@ public class FileProcessingService {
                     return csvParsingService.parseCsv(is2, delimiter);
                 }
             }
-            case EXCEL_OLE2 -> {
-                try (InputStream stream = file.getInputStream()) {
-                    return excelParsingService.parseExcel(stream, HSSFWorkbook::new, page);
-                }
-            }
             case EXCEL_OOXML -> {
                 try (InputStream stream = file.getInputStream()) {
-                    return excelParsingService.parseExcel(stream, XSSFWorkbook::new, page);
+                    return excelParsingService.readExcel(stream, page);
                 }
+            }
+            case EXCEL_OLE2 -> {
+                throw new IllegalArgumentException(
+                        "The old Excel format (.xls) is not supported. " +
+                                "Please convert the file to the modern .xlsx format."
+                );
             }
             default -> throw new InputFileException("Unsupported file type");
         }

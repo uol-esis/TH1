@@ -77,6 +77,11 @@
             <artifactId>jooq</artifactId>
             <version>3.20.6</version>
         </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>easyexcel</artifactId>
+            <version>4.0.3</version>
+        </dependency>
 
         <!--SpringDoc dependencies -->
         <dependency>
