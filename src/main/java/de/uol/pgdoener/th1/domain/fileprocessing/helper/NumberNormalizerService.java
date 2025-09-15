@@ -2,12 +2,8 @@ package de.uol.pgdoener.th1.domain.fileprocessing.helper;
 
 import org.springframework.stereotype.Service;
 
-import java.util.regex.Pattern;
-
 @Service
 public class NumberNormalizerService {
-
-    private static final Pattern NON_NUMERIC_PATTERN = Pattern.compile("[^\\d.,-]");
 
     /**
      * Formats a numeric value into a string using US locale.
@@ -44,7 +40,15 @@ public class NumberNormalizerService {
             return null;
         }
 
-        String input = NON_NUMERIC_PATTERN.matcher(raw).replaceAll("");
+        // Manuelles Filtering statt Regex
+        StringBuilder sb = new StringBuilder(raw.length());
+        for (int i = 0; i < raw.length(); i++) {
+            char c = raw.charAt(i);
+            if (Character.isDigit(c) || c == '.' || c == ',' || c == '-') {
+                sb.append(c);
+            }
+        }
+        String input = sb.toString();
 
         boolean hasComma = input.contains(",");
         boolean hasDot = input.contains(".");

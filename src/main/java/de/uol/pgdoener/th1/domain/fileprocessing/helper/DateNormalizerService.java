@@ -5,28 +5,38 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.ResolverStyle;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class DateNormalizerService {
-
-    private static final List<DateTimeFormatter> DATE_FORMATTERS = List.of(
-            DateTimeFormatter.ofPattern("dd.MM.yyyy"),
-            DateTimeFormatter.ofPattern("dd/MM/yyyy"),
-            DateTimeFormatter.ofPattern("dd-MM-yyyy"),
-            DateTimeFormatter.ofPattern("dd-MMM-yyyy", Locale.ENGLISH),
-            DateTimeFormatter.ofPattern("yyyy.MM.dd"),
-            DateTimeFormatter.ofPattern("yyyy-MM-dd"),
-            DateTimeFormatter.ofPattern("yyyy/MM/dd"),
-            DateTimeFormatter.ofPattern("yy.MM.dd"),
-            DateTimeFormatter.ofPattern("d/M/yyyy"),
-            DateTimeFormatter.ofPattern("MM/dd/yyyy")
-    );
-
     private static final DateTimeFormatter DEFAULT_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    /// TODO: Option for Us Format interpretation
+    private static final DateTimeFormatter MULTI_FORMATTER = new DateTimeFormatterBuilder()
+            // EU
+            .appendOptional(DateTimeFormatter.ofPattern("d/M/uuuu").withResolverStyle(ResolverStyle.STRICT))
+            .appendOptional(DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT))
+            .appendOptional(DateTimeFormatter.ofPattern("dd.MM.uuuu").withResolverStyle(ResolverStyle.STRICT))
+            .appendOptional(DateTimeFormatter.ofPattern("dd-MM-uuuu").withResolverStyle(ResolverStyle.STRICT))
+            // ISO
+            .appendOptional(DateTimeFormatter.ofPattern("uuuu-MM-dd").withResolverStyle(ResolverStyle.STRICT))
+            .appendOptional(DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT))
+            .appendOptional(DateTimeFormatter.ofPattern("uuuu.MM.dd").withResolverStyle(ResolverStyle.STRICT))
+            .appendOptional(DateTimeFormatter.ofPattern("yy.MM.dd").withResolverStyle(ResolverStyle.STRICT))
+            .toFormatter();
+
+    private static final DateTimeFormatter[] DATE_FORMATTERS = new DateTimeFormatter[]{
+            MULTI_FORMATTER,
+            DateTimeFormatter.ofPattern("dd-MMM-uuuu", Locale.ENGLISH),
+            DateTimeFormatter.ofPattern("M/d/uuuu")
+    };
+
+    private final Map<String, String> cache = new ConcurrentHashMap<>();
 
     /**
      * Tries to normalize a date string to the default format ("yyyy-MM-dd").
@@ -45,15 +55,18 @@ public class DateNormalizerService {
     public String tryNormalize(String value) {
         if (value == null) return null;
 
-        for (DateTimeFormatter formatter : DATE_FORMATTERS) {
-            try {
-                LocalDate date = LocalDate.parse(value, formatter);
-                return date.format(DEFAULT_FORMAT);
-            } catch (DateTimeParseException ignored) {
-                // try next format
+        final String trimmed = value.trim();
+
+        return cache.computeIfAbsent(trimmed, v -> {
+            for (DateTimeFormatter formatter : DATE_FORMATTERS) {
+                try {
+                    LocalDate date = LocalDate.parse(v, formatter);
+                    return date.format(DEFAULT_FORMAT);
+                } catch (Exception ignored) {
+                }
             }
-        }
-        return null;
+            return null;
+        });
     }
 
     /**
