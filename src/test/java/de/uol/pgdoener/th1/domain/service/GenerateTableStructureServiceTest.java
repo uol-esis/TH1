@@ -95,7 +95,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartColumn().orElseThrow());
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(7));
-        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Value"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
         assertInstanceOf(RemoveKeywordsStructureDto.class, tableStructure.getStructures().get(8));
         assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(9));
         assertEquals("", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(9)).getSearch().orElseThrow());
@@ -124,7 +124,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartColumn().orElseThrow());
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(6)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(7));
-        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Geschlecht", "Altersgruppen", "Value"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(7)).getHeaderNames());
     }
 
 
@@ -167,7 +167,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartColumn().orElseThrow());
         assertEquals(2, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
-        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
+        assertEquals(List.of("Sozialräume", "Stadtteile", "Stadtviertel", "Altersgruppen", "Value"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
     }
 
 //    @Test
@@ -217,7 +217,7 @@ class GenerateTableStructureServiceTest {
         assertEquals(1, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartColumn().orElseThrow());
         assertEquals(3, ((RemoveGroupedHeaderStructureDto) tableStructure.getStructures().get(5)).getStartRow().orElseThrow());
         assertInstanceOf(AddHeaderNameStructureDto.class, tableStructure.getStructures().get(6));
-        assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen", "Wert"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
+        assertEquals(List.of("Stadtviertel", "Geschlecht", "Altersgruppen", "Value"), ((AddHeaderNameStructureDto) tableStructure.getStructures().get(6)).getHeaderNames());
         assertInstanceOf(RemoveKeywordsStructureDto.class, tableStructure.getStructures().get(7));
         assertInstanceOf(ReplaceEntriesStructureDto.class, tableStructure.getStructures().get(8));
         assertEquals("-", ((ReplaceEntriesStructureDto) tableStructure.getStructures().get(8)).getSearch().orElseThrow());

@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.PivotMatrixStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -156,7 +156,7 @@ public class PivotMatrixConverter extends Converter {
             headerRow[col++] = category;
         }
 
-        headerRow[col] = "Wert";
+        headerRow[col] = "Value";
     }
 
     /**
