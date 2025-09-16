@@ -29,7 +29,8 @@ public class FileProcessingService {
      * - Delegates parsing to the corresponding service:
      *   <ul>
      *     <li>{@link CsvParsingService} for CSV files (delimiter automatically detected via {@link DetectDelimiterService})</li>
-     *     <li>{@link ExcelOLE2ParsingService} for Excel files (HSSF or XSSF)</li>
+     *     <li>{@link ExcelOLE2ParsingService} for old Excel files (HSSF / .xls)</li>
+     *     <li>{@link ExcelOOXMLParsingService} for modern Excel files (XSSF / .xlsx)</li>
      *   </ul>
      * - Returns the parsed data as a 2D String array.
      */
