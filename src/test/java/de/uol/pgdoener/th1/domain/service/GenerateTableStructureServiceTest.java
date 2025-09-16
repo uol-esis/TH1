@@ -17,7 +17,7 @@ import de.uol.pgdoener.th1.domain.fileprocessing.helper.DetectDelimiterService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.TypeDetector;
 import de.uol.pgdoener.th1.domain.fileprocessing.service.CsvParsingService;
-import de.uol.pgdoener.th1.domain.fileprocessing.service.ExcelParsingService;
+import de.uol.pgdoener.th1.domain.fileprocessing.service.ExcelOLE2ParsingService;
 import de.uol.pgdoener.th1.domain.fileprocessing.service.FileProcessingService;
 import de.uol.pgdoener.th1.domain.tablestructure.service.GenerateTableStructureService;
 import org.junit.jupiter.api.Test;
@@ -59,7 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
         GenerateTableStructureService.class,
         FileProcessingService.class,
         CsvParsingService.class,
-        ExcelParsingService.class,
+        ExcelOLE2ParsingService.class,
         NumberNormalizerService.class,
         DateNormalizerService.class,
         DetectDelimiterService.class,

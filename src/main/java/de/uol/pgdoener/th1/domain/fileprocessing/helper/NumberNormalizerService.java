@@ -40,7 +40,6 @@ public class NumberNormalizerService {
             return null;
         }
 
-        // Manuelles Filtering statt Regex
         StringBuilder sb = new StringBuilder(raw.length());
         for (int i = 0; i < raw.length(); i++) {
             char c = raw.charAt(i);

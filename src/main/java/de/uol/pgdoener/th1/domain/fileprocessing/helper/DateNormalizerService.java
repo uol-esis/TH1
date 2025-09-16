@@ -1,5 +1,8 @@
 package de.uol.pgdoener.th1.domain.fileprocessing.helper;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -9,8 +12,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.ResolverStyle;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class DateNormalizerService {
@@ -36,37 +38,52 @@ public class DateNormalizerService {
             DateTimeFormatter.ofPattern("M/d/uuuu")
     };
 
-    private final Map<String, String> cache = new ConcurrentHashMap<>();
+    private final Cache<@NotNull String, String> cache = Caffeine.newBuilder()
+            .maximumSize(1000)
+            .expireAfterAccess(10, TimeUnit.MINUTES)
+            .build();
 
     /**
      * Tries to normalize a date string to the default format ("yyyy-MM-dd").
      * <p>
-     * Steps:
-     * <ul>
-     *   <li>Quickly checks if the value matches a basic date pattern</li>
-     *   <li>Tries parsing with each known date format</li>
-     *   <li>If parsing succeeds, returns the normalized date string</li>
-     *   <li>If no format matches, returns {@code null}</li>
-     * </ul>
+     * This method first trims the input string and then attempts to retrieve the
+     * normalized value from the cache. If the value is not in the cache, it will
+     * be parsed and normalized using {@link #normalizeDate(String)} and stored
+     * in the cache for future lookups.
+     * <p>
+     * Caching is handled by Caffeine:
+     * - Maximum of 1000 entries in the cache
+     * - Entries expire 1 hour after last access
      *
      * @param value the date string to normalize
      * @return the normalized date string, or {@code null} if parsing failed
      */
     public String tryNormalize(String value) {
         if (value == null) return null;
-
         final String trimmed = value.trim();
+        return cache.get(trimmed, this::normalizeDate);
+    }
 
-        return cache.computeIfAbsent(trimmed, v -> {
-            for (DateTimeFormatter formatter : DATE_FORMATTERS) {
-                try {
-                    LocalDate date = LocalDate.parse(v, formatter);
-                    return date.format(DEFAULT_FORMAT);
-                } catch (Exception ignored) {
-                }
+    /**
+     * Normalizes a date string to the default format ("yyyy-MM-dd") by trying
+     * each of the configured {@link #DATE_FORMATTERS}. If parsing succeeds, the
+     * normalized string is returned; otherwise {@code null} is returned.
+     * <p>
+     * This method is used internally by {@link #tryNormalize(String)} and should
+     * not be called directly, as caching is handled at the outer level.
+     *
+     * @param value the date string to normalize
+     * @return the normalized date string, or {@code null} if parsing failed
+     */
+    private String normalizeDate(String value) {
+        for (DateTimeFormatter formatter : DATE_FORMATTERS) {
+            try {
+                LocalDate date = LocalDate.parse(value, formatter);
+                return date.format(DEFAULT_FORMAT);
+            } catch (Exception ignored) {
             }
-            return null;
-        });
+        }
+        return null;
     }
 
     /**

@@ -4,6 +4,7 @@ import de.uol.pgdoener.th1.domain.fileprocessing.helper.DetectDelimiterService;
 import de.uol.pgdoener.th1.domain.shared.exceptions.InputFileException;
 import de.uol.pgdoener.th1.domain.shared.model.FileType;
 import lombok.RequiredArgsConstructor;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +18,8 @@ import java.util.Optional;
 public class FileProcessingService {
 
     private final CsvParsingService csvParsingService;
-    private final ExcelParsingService excelParsingService;
+    private final ExcelOOXMLParsingService excelOOXMLParsingService;
+    private final ExcelOLE2ParsingService excelOLE2ParsingService;
     private final DetectDelimiterService detectDelimiterService;
 
     /**
@@ -27,7 +29,7 @@ public class FileProcessingService {
      * - Delegates parsing to the corresponding service:
      *   <ul>
      *     <li>{@link CsvParsingService} for CSV files (delimiter automatically detected via {@link DetectDelimiterService})</li>
-     *     <li>{@link ExcelParsingService} for Excel files (HSSF or XSSF)</li>
+     *     <li>{@link ExcelOLE2ParsingService} for Excel files (HSSF or XSSF)</li>
      *   </ul>
      * - Returns the parsed data as a 2D String array.
      */
@@ -47,14 +49,13 @@ public class FileProcessingService {
             }
             case EXCEL_OOXML -> {
                 try (InputStream stream = file.getInputStream()) {
-                    return excelParsingService.readExcel(stream, page);
+                    return excelOOXMLParsingService.readExcel(stream, page);
                 }
             }
             case EXCEL_OLE2 -> {
-                throw new IllegalArgumentException(
-                        "The old Excel format (.xls) is not supported. " +
-                                "Please convert the file to the modern .xlsx format."
-                );
+                try (InputStream stream = file.getInputStream()) {
+                    return excelOLE2ParsingService.readExcel(stream, XSSFWorkbook::new, page);
+                }
             }
             default -> throw new InputFileException("Unsupported file type");
         }
