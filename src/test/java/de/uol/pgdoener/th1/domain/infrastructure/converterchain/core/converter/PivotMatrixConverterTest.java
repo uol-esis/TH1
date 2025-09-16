@@ -38,7 +38,7 @@ public class PivotMatrixConverterTest {
         };
 
         String[][] expected = {
-                {"Jahr", "Kategorie", "Unterkategorie", "Wert"},
+                {"Jahr", "Kategorie", "Unterkategorie", "Value"},
                 {"2021", "Bevölkerung", "", "11124642"},
                 {"2021", "Bevölkerung", "unter 50", "6305201"},
                 {"2021", "Bevölkerung", "50–60", "1726379"},
@@ -88,7 +88,7 @@ public class PivotMatrixConverterTest {
                 {"2021", "11124642", "6305201", "1726379", "1398493", "918605", "666609", "109355", "540401", "63441", "28584", "50031", "94859", "221796", "81690", "207294", "333107", "93597", "91759", "291159", "63886", "145606", "40052", "105554"},
         };
         String[][] expected = {
-                {"Jahr", "Kategorie", "Altersgruppen", "Geschlecht", "Versorgungsart", "Wert"},
+                {"Jahr", "Kategorie", "Altersgruppen", "Geschlecht", "Versorgungsart", "Value"},
                 {"2021", "Bevölkerung", "", "", "", "11124642"},
                 {"2021", "Bevölkerung", "unter 50", "", "", "6305201"},
                 {"2021", "Bevölkerung", "50–60", "", "", "1726379"},

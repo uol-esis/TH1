@@ -90,7 +90,7 @@ public class FindGroupedHeaderService {
             String rowHeaderName = matrix[i][0];
             headerNames.add(rowHeaderName);
         }
-        headerNames.add("Wert");
+        headerNames.add("Value");
         return headerNames;
     }
 
