@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.FillEmptyColumnStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
@@ -24,7 +24,8 @@ public class FillEmptyColumnConverter extends Converter {
         for (int columnIndex : columnsToFill) {
             String lastNonEmptyValue = "";
             for (String[] row : matrix) {
-                if (!row[columnIndex].isBlank()) {
+                String cell = row[columnIndex];
+                if (!cell.isBlank() && !cell.equals("*")) {
                     lastNonEmptyValue = row[columnIndex];
                 } else {
                     row[columnIndex] = lastNonEmptyValue;
