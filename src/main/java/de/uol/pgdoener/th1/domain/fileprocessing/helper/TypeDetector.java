@@ -60,18 +60,23 @@ public class TypeDetector {
     }
 
     private boolean isNumber(String s) {
+        boolean hasDigit = false;
+
         for (int i = 0; i < s.length(); i++) {
             char c = s.charAt(i);
             if (Character.isWhitespace(c) || c == '\u00A0') continue;
-            if (Character.isDigit(c)) continue;
+            if (Character.isDigit(c)) {
+                hasDigit = true;
+                continue;
+            }
             if (!isNumberSeparator(c, i)) return false;
         }
-        return true;
+        return hasDigit;
     }
 
     private boolean isNumberSeparator(char c, int idx) {
         return switch (c) {
-            case '.', ',', '\'', '€', '$', '%' -> idx != 0;
+            case '.', ',', '\'', '€', '$', '%' -> true;
             case '-', '+' -> idx == 0;
             default -> false;
         };

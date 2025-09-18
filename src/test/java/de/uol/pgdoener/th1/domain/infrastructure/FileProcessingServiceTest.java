@@ -239,7 +239,8 @@ public class FileProcessingServiceTest {
         String[][] expected = {
                 {"Value1", "Value2", "Value3", "Value4", "Value5"},
                 {":", "|", "/", "%", "&"},
-                {".", "-", "€", "$", "§"}
+                {".", "-", "€", "$", "§"},
+                {".", "-", "3434", "345", "§"}
         };
 
         assertThat(result).isEqualTo(expected);
