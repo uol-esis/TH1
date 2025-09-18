@@ -61,11 +61,18 @@ public class TypeDetector {
 
     private boolean isText(String s) {
         for (int i = 0; i < s.length(); i++) {
-            if (Character.isLetter(s.charAt(i))) {
-                return true;
-            }
+            char c = s.charAt(i);
+            if (Character.isLetter(c) || isSeparator(c, i)) return true;
         }
         return false;
+    }
+
+    private boolean isSeparator(char c, int idx) {
+        return switch (c) {
+            case '/', '|', ':' -> true;
+            case '-' -> idx != 0;
+            default -> false;
+        };
     }
 
 }
