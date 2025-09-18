@@ -205,7 +205,7 @@ public class FileProcessingServiceTest {
 
         MockMultipartFile mockFile = new MockMultipartFile(
                 "file",
-                "operator_test_file.csv",
+                "separator.csv",
                 "text/csv",
                 csvInputStream
         );
@@ -216,6 +216,30 @@ public class FileProcessingServiceTest {
                 {"Value1", "Value2", "Value3", "Value4", "Value5"},
                 {"10/15", "20|25", "30:35", "a-b", "100-200"},
                 {"5/6", "7|8", "9:10", "c-d", "50-75"}
+        };
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void testOperatorNoLetter() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/no_letter_values.csv");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "no_letter_values.csv",
+                "text/csv",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
+
+        String[][] expected = {
+                {"Value1", "Value2", "Value3", "Value4", "Value5"},
+                {":", "|", "/", "%", "&"},
+                {".", "-", "€", "$", "§"}
         };
 
         assertThat(result).isEqualTo(expected);
