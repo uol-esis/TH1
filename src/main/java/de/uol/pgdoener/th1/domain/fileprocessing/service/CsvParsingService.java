@@ -7,6 +7,7 @@ import de.uol.pgdoener.th1.domain.fileprocessing.helper.ValueType;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -43,12 +44,15 @@ public class CsvParsingService {
                 Reader reader = new InputStreamReader(originalInputStream);
                 CSVParser parser = format.parse(reader)
         ) {
-            return parser.stream()
+            var rows = parser.getRecords();
+            int maxColumns = rows.stream().mapToInt(CSVRecord::size).max().orElse(0);
+
+            return rows.stream()
                     .map(r -> {
-                        int size = r.size();
-                        String[] row = new String[size];
-                        for (int i = 0; i < size; i++) {
-                            row[i] = getValue(r.get(i));
+                        String[] row = new String[maxColumns];
+                        for (int i = 0; i < maxColumns; i++) {
+                            String raw = i < r.size() ? r.get(i) : "*";
+                            row[i] = getValue(raw);
                         }
                         return row;
                     })
@@ -69,7 +73,7 @@ public class CsvParsingService {
      * @return the cleaned and normalized value
      */
     private String getValue(String raw) {
-        if (raw == null || raw.isBlank()) return "";
+        if (raw == null || raw.isBlank()) return "*";
         ValueType valueType = typeDetector.detect(raw);
 
         return switch (valueType) {
