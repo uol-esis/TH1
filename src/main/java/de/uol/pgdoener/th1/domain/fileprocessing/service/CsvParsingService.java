@@ -73,7 +73,7 @@ public class CsvParsingService {
      * @return the cleaned and normalized value
      */
     private String getValue(String raw) {
-        if (raw == null || raw.isBlank()) return "*";
+        if (raw == null || raw.isBlank()) return "";
         ValueType valueType = typeDetector.detect(raw);
 
         return switch (valueType) {
