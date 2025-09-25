@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.domain.fileprocessing.service;
 
+import de.uol.pgdoener.th1.domain.dataframe.*;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DateNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.TypeDetector;
@@ -7,12 +8,14 @@ import de.uol.pgdoener.th1.domain.fileprocessing.helper.ValueType;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -31,32 +34,66 @@ public class CsvParsingService {
      * @return a 2D array of Strings containing the CSV data
      * @throws IOException if an error occurs while reading the stream
      */
-    public String[][] parseCsv(InputStream originalInputStream, String delimiter) throws IOException {
-        CSVFormat format = CSVFormat.DEFAULT.builder()
-                .setDelimiter(delimiter.charAt(0))
-                .setQuote('"')
-                .setIgnoreEmptyLines(true)
-                .setTrim(true)
-                .get();
-
+    public DataFrame createDataFrame(InputStream originalInputStream, CSVFormat format) throws IOException {
         try (
                 Reader reader = new InputStreamReader(originalInputStream);
                 CSVParser parser = format.parse(reader)
         ) {
-            return parser.stream()
-                    .map(r -> {
-                        int size = r.size();
-                        String[] row = new String[size];
-                        for (int i = 0; i < size; i++) {
-                            row[i] = getValue(r.get(i));
-                        }
-                        return row;
-                    })
-                    .toArray(String[][]::new);
+            List<String> headers = parser.getHeaderNames();
+            int colCount = headers.size();
+
+            DataColMeta[] dataColMetas = new DataColMeta[colCount];
+            for (int i = 0; i < colCount; i++) {
+                dataColMetas[i] = new DataColMeta(headers.get(i));
+            }
+
+            int rowCount = 0;
+            for (CSVRecord csvRecord : parser) {
+                for (int j = 0; j < csvRecord.size(); j++) {
+                    String rawValue = csvRecord.get(j);
+                    if (rawValue == null || rawValue.isBlank()) continue;
+                    ValueType valueType = typeDetector.detect(rawValue);
+                    dataColMetas[j].mergeType(valueType);
+                }
+                rowCount++;
+            }
+
+            DataFrame df = new DataFrame();
+            for (DataColMeta dataColMeta : dataColMetas) {
+                DataColumn col = createColumnForType(dataColMeta.getName(), dataColMeta.getValueType(), rowCount);
+                df.addColumn(dataColMeta.getName(), col);
+            }
+
+            return df;
         }
     }
 
+    public DataFrame parseCsv(InputStream originalInputStream, CSVFormat format, DataFrame df) throws IOException {
+        try (
+                Reader reader = new InputStreamReader(originalInputStream);
+                CSVParser parser = format.parse(reader)
+        ) {
+            for (CSVRecord csvRecord : parser) {
+                for (int j = 0; j < csvRecord.size(); j++) {
+                    String rawValue = csvRecord.get(j);
+
+                    df.getColumn()
+                }
+            }
+            return df;
+        }
+    }
+
+
     // ----------------- Private Helper Methods ----------------- //
+
+    private DataColumn createColumnForType(String name, ValueType valueType, int capacity) {
+        return switch (valueType) {
+            case NUMBER -> new IntColumn(name, capacity);
+            case DATE -> new DateColumn(name, capacity);
+            case TEXT, TIMESTAMP, BOOLEAN, UUID -> new StringColumn(name, capacity);
+        };
+    }
 
     /**
      * Cleans and normalizes a single CSV field value.

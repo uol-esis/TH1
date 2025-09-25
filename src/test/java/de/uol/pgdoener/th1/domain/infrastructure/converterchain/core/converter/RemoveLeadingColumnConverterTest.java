@@ -83,7 +83,7 @@ public class RemoveLeadingColumnConverterTest {
         RemoveLeadingColumnConverter converter = new RemoveLeadingColumnConverter(structureDto);
 
         String[][] input = {
-                {"", "*", null, "A", "B", "C"},
+                {"", "", null, "A", "B", "C"},
                 {"", "", "", "1", "2", "3"},
                 {"", "*", "", "X", "", "*"},
         };

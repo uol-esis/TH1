@@ -2,7 +2,7 @@ package de.uol.pgdoener.th1.domain.dataframe;
 
 import java.time.LocalDate;
 
-class DateColumn extends DataColumn {
+public class DateColumn extends DataColumn {
     private final LocalDate[] data;
     private int pos = 0;
 

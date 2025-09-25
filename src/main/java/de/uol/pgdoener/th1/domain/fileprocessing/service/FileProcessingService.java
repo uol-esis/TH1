@@ -1,9 +1,11 @@
 package de.uol.pgdoener.th1.domain.fileprocessing.service;
 
+import de.uol.pgdoener.th1.domain.dataframe.DataFrame;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DetectDelimiterService;
 import de.uol.pgdoener.th1.domain.shared.exceptions.InputFileException;
 import de.uol.pgdoener.th1.domain.shared.model.FileType;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.csv.CSVFormat;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,7 @@ public class FileProcessingService {
      *   </ul>
      * - Returns the parsed data as a 2D String array.
      */
-    public String[][] process(MultipartFile file, Optional<Integer> page) throws IOException, InputFileException {
+    public DataFrame process(MultipartFile file, Optional<Integer> page) throws IOException, InputFileException {
         FileType fileType = FileType.getType(file);
 
         switch (fileType) {
@@ -43,8 +45,22 @@ public class FileProcessingService {
                     delimiter = detectDelimiterService.detect(is1);
                 }
 
+                CSVFormat format = CSVFormat.DEFAULT.builder()
+                        .setDelimiter(delimiter.charAt(0))
+                        .setQuote('"')
+                        .setIgnoreEmptyLines(true)
+                        .setTrim(true)
+                        .setHeader()
+                        .setSkipHeaderRecord(true)
+                        .get();
+
+                DataFrame df;
                 try (InputStream is2 = file.getInputStream()) {
-                    return csvParsingService.parseCsv(is2, delimiter);
+                    df = csvParsingService.createDataFrame(is2, format);
+                }
+
+                try (InputStream is3 = file.getInputStream()) {
+                    return csvParsingService.parseCsv(is3, format, df);
                 }
             }
             case EXCEL_OLE2 -> {

@@ -1,6 +1,6 @@
 package de.uol.pgdoener.th1.domain.dataframe;
 
-class IntColumn extends DataColumn {
+public class IntColumn extends DataColumn {
     private final int[] data;
     private int pos = 0;
 
