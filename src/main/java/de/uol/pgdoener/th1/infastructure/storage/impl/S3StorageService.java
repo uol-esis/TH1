@@ -2,9 +2,6 @@ package de.uol.pgdoener.th1.infastructure.storage.impl;
 
 import de.uol.pgdoener.th1.autoconfigure.ObjectStorageProperties;
 import de.uol.pgdoener.th1.infastructure.storage.StorageService;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.PutObjectArgs;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,19 +24,20 @@ public class S3StorageService implements StorageService {
     private final ObjectStorageProperties objectStorageProperties;
 
 
-    private final MinioClient minioClient;
+//    private final MinioClient minioClient;
 
     @Override
     public Optional<UUID> store(InputStream inputStream) {
         UUID objectID = UUID.randomUUID();
         try {
-            minioClient.putObject(PutObjectArgs.builder()
-                    .bucket(objectStorageProperties.getS3().getBucket().getName())
-                    .object(objectID.toString())
-                    .stream(inputStream, inputStream.available(), -1)
-                    .build());
-            log.debug("Stored object in objectStorage");
-            return Optional.of(objectID);
+//            minioClient.putObject(PutObjectArgs.builder()
+//                    .bucket(objectStorageProperties.getS3().getBucket().getName())
+//                    .object(objectID.toString())
+//                    .stream(inputStream, inputStream.available(), -1)
+//                    .build());
+//            log.debug("Stored object in objectStorage");
+//            return Optional.of(objectID);
+            throw new UnsupportedOperationException();
         } catch (Exception e) {
             log.warn("Upload failed", e);
             return Optional.empty();
@@ -49,11 +47,12 @@ public class S3StorageService implements StorageService {
     @Override
     public Optional<InputStream> load(UUID objectID) {
         try {
-            var response = minioClient.getObject(GetObjectArgs.builder()
-                    .bucket(objectStorageProperties.getS3().getBucket().getName())
-                    .object(objectID.toString())
-                    .build());
-            return Optional.of(response);
+//            var response = minioClient.getObject(GetObjectArgs.builder()
+//                    .bucket(objectStorageProperties.getS3().getBucket().getName())
+//                    .object(objectID.toString())
+//                    .build());
+//            return Optional.of(response);
+            throw new UnsupportedOperationException();
         } catch (Exception e) {
             log.warn("Download failed", e);
             return Optional.empty();
