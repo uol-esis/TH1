@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.RemoveTrailingColumnStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -88,7 +88,7 @@ public class RemoveTrailingColumnConverter extends Converter {
      * @return true if valid, false otherwise
      */
     private boolean isValidEntry(String entry) {
-        if (entry == null || entry.isBlank()) {
+        if (entry == null || entry.isBlank() || entry.equals("*")) {
             return false;
         }
 
