@@ -1,12 +1,14 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.application.dto.RemoveInvalidRowsStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
 import de.uol.pgdoener.th1.domain.converterchain.model.converter.RemoveInvalidRowsConverter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RemoveInvalidRowsConverterTest {
 
@@ -84,7 +86,7 @@ public class RemoveInvalidRowsConverterTest {
     void testHandleRequestsHigherThreshold() {
         RemoveInvalidRowsStructureDto removeInvalidRowsStructure = new RemoveInvalidRowsStructureDto()
                 .threshold(3)
-                .blockList(List.of());
+                .blockList(List.of("Data"));
         RemoveInvalidRowsConverter converter = new RemoveInvalidRowsConverter(removeInvalidRowsStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, "", ""},       // not valid
@@ -110,10 +112,8 @@ public class RemoveInvalidRowsConverterTest {
                 {null, "", null}
         };
 
-        String[][] result = converter.handleRequest(matrix);
-
         // Wenn keine Header-Zeile gefunden wird, sollte Originalmatrix zurückgegeben werden
-        assertArrayEquals(matrix, result);
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test

@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.RemoveHeaderStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,16 +18,16 @@ public class RemoveHeaderConverter extends Converter {
         Integer headerRowIndex = null;
         int threshold = getThreshold(inputMatrix[0].length, removeHeaderStructure);
 
-        // Find the first line with at least two valid elements
+        // Find the first line with at least threshold valid elements
         for (int i = 0; i < inputMatrix.length; i++) {
             String[] row = inputMatrix[i];
             long validElementCount = countValidElements(row);
 
             if (validElementCount > threshold) {
                 log.debug("Find HeaderRow at id {} with {} valid elements", i, validElementCount);
-                headerRowIndex = i;
                 break;
             }
+            headerRowIndex = i;
         }
 
         if (headerRowIndex == null) {
@@ -35,10 +35,14 @@ public class RemoveHeaderConverter extends Converter {
             return super.handleRequest(inputMatrix);
         }
 
+        if (headerRowIndex == inputMatrix.length - 1) {
+            throwConverterException("Header row is the last row — no data left after cleanup.");
+        }
+
         // Remove all lines up to and including the header line
-        int rowsToKeep = inputMatrix.length - headerRowIndex;
+        int rowsToKeep = inputMatrix.length - (headerRowIndex + 1);
         String[][] cleanedMatrix = new String[rowsToKeep][];
-        System.arraycopy(inputMatrix, headerRowIndex, cleanedMatrix, 0, rowsToKeep);
+        System.arraycopy(inputMatrix, headerRowIndex + 1, cleanedMatrix, 0, rowsToKeep);
 
         return super.handleRequest(cleanedMatrix);
     }
@@ -82,6 +86,6 @@ public class RemoveHeaderConverter extends Converter {
             return true;
         }
 
-        return validElements.stream().noneMatch(entry::contains);
+        return validElements.stream().noneMatch(entry::equals);
     }
 }

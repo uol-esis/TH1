@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.RemoveTrailingColumnStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,6 +32,7 @@ public class RemoveTrailingColumnConverter extends Converter {
 
         if (maxValidRowLength == 0) {
             log.debug("No valid trailing columns found — returning original matrix");
+            throwConverterException("All rows are invalid");
             return super.handleRequest(inputMatrix);
         }
 

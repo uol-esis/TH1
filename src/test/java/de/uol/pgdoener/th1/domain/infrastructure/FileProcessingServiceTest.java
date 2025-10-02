@@ -245,4 +245,55 @@ public class FileProcessingServiceTest {
 
         assertThat(result).isEqualTo(expected);
     }
+
+    @Test
+    public void testOperatorParagraphCsv() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/multiline_values.csv");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "multiline_values.csv",
+                "text/csv",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
+
+        String[][] expected = {
+                {"Value1", "Value2", "Value3", "Value4", "Value5"},
+                {"Value", "Value", "Value", "Value-A\nValue-B\nValue-C\nValue-D", "Value"},
+                {"Value", "Value", "Value", "Value-A\nValue-B\nValue-D", "Value"},
+                {"Value", "Value", "Value", "Value-A", "Value"}
+        };
+
+
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    public void testOperatorParagraphXlsx() throws Exception {
+        InputStream csvInputStream = getClass().getClassLoader().getResourceAsStream("test/multiline_values.xlsx");
+
+        assert csvInputStream != null;
+
+        MockMultipartFile mockFile = new MockMultipartFile(
+                "file",
+                "multiline_values.xlsx",
+                ".xlsx",
+                csvInputStream
+        );
+
+        String[][] result = fileProcessingService.process(mockFile, Optional.empty());
+
+        String[][] expected = {
+                {"", "Value1", "Value2", "Value3", "Value4", "Value5"},
+                {"", "Value", "Value", "Value", "Value-A\nValue-B\nValue-C\nValue-D", "Value"},
+                {"", "Value", "Value", "Value", "Value-A\nValue-B\nValue-D", "Value"},
+                {"", "Value", "Value", "Value", "Value-A", "Value"}
+        };
+
+        assertThat(result).isEqualTo(expected);
+    }
 }

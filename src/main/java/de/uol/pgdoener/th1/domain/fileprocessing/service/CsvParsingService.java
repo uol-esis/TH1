@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.StandardCharsets;
 
 @Service
 @RequiredArgsConstructor
@@ -41,7 +42,7 @@ public class CsvParsingService {
                 .get();
 
         try (
-                Reader reader = new InputStreamReader(originalInputStream);
+                Reader reader = new InputStreamReader(originalInputStream, StandardCharsets.UTF_8);
                 CSVParser parser = format.parse(reader)
         ) {
             var rows = parser.getRecords();

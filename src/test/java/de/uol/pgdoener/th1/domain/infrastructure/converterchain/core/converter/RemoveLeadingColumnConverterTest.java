@@ -1,6 +1,7 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.application.dto.RemoveLeadingColumnStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
 import de.uol.pgdoener.th1.domain.converterchain.model.converter.RemoveLeadingColumnConverter;
 import org.junit.jupiter.api.Test;
 
@@ -8,6 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RemoveLeadingColumnConverterTest {
 
@@ -133,8 +135,7 @@ public class RemoveLeadingColumnConverterTest {
                 {"*", "", null}
         };
 
-        String[][] result = converter.handleRequest(input);
-        assertArrayEquals(input, result);
+        assertThrows(ConverterException.class, () -> converter.handleRequest(input));
     }
 
 }

@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.RemoveLeadingColumnStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,6 +56,7 @@ public class RemoveLeadingColumnConverter extends Converter {
 
             if (columnStartIndex == row.length) {
                 log.debug("No leading trailing found — returning original matrix");
+                throwConverterException("All rows are invalid");
                 break;
             }
         }

@@ -1,12 +1,15 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.application.dto.RemoveHeaderStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
 import de.uol.pgdoener.th1.domain.converterchain.model.converter.RemoveHeaderConverter;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RemoveHeaderConverterTest {
 
@@ -70,7 +73,7 @@ public class RemoveHeaderConverterTest {
     void testHandleRequestsHigherThreshold() {
         RemoveHeaderStructureDto removeHeaderStructure = new RemoveHeaderStructureDto()
                 .threshold(3)
-                .blockList(List.of());
+                .blockList(List.of("Data"));
         RemoveHeaderConverter converter = new RemoveHeaderConverter(removeHeaderStructure);
         String[][] matrix = new String[][]{
                 {"Invalid", null, "", ""},       // not valid
@@ -80,6 +83,7 @@ public class RemoveHeaderConverterTest {
         };
 
         String[][] result = converter.handleRequest(matrix);
+        System.out.println(Arrays.deepToString(result));
 
         assertArrayEquals(new String[][]{{"Data1", "Data2", "Data3", "Data4"}}, result);
     }
@@ -96,10 +100,7 @@ public class RemoveHeaderConverterTest {
                 {null, "", null}     // not valid
         };
 
-        String[][] result = converter.handleRequest(matrix);
-
-        // Wenn keine Header-Zeile gefunden wird, sollte Originalmatrix zurückgegeben werden
-        assertArrayEquals(matrix, result);
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test
@@ -121,6 +122,22 @@ public class RemoveHeaderConverterTest {
     }
 
     @Test
+    void testHandleRequestNoHeaderRowFoundAllNotValidElements() {
+        RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
+                .threshold(3)
+                .blockList(List.of());
+        RemoveHeaderConverter converter = new RemoveHeaderConverter(structure);
+        String[][] matrix = new String[][]{
+                {"skip", "this"},
+                {"Header", "Valid"},
+                {"Row1", "Data1"},
+                {"Row2", "Data2"}
+        };
+
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
+    }
+
+    @Test
     void testHandleRequestNullValuesOnly() {
         RemoveHeaderStructureDto structure = new RemoveHeaderStructureDto()
                 .threshold(null)
@@ -131,9 +148,7 @@ public class RemoveHeaderConverterTest {
                 {null, null, null}
         };
 
-        String[][] result = converter.handleRequest(matrix);
-
-        assertArrayEquals(matrix, result);
+        assertThrows(ConverterException.class, () -> converter.handleRequest(matrix));
     }
 
     @Test

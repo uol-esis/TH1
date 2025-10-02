@@ -1,12 +1,14 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
 import de.uol.pgdoener.th1.application.dto.RemoveTrailingColumnStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.exception.ConverterException;
 import de.uol.pgdoener.th1.domain.converterchain.model.converter.RemoveTrailingColumnConverter;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 public class RemoveTrailingColumnConverterTest {
 
@@ -151,7 +153,6 @@ public class RemoveTrailingColumnConverterTest {
                 {"*", "", null}
         };
 
-        String[][] result = converter.handleRequest(input);
-        assertArrayEquals(input, result, "Should return original matrix if no valid elements found.");
+        assertThrows(ConverterException.class, () -> converter.handleRequest(input));
     }
 }

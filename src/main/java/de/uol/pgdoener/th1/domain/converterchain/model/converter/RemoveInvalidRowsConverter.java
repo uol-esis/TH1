@@ -1,7 +1,7 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.RemoveInvalidRowsStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,7 +21,7 @@ public class RemoveInvalidRowsConverter extends Converter {
 
         if (invalidRowIndices.size() == inputMatrix.length) {
             log.debug("All rows are invalid");
-            return super.handleRequest(inputMatrix);
+            throwConverterException("All rows are invalid");
         }
 
         if (invalidRowIndices.isEmpty()) {
@@ -90,7 +90,7 @@ public class RemoveInvalidRowsConverter extends Converter {
             return true;
         }
 
-        return validElements.stream().noneMatch(entry::contains);
+        return validElements.stream().noneMatch(entry::equals);
     }
 
     /**
