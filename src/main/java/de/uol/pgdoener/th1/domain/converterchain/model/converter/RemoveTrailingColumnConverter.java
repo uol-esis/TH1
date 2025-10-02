@@ -89,7 +89,7 @@ public class RemoveTrailingColumnConverter extends Converter {
      * @return true if valid, false otherwise
      */
     private boolean isValidEntry(String entry) {
-        if (entry == null || entry.isBlank()) {
+        if (entry == null || entry.isBlank() || entry.equals("*")) {
             return false;
         }
 

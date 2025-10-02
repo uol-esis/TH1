@@ -77,7 +77,7 @@ public class RemoveHeaderConverter extends Converter {
      * Invalid = null, empty string, or a literal "*"
      */
     private boolean isValidEntry(String entry) {
-        if (entry == null || entry.isBlank()) {
+        if (entry == null || entry.isBlank() || entry.equals("*")) {
             return false;
         }
 
