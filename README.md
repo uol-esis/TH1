@@ -66,7 +66,7 @@ background.
 To test the whole application using docker simply run the following command:
 
 ```bash
-docker compose -f docker/docker-compose.yaml up -d --build && docker compose -f docker/docker-compose.yaml logs -f backend
+docker compose -f docker/docker-compose.yaml up metabase db backend -d --build && docker compose -f docker/docker-compose.yaml logs -f backend
 ```
 
 This will build the th1 application from the current state of the repository and start it in a docker container. The
@@ -79,8 +79,8 @@ To stop the application, run the following command:
 docker compose -f docker/docker-compose.yaml down
 ```
 
-> **Note:** Please consult the [wiki page](https://github.com/uol-esis/TH1/wiki/Docker) for further information about
-> the docker setup.
+> **Note:** Please consult the [wiki page](https://github.com/uol-esis/TH1/wiki/Docker) and the local `Readme` in the 
+> `docker` directory for further information about the docker setup.
 
 ## Authentication
 

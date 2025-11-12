@@ -11,18 +11,18 @@ public class SecurityProperties {
 
     /**
      * Allowed origins for CORS.
-     * example for keycloak would be: http://localhost:8080
+     * for example: http://localhost:8080
      */
     private List<String> allowedOrigins;
 
     /**
      * Authorization URL for OAuth2.
-     * example for keycloak would be: http://localhost:8080/realms/example/protocol/openid-connect/auth
+     * example for keycloak could be: http://localhost:8080/realms/example/protocol/openid-connect/auth
      */
     private String authorizationUrl;
     /**
      * Token URL for OAuth2.
-     * example for keycloak would be: http://localhost:8080/realms/example/protocol/openid-connect/token
+     * example for keycloak could be: http://localhost:8080/realms/example/protocol/openid-connect/token
      */
     private String tokenUrl;
 

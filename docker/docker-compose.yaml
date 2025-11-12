@@ -2,13 +2,12 @@
 # DO NOT USE IN PRODUCTION!
 # DO NOT USE DEFAULT CREDENTIALS IN PRODUCTION!
 # Visit the documentation for more information about deployment (https://github.com/uol-esis/TH1/wiki/Deployment)
-name: th1
+name: Th1nk
 services:
 
   backend:
     build: ..
     environment:
-      APP_SECURITY_ENABLED: true
       SPRING_DATASOURCE_USERNAME: example
       SPRING_DATASOURCE_PASSWORD: example
       SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/example
@@ -20,23 +19,25 @@ services:
       TH1_SECURITY_AUTHORIZATIONURL: http://localhost:8085/realms/th1/protocol/openid-connect/auth
       TH1_SECURITY_TOKENURL: http://localhost:8085/realms/th1/protocol/openid-connect/token
       SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI: http://localhost:8085/realms/th1
-      LOGGING_LEVEL_DE_UOL_PGDOENER_TH1: DEBUG
+      SPRING_PROFILES_ACTIVE: noSecurity # comment out to enable security
+      # LOGGING_LEVEL_DE_UOL_PGDOENER_TH1: DEBUG
     network_mode: host # host mode for token verification with keycloak
     depends_on:
       db:
         condition: service_healthy
 
-  # WIP
   frontend:
     build:
       context: https://github.com/uol-esis/Frontend.git
       args:
-        OAUTH_URL: http://localhost:8085
-        OAUTH_REALM: th1
-        OAUTH_CLIENT_ID: th1
+        # configure OAuth only if security is enabled in the backend
+        # OAUTH_URL: http://localhost:8085
+        # OAUTH_REALM: th1
+        # OAUTH_CLIENT_ID: th1
+        OAUTH_ENABLED: false
     environment:
       API_HOST: http://127.0.0.1:8080
-      METABASE_HOST: http://localhost:3000
+      METABASE_HOST: http://127.0.0.1:3000
     network_mode: host
 
   db:
@@ -55,8 +56,9 @@ services:
       start_period: 5s
       test: [ "CMD-SHELL", "pg_isready" ]
 
+  # only required if security is enabled in the backend
   keycloak:
-    image: quay.io/keycloak/keycloak:26.2
+    image: quay.io/keycloak/keycloak:26.4.5
     ports:
       - "8085:8080"
     environment:
@@ -68,8 +70,7 @@ services:
       - "./data/realms:/opt/keycloak/data/import"
 
   metabase:
-    image: metabase/metabase
-    container_name: metabase
+    image: metabase/metabase:v0.57.2.1
     environment:
       MB_API_KEY: key
     ports:
@@ -78,18 +79,16 @@ services:
       db:
         condition: service_healthy
 
+  # Object Storage Service (optional)
   garage:
-    image: dxflrs/garage:v2.0.0
+    image: dxflrs/garage:v2.1.0
     container_name: garaged
     ports:
       - "3900:3900"
-      - "3901:3901"
-      - "3902:3902"
-      - "3903:3903"
     volumes:
       - ./objectstorage/garage.toml:/etc/garage.toml
-      - ./objectstorage/meta:/var/lib/garage/meta
-      - ./objectstorage/data:/var/lib/garage/data
+     # - ./objectstorage/meta:/var/lib/garage/meta
+     # - ./objectstorage/data:/var/lib/garage/data
 
   garage_config:
     image: docker:cli

@@ -6,7 +6,7 @@ possible.
 To start all services required simply run:
 
 ```shell
-docker compose up -d db keycloak metabase
+docker compose up -d db metabase 
 ```
 
 After this, you need to open the website of metabase at http://localhost:3000 in order to configure metabase to use the
@@ -17,6 +17,28 @@ All other configurations - especially the setup of keycloak - should happen auto
 
 Please note: When using Docker Desktop to run docker images, you need to enable the usage of the option
 `network_mode: host` via the settings in docker desktop.
+
+## Setting up the stack in secure mode
+
+By default, the backend will be started with the profile `noSecurity` enabled. This means, that no authentication and
+authorization will be enforced. To start the stack in secure mode, you need to disable the `noSecurity` profile. This 
+can be done by removing the profile definition in the `docker-compose.yaml` file for the backend service.
+
+When starting the stack in secure mode, please make sure that all environment variables required for keycloak within 
+all other services, namely the backend and the frontend (if required), are configured correctly. (Mostly uncommenting 
+predefined env variables.)
+
+With this done you may start the required services with:
+
+```shell
+docker compose up -d db keycloak metabase frontend
+```
+
+If not done already, you need to configure metabase as described above.
+
+Then you may start the backend from source or using docker.
+
+Please obtain the required credentials for the development realm from the Readme in the root directory of the project.
 
 ## (OPTIONAL) Setting up an S3 Objectstorage
 
