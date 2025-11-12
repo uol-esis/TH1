@@ -1,11 +1,12 @@
 package de.uol.pgdoener.th1.domain.datatable.helper;
 
+import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
 import de.uol.pgdoener.th1.domain.shared.exceptions.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
-import java.util.Map;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -19,14 +20,14 @@ public class SqlValidator {
             "group", "order", "limit", "union", "alter", "into", "values"
     );
 
-    public void validateHeaders(Map<String, String> headers) {
-        for (String column : headers.keySet()) {
-            validateIdentifier(column, "Column");
+    public void validateHeaders(List<SqlColumn> headers) {
+        for (SqlColumn header : headers) {
+            validateIdentifier(header.getName(), "Column");
         }
     }
 
     public void validateTableName(String tableName) {
-        validateIdentifier(tableName, "File");
+        validateIdentifier(tableName, "table");
     }
 
     //private methods//

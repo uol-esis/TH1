@@ -21,7 +21,7 @@ public class ConverterFactory {
             case RemoveTrailingColumnStructureDto s -> new RemoveTrailingColumnConverter(s);
             case RemoveLeadingColumnStructureDto s -> new RemoveLeadingColumnConverter(s);
             case ReplaceEntriesStructureDto s -> new ReplaceEntriesConverter(s);
-            case SplitRowStructureDto s -> new SplitRowConverter(s);
+            case SplitCellStructureDto s -> new SplitCellConverter(s);
             case RemoveInvalidRowsStructureDto s -> new RemoveInvalidRowsConverter(s);
             case MergeColumnsStructureDto s -> new MergeColumnsConverter(s);
             case TransposeMatrixStructureDto s -> new TransposeMatrixConverter(s);

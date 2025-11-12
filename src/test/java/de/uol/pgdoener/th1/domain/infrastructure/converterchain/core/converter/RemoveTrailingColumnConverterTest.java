@@ -98,11 +98,11 @@ public class RemoveTrailingColumnConverterTest {
     @Test
     void testRemoveTrailingColumnsConsideringBlacklist() {
         RemoveTrailingColumnStructureDto structureDto = new RemoveTrailingColumnStructureDto()
-                .blockList(List.of("*"));
+                .blockList(List.of("a"));
         RemoveTrailingColumnConverter converter = new RemoveTrailingColumnConverter(structureDto);
 
         String[][] input = {
-                {"A", "B", "*", "*", ""},
+                {"A", "B", "*", "a", ""},
                 {"1", "2", "3", "", ""},
                 {"X", "", "*", "", ""}
         };

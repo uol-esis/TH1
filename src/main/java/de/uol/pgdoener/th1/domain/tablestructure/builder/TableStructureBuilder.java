@@ -149,12 +149,12 @@ public class TableStructureBuilder {
      */
     private void buildSplitRowReportDto(SplitRowReportDto report) {
         log.debug("Start buildSplitRowStructure");
-        SplitRowStructureDto SplitRowStructure = new SplitRowStructureDto();
-        SplitRowStructure.converterType(ConverterTypeDto.SPLIT_ROW)
+        SplitCellStructureDto splitCellStructure = new SplitCellStructureDto();
+        splitCellStructure.converterType(ConverterTypeDto.SPLIT_CELL)
                 .columnIndex(report.getColumnIndex())
                 .delimiter(report.getDelimiter());
         log.debug("Finish buildSplitRowStructure");
-        tableStructure.addStructuresItem(SplitRowStructure);
+        tableStructure.addStructuresItem(splitCellStructure);
     }
 
     /**
@@ -283,8 +283,7 @@ public class TableStructureBuilder {
                 .removeRows(removeKeywordsSettingsDto.isRemoveRows())
                 .removeColumns(removeKeywordsSettingsDto.isRemoveColumns())
                 .ignoreCase(removeKeywordsSettingsDto.isIgnoreCase())
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.
-                        valueOf(removeKeywordsSettingsDto.getMatchType().getValue()));
+                .matchType(MatchTypeDto.valueOf(removeKeywordsSettingsDto.getMatchType().name()));
         log.debug("Finish buildRemoveKeywordStructure");
         tableStructure.addStructuresItem(removeKeywordsStructure);
     }

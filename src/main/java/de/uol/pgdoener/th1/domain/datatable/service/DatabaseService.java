@@ -4,7 +4,7 @@ import de.uol.pgdoener.th1.domain.datatable.helper.SqlHeaderBuilder;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlQueryBuilder;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlValidator;
 import de.uol.pgdoener.th1.domain.datatable.helper.SqlValueBuilder;
-import de.uol.pgdoener.th1.infastructure.persistence.entity.SchemaVersion;
+import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
 import de.uol.pgdoener.th1.infastructure.persistence.repository.DynamicTableRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -14,15 +14,12 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class DatabaseService {
-    private final int BATCH_SIZE = 1000;
 
     final DynamicTableRepository dynamicTableRepository;
-
     final SqlHeaderBuilder headerBuilder;
     final SqlValidator sqlValidator;
     final SqlQueryBuilder queryBuilder;
@@ -32,48 +29,48 @@ public class DatabaseService {
 
     @Transactional
     public void createDatabaseTableWithValues(String tableName, String[][] matrix) {
-        Map<String, String> columns = headerBuilder.build(matrix);
+        List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(columns);
 
-        String sql = queryBuilder.buildCreateTableQuery(tableName, columns);
-        dynamicTableRepository.executeRawSql(sql);
+        List<Object[]> values = sqlValueBuilder.build(header, matrix);
+        queryBuilder.buildDataTable(tableName, header);
+        queryBuilder.insertValuesIntoTable(tableName, header, values);
 
-        insertValuesIntoTable(tableName, columns, matrix);
-
-        schemaVersionService.saveVersion(tableName, "CREATED", sql, matrix);
+        //schemaVersionService.saveVersion(tableName, "CREATED", sql, matrix);
     }
 
     @Transactional
     public void extendDatabaseTableWithValues(String tableName, String[][] matrix) {
-        Map<String, String> columns = headerBuilder.build(matrix);
+        List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(columns);
 
-        insertValuesIntoTable(tableName, columns, matrix);
+        List<Object[]> values = sqlValueBuilder.build(header, matrix);
+        queryBuilder.insertValuesIntoTable(tableName, header, values);
 
-        schemaVersionService.saveVersion(tableName, "EXTEND", "", matrix);
+        //schemaVersionService.saveVersion(tableName, "EXTEND", "", matrix);
     }
 
     @Transactional
     public void replaceDatabaseTableWithValues(String tableName, String[][] matrix) {
-        Map<String, String> columns = headerBuilder.build(matrix);
+        List<SqlColumn> header = headerBuilder.build(matrix);
 
         sqlValidator.validateTableName(tableName);
-        sqlValidator.validateHeaders(columns);
 
-        String deleteSql = "DELETE FROM " + tableName;
-        dynamicTableRepository.executeRawSql(deleteSql);
+        List<Object[]> values = sqlValueBuilder.build(header, matrix);
+        queryBuilder.deleteTable(tableName);
+        queryBuilder.insertValuesIntoTable(tableName, header, values);
 
-        insertValuesIntoTable(tableName, columns, matrix);
-
-        schemaVersionService.saveVersion(tableName, "REPLACE", deleteSql, matrix);
+        //schemaVersionService.saveVersion(tableName, "REPLACE", deleteSql, matrix);
     }
 
     public List<String> getTableNames() {
         return dynamicTableRepository.getAllTableNames();
+    }
+
+    public boolean tableExists(String tableName) {
+        return dynamicTableRepository.tableExists(tableName);
     }
 
     @Transactional
@@ -93,40 +90,23 @@ public class DatabaseService {
         //insertValuesIntoTable(tableName, columns, matrix);
     }
 
-    public void rollbackToVersion(String tableName, int version) throws IOException {
-
-        SchemaVersion versionMeta = schemaVersionService.getVersion(tableName, version);
-
-        dynamicTableRepository.executeRawSql("DROP TABLE IF EXISTS " + tableName);
-        dynamicTableRepository.executeRawSql(versionMeta.getChangeSql());
-
-        List<String[]> matrix = loadMatrixFromCsv(versionMeta.getSnapshotPath());
-        Map<String, String> columns = headerBuilder.build(matrix.toArray(new String[0][0]));
-        insertValuesIntoTable(tableName, columns, matrix.toArray(new String[0][0]));
-    }
+//    public void rollbackToVersion(String tableName, int version) throws IOException {
+//
+//        SchemaVersion versionMeta = schemaVersionService.getVersion(tableName, version);
+//
+//        dynamicTableRepository.executeRawSql("DROP TABLE IF EXISTS " + tableName);
+//        dynamicTableRepository.executeRawSql(versionMeta.getChangeSql());
+//
+//        List<String[]> matrix = loadMatrixFromCsv(versionMeta.getSnapshotPath());
+//        Map<String, String> columns = headerBuilder.build(matrix.toArray(new String[0][0]));
+//        insertValuesIntoTable(tableName, columns, matrix.toArray(new String[0][0]));
+//    }
 
     private List<String[]> loadMatrixFromCsv(String path) throws IOException {
         List<String> lines = Files.readAllLines(Paths.get(path));
         return lines.stream()
                 .map(line -> line.split(","))
                 .toList();
-    }
-
-    private void insertValuesIntoTable(String tableName, Map<String, String> columns, String[][] matrix) {
-        /// TODO: auslagern ?
-        int maxParams = 65535;
-        int columnsCount = columns.size();
-        int batchSize = Math.min(BATCH_SIZE, maxParams / columnsCount);
-
-        String insertSql = queryBuilder.buildInsertQuery(tableName, columns);
-
-        List<Object[]> values = sqlValueBuilder.build(columns, matrix);
-
-        for (int i = 0; i < values.size(); i += batchSize) {
-            int end = Math.min(i + batchSize, values.size());
-            List<Object[]> batch = values.subList(i, end);
-            dynamicTableRepository.executeRawSqlWithBatch(insertSql, batch);
-        }
     }
 
 }

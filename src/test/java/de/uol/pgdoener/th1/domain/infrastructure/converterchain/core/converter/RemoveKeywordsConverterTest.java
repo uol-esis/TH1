@@ -1,5 +1,6 @@
 package de.uol.pgdoener.th1.domain.infrastructure.converterchain.core.converter;
 
+import de.uol.pgdoener.th1.application.dto.MatchTypeDto;
 import de.uol.pgdoener.th1.application.dto.RemoveKeywordsStructureDto;
 import de.uol.pgdoener.th1.domain.converterchain.model.converter.RemoveKeywordsConverter;
 import org.junit.jupiter.api.Test;
@@ -16,7 +17,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true)
                 .removeColumns(false)
                 .ignoreCase(true)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS)
+                .matchType(MatchTypeDto.CONTAINS)
                 .keywords(List.of("remove"));
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);
@@ -46,7 +47,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true)
                 .removeColumns(false)
                 .ignoreCase(false)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS)
+                .matchType(MatchTypeDto.EQUALS)
                 .keywords(List.of("remove"));
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);
@@ -75,7 +76,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true) // irrelevant here
                 .removeColumns(true)
                 .ignoreCase(true)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS)
+                .matchType(MatchTypeDto.EQUALS)
                 .keywords(List.of("secret"));
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);
@@ -105,7 +106,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true)
                 .removeColumns(true)
                 .ignoreCase(true)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS)
+                .matchType(MatchTypeDto.CONTAINS)
                 .keywords(List.of("x"));
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);
@@ -135,7 +136,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true)
                 .removeColumns(true)
                 .ignoreCase(false)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS)
+                .matchType(MatchTypeDto.CONTAINS)
                 .keywords(List.of("B")); // Matches header cell "B"
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);
@@ -164,7 +165,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true)
                 .removeColumns(true)
                 .ignoreCase(true)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS)
+                .matchType(MatchTypeDto.CONTAINS)
                 .keywords(List.of("zzz")); // No match
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);
@@ -186,7 +187,7 @@ public class RemoveKeywordsConverterTest {
                 .removeRows(true)
                 .removeColumns(true)
                 .ignoreCase(true)
-                .matchType(RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS)
+                .matchType(MatchTypeDto.CONTAINS)
                 .keywords(List.of("danger"));
 
         RemoveKeywordsConverter converter = new RemoveKeywordsConverter(structure);

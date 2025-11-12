@@ -32,8 +32,9 @@ public class ConvertFileService {
     private final CreateDatabaseService createDatabaseService;
     private final ConverterChainService converterChainService;
 
-    public void convertAndSaveInDB(Long tableStructureId, Optional<String> optionalMode, MultipartFile file) {
-
+    public void convertAndSaveInDB(
+            Long tableStructureId, Optional<String> optionalMode, MultipartFile file
+    ) {
         String mode = optionalMode.orElse("CREATE");
 
         Optional<TableStructure> tableStructure = tableStructureRepository.findById(tableStructureId);
@@ -54,10 +55,12 @@ public class ConvertFileService {
         mbService.updateAllDatabases();
     }
 
-    public ConverterResult convertTest(TableStructureDto tableStructureDto, MultipartFile file) {
+    public ConverterResult convertTest(
+            TableStructureDto tableStructureDto, MultipartFile file, Optional<Integer> page
+    ) {
         ConverterChain converterChain = converterChainCreationService.create(tableStructureDto);
         try {
-            String[][] transformedMatrix = converterChainService.performTransformation(file, converterChain);
+            String[][] transformedMatrix = converterChainService.performTransformation(file, converterChain, page);
             return new ConverterResult(tableStructureDto, transformedMatrix);
         } catch (Exception e) {
             throw new RuntimeException("Could not convert file: " + file.getOriginalFilename(), e);

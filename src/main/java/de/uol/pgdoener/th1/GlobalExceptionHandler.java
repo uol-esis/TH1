@@ -9,16 +9,16 @@ import de.uol.pgdoener.th1.infastructure.metabase.MetabaseException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.jooq.exception.DataAccessException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.validation.FieldError;
+import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.web.ErrorResponse;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -48,12 +48,69 @@ public class GlobalExceptionHandler {
         errorBody.put("suggestion", ex.getSuggestion());
 
         Map<String, Object> body = new LinkedHashMap<>();
-        body.put("status", ex.getHttpStatus().isError() ? "error" : "success");
-        body.put("statusCode", ex.getHttpStatus().value());
+        body.put("status", ex.getHttpStatus().value());
         body.put("error", errorBody);
         //body.put("documentation_url", "https://example.com/docs/errors#" + ex.getHttpStatus().value());
 
         return ResponseEntity.status(ex.getHttpStatus()).body(body);
+    }
+
+    @ExceptionHandler(DataAccessException.class)
+    public ResponseEntity<Object> handleDataAccessException(DataAccessException ex, HttpServletRequest request) {
+        String rootMessage = ex.getCause() != null ? ex.getCause().getMessage() : ex.getMessage();
+        String userMessage = "A database error occurred while processing your request.";
+        String suggestion = "Please contact support if the problem persists.";
+
+        if (rootMessage != null && rootMessage.contains("specified more than once")) {
+            userMessage = "A database table definition contains duplicate column names.";
+            suggestion = "Check the table schema for duplicate column definitions.";
+        }
+
+        Map<String, Object> errorBody = new LinkedHashMap<>();
+        errorBody.put("message", userMessage);
+        errorBody.put("details", rootMessage);
+        errorBody.put("timestamp", Instant.now().toString());
+        errorBody.put("path", request.getRequestURI());
+        errorBody.put("suggestion", suggestion);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", errorBody);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    @ExceptionHandler(BadSqlGrammarException.class)
+    public ResponseEntity<Object> handleBadSqlGrammar(BadSqlGrammarException ex, HttpServletRequest request) {
+        Throwable rootCause = ex.getRootCause();
+        String rootMessage = rootCause != null ? rootCause.getMessage() : ex.getMessage();
+
+        String userMessage = "A database query could not be executed due to invalid SQL syntax.";
+        String suggestion = "Please contact support if the issue persists.";
+
+        if (rootMessage != null && rootMessage.contains("specified more than once")) {
+            userMessage = "The database table definition contains duplicate column names.";
+            suggestion = "Check the table schema and remove duplicate column definitions.";
+        }
+
+        if (rootMessage != null && rootMessage.toLowerCase().contains("syntax error")) {
+            userMessage = "There is a syntax error in the database query.";
+            suggestion = "Verify that the SQL statements are correct.";
+        }
+
+        Map<String, Object> errorBody = new LinkedHashMap<>();
+        errorBody.put("message", userMessage);
+        errorBody.put("details", rootMessage);
+        errorBody.put("sql", ex.getSql()); // jOOQ SQL Statement
+        errorBody.put("timestamp", Instant.now().toString());
+        errorBody.put("path", request.getRequestURI());
+        errorBody.put("suggestion", suggestion);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+        body.put("error", errorBody);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
     @ExceptionHandler(MetabaseException.class)
@@ -114,18 +171,29 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse.getBody());
     }
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationExceptions(
-            MethodArgumentNotValidException ex) {
-        Map<String, String> errors = new HashMap<>();
-        ex.getBindingResult().getAllErrors().forEach(error -> {
-            String fieldName = ((FieldError) error).getField();
-            String errorMessage = error.getDefaultMessage();
-            errors.put(fieldName, errorMessage);
-        });
-        log.debug("MethodArgumentNotValidException: {}", errors);
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+    public ResponseEntity<Object> handleMethodArgumentNotValidException(
+            MethodArgumentNotValidException ex, HttpServletRequest request) {
+
+        Map<String, String> fieldErrors = new HashMap<>();
+        ex.getBindingResult().getFieldErrors().forEach(error ->
+                fieldErrors.put(error.getField(), error.getDefaultMessage()));
+
+        String userMessage = "Validation failed for one or more fields.";
+        String suggestion = "Check the provided input and try again.";
+
+        Map<String, Object> errorBody = new LinkedHashMap<>();
+        errorBody.put("message", userMessage);
+        errorBody.put("details", fieldErrors);
+        errorBody.put("timestamp", Instant.now().toString());
+        errorBody.put("path", request.getRequestURI());
+        errorBody.put("suggestion", suggestion);
+
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("status", HttpStatus.BAD_REQUEST.value());
+        body.put("error", errorBody);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
 
     @ExceptionHandler(TableStructureGenerationException.class)

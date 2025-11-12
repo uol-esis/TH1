@@ -1,84 +1,41 @@
 package de.uol.pgdoener.th1.domain.datatable.helper;
 
+import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
+import de.uol.pgdoener.th1.domain.datatable.model.SqlType;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
+@Slf4j
 @Component
+@RequiredArgsConstructor
 public class SqlValueBuilder {
 
-    public List<Object[]> build(Map<String, String> columns, String[][] transformedMatrix) {
-        String[] headers = columns.keySet().stream().filter(key -> !key.equals("id")).toArray(String[]::new);
+    private final SqlTypeGuesser sqlTypeGuesser;
+    private final SqlValueFormatter sqlValueFormatter;
+
+    public List<Object[]> build(List<SqlColumn> columns, String[][] transformedMatrix) {
         String[][] valueMatrix = Arrays.copyOfRange(transformedMatrix, 1, transformedMatrix.length);
+        List<Object[]> result = new ArrayList<>(transformedMatrix[0].length);
 
-        return Arrays.stream(valueMatrix)
-                .map(row -> {
-                    Object[] formattedRow = new Object[headers.length];
-                    for (int i = 0; i < headers.length; i++) {
-                        String columnName = headers[i];
-                        String columnType = columns.get(columnName);
-                        String value = row[i];
-                        formattedRow[i] = formatValue(value, columnType);
-                    }
-                    return formattedRow;
-                })
-                .toList();
-    }
+        for (String[] row : valueMatrix) {
+            Object[] formattedRow = new Object[columns.size()];
+            int j = 0;
+            for (int i = 0; i < columns.size(); i++) {
+                SqlColumn column = columns.get(i);
 
-    public List<Object> buildNew(Map<String, String> columns, String[][] transformedMatrix, int start, int end) {
-        String[] headers = columns.keySet().stream().filter(key -> !key.equals("id")).toArray(String[]::new);
-        String[][] valueMatrix = Arrays.copyOfRange(transformedMatrix, 1, transformedMatrix.length);
+                String value = row[j++];
+                SqlType detectedType = sqlTypeGuesser.guessType(value);
+                column.mergeType(detectedType);
 
-        List<Object> values = new ArrayList<>();
-        for (int i = start; i < end; i++) {
-            String[] row = valueMatrix[i];
-            for (int j = 0; j < headers.length; j++) {
-                String columnName = headers[j];
-                String columnType = columns.get(columnName);
-                String value = row[j];
-                Object formattedValue = formatValue(value, columnType);
-                values.add(formattedValue);
+                formattedRow[i] = sqlValueFormatter.format(value, column.getType());
             }
+            result.add(formattedRow);
         }
-        return values;
+        return result;
     }
-
-    private static Object formatValue(String value, String columnType) {
-        if ("*".equals(value)) {
-            return null;
-        }
-
-        switch (columnType.toUpperCase()) {
-            case "INTEGER":
-                return Integer.parseInt(value);
-            case "NUMERIC":
-                return Double.valueOf(value);
-            case "BOOLEAN":
-                return Boolean.parseBoolean(value);
-            case "TEXT":
-            case "VARCHAR":
-            case "CHAR":
-                return value;
-            case "DATE":
-                try {
-                    if (value.matches("\\d{4}-\\d{2}-\\d{2}")) {
-                        return java.sql.Date.valueOf(value); // Bereits im richtigen Format
-                    } else if (value.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) {
-                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
-                        LocalDate date = LocalDate.parse(value, formatter);
-                        return java.sql.Date.valueOf(date);
-                    }
-                } catch (IllegalArgumentException e) {
-                    throw new IllegalArgumentException("Invalid date format for value: " + value);
-                }
-            default:
-                throw new IllegalArgumentException("Unknown column type: " + columnType);
-        }
-    }
-
 }

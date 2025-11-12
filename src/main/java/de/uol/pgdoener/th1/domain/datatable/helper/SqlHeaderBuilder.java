@@ -1,76 +1,79 @@
 package de.uol.pgdoener.th1.domain.datatable.helper;
 
+import de.uol.pgdoener.th1.domain.datatable.model.SqlColumn;
+import de.uol.pgdoener.th1.domain.datatable.model.SqlType;
 import org.springframework.stereotype.Component;
 
-import java.text.Normalizer;
-import java.util.LinkedHashMap;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.regex.Pattern;
 
 @Component
 public class SqlHeaderBuilder {
 
+    private static final Pattern REPLACE_INVALID_CHARS_PATTERN = Pattern.compile("[^a-z0-9_]");
+    private static final Pattern REPLACE_MULTIPLE_UNDERSCORES_PATTERN = Pattern.compile("_+");
+
     /**
      * Extracts the header from the first row of the matrix and infers SQL types based on the first data row.
      */
-    public Map<String, String> build(String[][] matrix) {
-        String[] headers = matrix[0];
-
-        Map<String, String> columnHeaders = new LinkedHashMap<>();
-        columnHeaders.put("id", "SERIAL PRIMARY KEY");
-
-        for (int i = 0; i < headers.length; i++) {
-            String header = prepareForSQLColumnName(headers[i]);
-            String value = getValue(i, matrix);
-            String type = guessType(value);
-            columnHeaders.put(header, type);
-        }
-
-        return columnHeaders;
+    public List<SqlColumn> build(String[][] matrix) {
+        return Arrays.stream(matrix[0])
+                .map(this::normalizeHeader)
+                .map(h -> new SqlColumn(h, SqlType.UNDEFINED))
+                .toList();
     }
 
-    // private methods //
-
-    private String getValue(int i, String[][] matrix) {
-        for (int rowIndex = 1; rowIndex < matrix.length; rowIndex++) {
-            String value = matrix[rowIndex][i];
-            if (value.equals("*")) continue;
-            return value;
+    private String normalizeHeader(String s) {
+        if (s == null || s.isBlank() || "*".equals(s)) {
+            return "col_unknown";
         }
-        throw new NoSuchElementException("No valid (non-*) value found in column index " + i);
+        return prepareForSQLColumnName(s);
     }
 
     private String prepareForSQLColumnName(String input) {
-        if (input == null || input.isEmpty()) {
-            return "_";
+        String normalized = input.trim().toLowerCase();
+        normalized = replaceUmlauts(normalized);
+        normalized = REPLACE_INVALID_CHARS_PATTERN.matcher(normalized).replaceAll("_");
+        normalized = REPLACE_MULTIPLE_UNDERSCORES_PATTERN.matcher(normalized).replaceAll("_");
+
+        //first character: must be a letter or underscore
+        if (!Character.isLetter(normalized.charAt(0)) && normalized.charAt(0) != '_') {
+            normalized = "col_" + normalized;
         }
 
-        // Trim und Kleinschreibung
-        String normalized = input.trim().toLowerCase();
-        // Entfernt alle nicht-ASCII-Zeichen (z. B. Umlaute → ue)
-        normalized = Normalizer.normalize(normalized, Normalizer.Form.NFD).replaceAll("\\p{M}", "");
-        // Ersetzt ungültige Zeichen durch Unterstrich
-        normalized = normalized.replaceAll("[^a-z0-9_]", "_");
-        // Entfernt doppelte Unterstriche
-        normalized = normalized.replaceAll("_+", "_");
-
-        // Stellt sicher, dass der Name mit einem Buchstaben beginnt
-        if (!Character.isLetter(normalized.charAt(0))) {
-            normalized = "_" + normalized;
+        // Maximum length 63 (PG-Ident limit)
+        if (normalized.length() > 63) {
+            String hash = Integer.toHexString(normalized.hashCode());
+            normalized = normalized.substring(0, 63 - hash.length() - 1) + "_" + hash;
         }
 
         return normalized;
     }
 
-    private String guessType(String value) {
-        if (value.matches("\\d+")) return "INTEGER"; // Ganzzahlen
-        if (value.matches("\\d+\\.\\d+")) return "NUMERIC"; // Dezimalzahlen
-        if (value.matches("true|false")) return "BOOLEAN"; // Wahrheitswerte
-        if (value.matches("\\d{4}-\\d{2}-\\d{2}")) return "DATE"; // Datumsangaben im Format YYYY-MM-DD
-        if (value.matches("\\d{2}\\.\\d{2}\\.\\d{4}")) return "DATE"; // Datumsangaben im Format dd.MM.yyyy
-        if (value.matches("\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}.*")) return "TIMESTAMP"; // ISO-8601-Timestamp
-        if (value.matches("[A-Fa-f0-9]{32}")) return "UUID"; // UUIDs (hexadezimale 32-Zeichen-Strings)
-        return "TEXT"; // Standard-Texttyp
+    private String ensureUnique(String name, Map<String, Integer> seen) {
+        int count = seen.getOrDefault(name, 0);
+        if (count == 0) {
+            seen.put(name, 1);
+            return name;
+        }
+        String uniqueName = name + "_" + (count + 1);
+        seen.put(name, count + 1);
+        return uniqueName;
     }
 
+    private String replaceUmlauts(String input) {
+        StringBuilder sb = new StringBuilder(input.length());
+        for (char c : input.toCharArray()) {
+            switch (c) {
+                case 'ä' -> sb.append("ae");
+                case 'ö' -> sb.append("oe");
+                case 'ü' -> sb.append("ue");
+                case 'ß' -> sb.append("ss");
+                default -> sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
 }

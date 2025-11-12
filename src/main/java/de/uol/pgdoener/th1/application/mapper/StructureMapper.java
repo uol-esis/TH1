@@ -5,11 +5,9 @@ import de.uol.pgdoener.th1.infastructure.persistence.entity.*;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static de.uol.pgdoener.th1.infastructure.persistence.entity.MatchType.CONTAINS;
-import static de.uol.pgdoener.th1.infastructure.persistence.entity.MatchType.EQUALS;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public abstract class StructureMapper {
@@ -51,7 +49,8 @@ public abstract class StructureMapper {
                     .description(structure.getDescription());
             case HeaderRowStructure structure -> new AddHeaderNameStructureDto(
                     ConverterTypeDto.ADD_HEADER_NAME,
-                    List.of(structure.getHeaderNames())
+                    List.of(structure.getHeaderNames()),
+                    HeaderPlacementTypeDto.valueOf(structure.getHeaderPlacementType().name())
             )
                     .name(structure.getName())
                     .description(structure.getDescription());
@@ -93,8 +92,8 @@ public abstract class StructureMapper {
                     .startRow(structure.getStartRow())
                     .endRow(structure.getEndRow())
                     .columnIndex(structure.getColumns());
-            case SplitRowStructure structure -> new SplitRowStructureDto(
-                    ConverterTypeDto.SPLIT_ROW,
+            case SplitCellStructure structure -> new SplitCellStructureDto(
+                    ConverterTypeDto.SPLIT_CELL,
                     structure.getColumnIndex()
             )
                     .name(structure.getName())
@@ -128,13 +127,22 @@ public abstract class StructureMapper {
                     structure.getRemoveRows(),
                     structure.getRemoveColumns(),
                     structure.getIgnoreCase(),
-                    convertMatchTypeToDto(structure.getMatchType())
+                    MatchTypeDto.valueOf(structure.getMatchType().name())
             )
                     .name(structure.getName())
                     .description(structure.getDescription())
                     .keywords(Arrays.asList(structure.getKeywords()));
             default -> throw new IllegalStateException("Unexpected value: " + entity);
         };
+    }
+
+    public static List<Structure> toEntity(List<StructureDto> structures, Long tableStructureId) {
+        List<Structure> structureList = new ArrayList<>(structures.size());
+        for (int i = 0; i < structures.size(); i++) {
+            StructureDto structure = structures.get(i);
+            structureList.add(toEntity(structure, i, tableStructureId));
+        }
+        return structureList;
     }
 
     public static Structure toEntity(StructureDto dto, int position, Long tableStructureId) {
@@ -188,7 +196,8 @@ public abstract class StructureMapper {
                     tableStructureId,
                     structure.getName().orElse(null),
                     structure.getDescription().orElse(null),
-                    structure.getHeaderNames().toArray(new String[0])
+                    structure.getHeaderNames().toArray(new String[0]),
+                    HeaderPlacementType.valueOf(structure.getHeaderPlacementType().name())
             );
             case RemoveHeaderStructureDto structure -> new RemoveHeaderStructure(
                     null, // ID wird von der Datenbank generiert
@@ -237,7 +246,7 @@ public abstract class StructureMapper {
                     structure.getStartRow().orElse(null),
                     structure.getEndRow().orElse(null)
             );
-            case SplitRowStructureDto structure -> new SplitRowStructure(
+            case SplitCellStructureDto structure -> new SplitCellStructure(
                     null, // ID wird von der Datenbank generiert
                     position,
                     tableStructureId,
@@ -294,30 +303,8 @@ public abstract class StructureMapper {
                     structure.isRemoveRows(),
                     structure.isRemoveColumns(),
                     structure.isIgnoreCase(),
-                    convertMatchTypeToEntity(structure.getMatchType())
+                    MatchType.valueOf(structure.getMatchType().name())
             );
-        };
-    }
-
-    private static MatchType convertMatchTypeToEntity(RemoveKeywordsStructureDto.MatchTypeEnum dtoEnum) {
-        if (dtoEnum == null) {
-            return EQUALS; // Default oder null-behandlung
-        }
-        return switch (dtoEnum) {
-            case CONTAINS -> CONTAINS;
-            case EQUALS -> EQUALS;
-            default -> throw new IllegalArgumentException("Unknown matchType: " + dtoEnum);
-        };
-    }
-
-
-    private static RemoveKeywordsStructureDto.MatchTypeEnum convertMatchTypeToDto(MatchType matchType) {
-        if (matchType == null) {
-            return RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS;
-        }
-        return switch (matchType) {
-            case CONTAINS -> RemoveKeywordsStructureDto.MatchTypeEnum.CONTAINS;
-            case EQUALS -> RemoveKeywordsStructureDto.MatchTypeEnum.EQUALS;
         };
     }
 

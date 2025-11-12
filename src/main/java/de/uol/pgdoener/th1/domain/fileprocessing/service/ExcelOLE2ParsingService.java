@@ -3,6 +3,8 @@ package de.uol.pgdoener.th1.domain.fileprocessing.service;
 import de.uol.pgdoener.th1.domain.fileprocessing.WorkbookFactory;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.DateNormalizerService;
 import de.uol.pgdoener.th1.domain.fileprocessing.helper.NumberNormalizerService;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.TypeDetector;
+import de.uol.pgdoener.th1.domain.fileprocessing.helper.ValueType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -11,14 +13,16 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Optional;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class ExcelParsingService {
+public class ExcelOLE2ParsingService {
 
     private final DateNormalizerService dateNormalizerService;
     private final NumberNormalizerService numberNormalizerService;
+    private final TypeDetector typeDetector;
 
     /**
      * Parses the first sheet of an Excel file into a 2D String array.
@@ -35,9 +39,9 @@ public class ExcelParsingService {
      * @return a 2D String array containing the parsed and normalized sheet data
      * @throws IOException if the file cannot be read or parsed
      */
-    public String[][] parseExcel(InputStream inputStream, WorkbookFactory workbookFactory) throws IOException {
+    public String[][] readExcel(InputStream inputStream, WorkbookFactory workbookFactory, Optional<Integer> page) throws IOException {
         try (Workbook workbook = workbookFactory.create(inputStream)) {
-            Sheet sheet = workbook.getSheetAt(0);
+            Sheet sheet = workbook.getSheetAt(page.orElse(0));
 
             int rowCount = sheet.getLastRowNum() + 1;
             int colCount = getColumnWidth(sheet);
@@ -107,14 +111,13 @@ public class ExcelParsingService {
             return switch (cellType) {
                 case STRING -> {
                     String value = cell.getStringCellValue();
+                    ValueType valueType = typeDetector.detect(value);
 
-                    String maybeDate = dateNormalizerService.tryNormalize(value);
-                    if (maybeDate != null) yield maybeDate;
-
-                    String maybeNumber = numberNormalizerService.normalizeFormat(value);
-                    if (maybeNumber != null) yield maybeNumber;
-
-                    yield value;
+                    yield switch (valueType) {
+                        case NUMBER -> numberNormalizerService.normalizeFormat(value);
+                        case DATE -> dateNormalizerService.tryNormalize(value);
+                        case TEXT, TIMESTAMP, BOOLEAN, UUID -> value;
+                    };
                 }
                 case NUMERIC -> {
                     if (DateUtil.isCellDateFormatted(cell)) {
@@ -138,4 +141,3 @@ public class ExcelParsingService {
 
     }
 }
-

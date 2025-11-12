@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SplitRowStructure extends Structure {
+public class SplitCellStructure extends Structure {
 
-    public SplitRowStructure(Long id, int position, Long tableStructureId, String name, String description,
-                             Integer columnIndex, String delimiter, Integer startRow, Integer endRow) {
+    public SplitCellStructure(Long id, int position, Long tableStructureId, String name, String description,
+                              Integer columnIndex, String delimiter, Integer startRow, Integer endRow) {
         super(id, position, tableStructureId, name, description);
         this.columnIndex = columnIndex;
         this.delimiter = delimiter;

@@ -67,9 +67,9 @@ public class RemoveLeadingColumnConverterTest {
         };
 
         String[][] expected = {
-                {"*", null, "A", "B", "C"},
-                {"", "", "1", "2", "3"},
-                {"*", "", "X", "", "*"},
+                {"A", "B", "C"},
+                {"1", "2", "3"},
+                {"X", "", "*"},
         };
 
         String[][] result = converter.handleRequest(input);
@@ -79,13 +79,13 @@ public class RemoveLeadingColumnConverterTest {
     @Test
     void testRemoveLeadingColumnsConsideringBlacklist() {
         RemoveLeadingColumnStructureDto structureDto = new RemoveLeadingColumnStructureDto()
-                .blockList(List.of("*"));
+                .blockList(List.of("a"));
         RemoveLeadingColumnConverter converter = new RemoveLeadingColumnConverter(structureDto);
 
         String[][] input = {
-                {"", "*", null, "A", "B", "C"},
+                {"", "a", null, "A", "B", "C"},
                 {"", "", "", "1", "2", "3"},
-                {"", "*", "", "X", "", "*"},
+                {"", "a", "", "X", "", "*"},
         };
 
         System.out.println(Arrays.deepToString(input));

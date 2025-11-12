@@ -2,8 +2,6 @@ package de.uol.pgdoener.th1.domain.fileprocessing.helper;
 
 import org.springframework.stereotype.Service;
 
-import java.util.Locale;
-
 @Service
 public class NumberNormalizerService {
 
@@ -19,11 +17,9 @@ public class NumberNormalizerService {
      */
     public String formatNumeric(double number) {
         if (number == (long) number) {
-            return String.format(Locale.US, "%d", (long) number);
+            return String.valueOf((long) number);
         } else {
-            return String.format(Locale.US, "%.10f", number)
-                    .replaceAll("0+$", "")
-                    .replaceAll("\\.$", "");
+            return String.valueOf(number);
         }
     }
 
@@ -40,11 +36,18 @@ public class NumberNormalizerService {
      * @return a normalized numeric string, or {@code null} if the input contains letters or is invalid
      */
     public String normalizeFormat(String raw) {
-        if (raw == null || raw.matches(".*[a-zA-Z].*")) {
+        if (raw == null || raw.isBlank()) {
             return null;
         }
 
-        String input = raw.replaceAll("[^\\d.,-]", ""); // nur Ziffern, Punkt, Komma und Minuszeichen bleiben
+        StringBuilder sb = new StringBuilder(raw.length());
+        for (int i = 0; i < raw.length(); i++) {
+            char c = raw.charAt(i);
+            if (Character.isDigit(c) || c == '.' || c == ',' || c == '-') {
+                sb.append(c);
+            }
+        }
+        String input = sb.toString();
 
         boolean hasComma = input.contains(",");
         boolean hasDot = input.contains(".");

@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for generating table structure from a given input file.
@@ -34,18 +35,60 @@ public class GenerateTableStructureService {
     private final FileProcessingService fileProcessingService;
 
     /**
-     * Main entry point to generate a table structure from the input file.
+     * Generates a table structure from the given input file using the provided settings.
+     * <p>
+     * This is a convenience method that calls
+     * {@link #generateTableStructure(MultipartFile, TableStructureGenerationSettingsDto, Optional)}
+     * with {@link Optional#empty()} as the page parameter.
      *
-     * @return the generated table structure DTO.
+     * @param file     The uploaded file containing the table data (e.g., PDF, image, spreadsheet).
+     * @param settings Settings controlling table structure generation (e.g., max iterations, detection options).
+     * @return A {@link Pair} where:
+     * <ul>
+     *   <li>Left: the generated {@link TableStructureDto} representing the table layout</li>
+     *   <li>Right: a list of {@link ReportDto} containing unresolved or informational reports from analysis</li>
+     * </ul>
+     * @throws TableStructureGenerationException if table generation fails unexpectedly.
      */
     public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
             MultipartFile file, TableStructureGenerationSettingsDto settings
     ) {
+        return generateTableStructure(file, settings, Optional.empty());
+    }
+
+    /**
+     * Generates a table structure from the given input file, optionally targeting a specific page.
+     * <p>
+     * Steps:
+     * <ol>
+     *     <li>Processes the uploaded file into a string matrix (rows x columns).</li>
+     *     <li>Initializes a {@link TableStructureBuilder} with the provided settings.</li>
+     *     <li>If a partial table structure is provided, applies its converters to the matrix.</li>
+     *     <li>Iteratively analyzes the matrix, building and refining the table structure until:
+     *         <ul>
+     *             <li>No new structures are detected, or</li>
+     *             <li>The maximum number of iterations is reached.</li>
+     *         </ul>
+     *     </li>
+     * </ol>
+     *
+     * @param file     The uploaded file containing the table data.
+     * @param settings Settings controlling table structure generation.
+     * @param page     An optional page number to process (empty = all/default).
+     * @return A {@link Pair} where:
+     * <ul>
+     *   <li>Left: the generated {@link TableStructureDto} representing the table layout</li>
+     *   <li>Right: a list of {@link ReportDto} containing unresolved or informational reports from analysis</li>
+     * </ul>
+     * @throws TableStructureGenerationException if table generation fails unexpectedly.
+     */
+    public Pair<TableStructureDto, List<ReportDto>> generateTableStructure(
+            MultipartFile file, TableStructureGenerationSettingsDto settings, Optional<Integer> page
+    ) {
         try {
             log.debug("Start generating table structure for file: {}", file.getOriginalFilename());
             // read file
-            //String[][] matrix = inputFile.asStringArray();
-            String[][] matrix = fileProcessingService.process(file);
+            String[][] matrix = fileProcessingService.process(file, page);
 
             // setup defaults
             TableStructureBuilder tableStructureBuilder = new TableStructureBuilder(settings);

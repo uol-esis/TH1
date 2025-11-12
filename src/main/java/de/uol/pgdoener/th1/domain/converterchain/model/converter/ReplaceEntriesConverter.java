@@ -1,11 +1,13 @@
 package de.uol.pgdoener.th1.domain.converterchain.model.converter;
 
-import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import de.uol.pgdoener.th1.application.dto.ReplaceEntriesStructureDto;
+import de.uol.pgdoener.th1.domain.converterchain.model.Converter;
 import lombok.RequiredArgsConstructor;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 
 @RequiredArgsConstructor
 public class ReplaceEntriesConverter extends Converter {
@@ -37,15 +39,18 @@ public class ReplaceEntriesConverter extends Converter {
 
     private UnaryOperator<String> getMapper() {
         UnaryOperator<String> mapper = null;
+        final Optional<String> search = structure.getSearch();
+        final Optional<String> regexSearch = structure.getRegexSearch();
 
-        if (structure.getSearch().isPresent()) {
-            final String search = structure.getSearch().get();
+        if (search.isPresent()) {
+            final String s = search.get();
             final String replacement = structure.getReplacement();
-            mapper = value -> value.equals(search) ? replacement : value;
-        } else if (structure.getRegexSearch().isPresent()) {
-            final String regex = structure.getRegexSearch().get();
+            mapper = value -> value.equals(s) ? replacement : value;
+        } else if (regexSearch.isPresent()) {
+            final String regex = regexSearch.get();
             final String replacement = structure.getReplacement();
-            mapper = value -> value.matches(regex) ? replacement : value;
+            final Pattern pattern = Pattern.compile(regex);
+            mapper = value -> pattern.matcher(value).matches() ? replacement : value;
         } else {
             throwConverterException("Either search or regexSearch must be provided.");
         }

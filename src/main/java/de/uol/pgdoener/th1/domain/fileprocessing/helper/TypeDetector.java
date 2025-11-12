@@ -1,0 +1,85 @@
+package de.uol.pgdoener.th1.domain.fileprocessing.helper;
+
+import org.springframework.stereotype.Component;
+
+import java.util.regex.Pattern;
+
+@Component
+public class TypeDetector {
+
+    private static final Pattern UUID_PATTERN =
+            Pattern.compile("^[a-fA-F0-9]{8}-([a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}$");
+    private static final Pattern TIMESTAMP_PATTERN =
+            Pattern.compile("^(\\d{4}-\\d{2}-\\d{2}[ T]\\d{2}:\\d{2}:\\d{2}|\\d{14})$");
+    private static final Pattern DATE_PATTERN = Pattern.compile(
+            "^(" +
+                    "\\d{1,2}[./-]\\d{1,2}[./-]\\d{2,4}" +      // dd.MM.yyyy, dd/MM/yyyy, dd-MM-yyyy, d/M/yyyy, yy.MM.dd
+                    "|" +
+                    "\\d{4}[./-]\\d{1,2}[./-]\\d{1,2}" +        // yyyy.MM.dd, yyyy-MM-dd, yyyy/MM/dd
+                    "|" +
+                    "\\d{1,2}-[a-zA-Z]{3}-\\d{4}" +             // dd-MMM-yyyy
+                    ")$"
+    );
+
+    public ValueType detect(String raw) {
+        if (raw == null || raw.isBlank()) {
+            return ValueType.TEXT;
+        }
+        raw = raw.trim();
+        int length = raw.length();
+
+        if (isDate(raw, length)) return ValueType.DATE;
+
+        if (isUUID(raw, length)) return ValueType.UUID;
+
+        if (isTimestamp(raw, length)) return ValueType.TIMESTAMP;
+
+        if (isNumber(raw)) return ValueType.NUMBER;
+
+        return ValueType.TEXT;
+    }
+
+    private boolean isDate(String s, int length) {
+        if (length < 8 || length > 11) return false;
+        if (!s.contains(".") && !s.contains("/") && !s.contains("-")) return false;
+
+        return DATE_PATTERN.matcher(s).matches();
+    }
+
+    private boolean isUUID(String s, int length) {
+        if (length != 36) return false;
+        if (!s.contains("-")) return false;
+
+        return UUID_PATTERN.matcher(s).matches();
+    }
+
+    private boolean isTimestamp(String s, int length) {
+        if (length != 19 && length != 14) return false;
+
+        return TIMESTAMP_PATTERN.matcher(s).matches();
+    }
+
+    private boolean isNumber(String s) {
+        boolean hasDigit = false;
+
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isWhitespace(c) || c == '\u00A0') continue;
+            if (Character.isDigit(c)) {
+                hasDigit = true;
+                continue;
+            }
+            if (!isNumberSeparator(c, i)) return false;
+        }
+        return hasDigit;
+    }
+
+    private boolean isNumberSeparator(char c, int idx) {
+        return switch (c) {
+            case '.', ',', '\'', '€', '$', '%' -> true;
+            case '-', '+' -> idx == 0;
+            default -> false;
+        };
+    }
+
+}
