@@ -1,3 +1,6 @@
+> [!IMPORTANT]
+> Moved to [Monorepo](https://github.com/uol-esis/Th1nk)
+
 # TH1
 
 ## Building the project
